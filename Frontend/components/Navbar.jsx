@@ -1,0 +1,136 @@
+"use client";
+import React from 'react';
+import Link from 'next/link';
+import { useAuth } from '@/hooks/useAuth';
+import ThemeToggle from '@/app/components/ThemeToggle';
+import HeaderCategoryDropdown from '@/app/components/HeaderCategoryDropdown';
+import { useRouter, usePathname } from 'next/navigation';
+import toast from 'react-hot-toast';
+
+const Navbar = () => {
+  const { user, isLoggedIn, logout } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
+  const isAuthPage = pathname === '/login';
+
+  const [showUserMenu, setShowUserMenu] = React.useState(false);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Logged out successfully');
+      router.push('/');
+    } catch (error) {
+      toast.error('Logout failed');
+    }
+  };
+
+  return (
+    <nav className={`fixed top-0 w-full z-50 transition-all duration-700 ${isAuthPage ? 'bg-transparent border-transparent' : 'bg-surface/90 backdrop-blur-md border-b border-outline-variant'}`}>
+      <div className="flex justify-between items-center px-6 md:px-12 h-16 max-w-[1440px] mx-auto">
+        <div className="flex items-center gap-8 md:gap-12">
+          <Link href="/" className="text-3xl font-gothic text-primary tracking-wider drop-shadow-sm">
+            KaaliKahani
+          </Link>
+          <div className="hidden md:flex items-center gap-6 font-sans text-sm font-bold tracking-widest uppercase">
+            <HeaderCategoryDropdown />
+          </div>
+        </div>
+        
+        {/* Search Bar & Actions */}
+        <div className="flex items-center gap-4">
+          <div className="hidden lg:flex items-center bg-surface-container px-4 py-1.5 rounded-full border border-outline-variant w-56 transition-colors duration-300">
+            <span className="material-symbols-outlined text-on-surface-variant text-sm mr-2 flex items-center justify-center">search</span>
+            <input 
+              className="bg-transparent border-none focus:outline-none text-xs w-full placeholder:text-on-surface-variant flex items-center h-full outline-none text-on-surface" 
+              placeholder="Search stories..." 
+              type="text" 
+            />
+          </div>
+
+            <div className="flex items-center gap-4">
+              <ThemeToggle />
+              {isLoggedIn ? (
+                <div className="flex items-center gap-5">
+                  <div className="flex items-center gap-3">
+                    {user?.role === 'admin' && (
+                      <Link 
+                        href="/admin" 
+                        className="bg-primary/10 text-primary border border-primary/20 px-4 py-1.5 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-primary/20 transition-all flex items-center h-8"
+                      >
+                        Admin Desk
+                      </Link>
+                    )}
+                    <Link 
+                      href="/submit" 
+                      className="bg-white/5 text-on-surface-variant border border-white/10 px-4 py-1.5 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-white/10 transition-all flex items-center h-8"
+                    >
+                      New Story
+                    </Link>
+                  </div>
+                  
+                  {/* Cinematic Curator Dropdown */}
+                  <div className="relative pl-4 border-l border-white/10">
+                    <button 
+                      onClick={() => setShowUserMenu(!showUserMenu)}
+                      className="group relative flex items-center"
+                      title={`Curator: ${user?.name}`}
+                    >
+                      <div className="w-9 h-9 rounded-full ring-2 ring-white/10 ring-offset-2 ring-offset-black transition-all group-hover:ring-primary/50 overflow-hidden bg-surface-container-highest/30 backdrop-blur-xl flex items-center justify-center">
+                        {user?.avatar ? (
+                          <img src={user.avatar} alt={user.name} className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all" />
+                        ) : (
+                          <span className="material-symbols-outlined text-lg text-on-surface-variant group-hover:text-primary transition-colors">account_circle</span>
+                        )}
+                      </div>
+                      {/* Status Indicator */}
+                      <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-black"></div>
+                    </button>
+
+                    {/* Editorial Dropdown Menu */}
+                    {showUserMenu && (
+                      <div className="absolute top-12 right-0 w-48 bg-black/80 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl py-3 animate-in fade-in slide-in-from-top-2 duration-300 z-50 overflow-hidden">
+                        <div className="px-5 py-2 border-b border-white/5 mb-2">
+                          <p className="text-[8px] font-black text-primary uppercase tracking-[0.3em]">Curator Identified</p>
+                          <p className="text-[10px] text-white font-bold truncate max-w-full">{user?.name}</p>
+                        </div>
+                        
+                        <Link 
+                          href="/profile" 
+                          onClick={() => setShowUserMenu(false)}
+                          className="flex items-center gap-3 px-5 py-3 text-[9px] font-black uppercase tracking-[0.2em] text-on-surface-variant hover:text-white hover:bg-white/5 transition-all group"
+                        >
+                          <span className="material-symbols-outlined text-sm group-hover:text-primary transition-colors">person_search</span>
+                          Profile Archive
+                        </Link>
+                        
+                        <button 
+                          onClick={() => {
+                            handleLogout();
+                            setShowUserMenu(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-5 py-3 text-[9px] font-black uppercase tracking-[0.2em] text-red-500 hover:bg-red-500/10 transition-all border-t border-white/5 group"
+                        >
+                          <span className="material-symbols-outlined text-sm group-hover:animate-pulse">power_settings_new</span>
+                          Terminate Session
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <Link 
+                  href="/login" 
+                  className="bg-white/5 text-on-surface border border-white/10 px-6 py-2 rounded-full font-black text-[9px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all shadow-2xl backdrop-blur-xl flex items-center h-9"
+                >
+                  Initiate Access
+                </Link>
+              )}
+            </div>
+        </div>
+      </div>
+    </nav>
+  );
+};
+
+export default Navbar;

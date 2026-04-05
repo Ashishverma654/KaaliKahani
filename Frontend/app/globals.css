@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Epilogue', ui-sans-serif, system-ui, sans-serif;
+  --font-gothic: 'Pirata One', 'Cinzel Decorative', serif;
+  
+  --color-surface: var(--surface);
+  --color-surface-container-low: var(--surface-container-low);
+  --color-surface-container: var(--surface-container);
+  --color-surface-container-high: var(--surface-container-high);
+  
+  --color-primary: var(--primary);
+  --color-primary-container: var(--primary-container);
+  --color-on-primary-container: var(--on-primary-container);
+  
+  --color-on-surface: var(--on-surface);
+  --color-on-surface-variant: var(--on-surface-variant);
+  --color-outline-variant: var(--outline-variant);
+}
+
+:root {
+  /* LIGHT MODE */
+  --surface: #ffffff;
+  --surface-container-low: #f8f9fa;
+  --surface-container: #f1f3f5;
+  --surface-container-high: #e9ecef;
+  
+  --primary: #9e1b1b; 
+  --primary-container: #ffdad6;
+  --on-primary-container: #ffffff;
+  
+  --on-surface: #1c1b1b;
+  --on-surface-variant: #494456;
+  --outline-variant: #cbc3d9;
+}
+
+.dark {
+  /* DARK MODE (Gothic Horror from Reference) */
+  --surface: #030303;
+  --surface-container-low: #0a0a0a;
+  --surface-container: #111111;
+  --surface-container-high: #1a1a1a;
+  
+  --primary: #9e1b1b; 
+  --primary-container: #5c0000;
+  --on-primary-container: #ffffff;
+  
+  --on-surface: #e5e5e5;
+  --on-surface-variant: #8c8c8c;
+  --outline-variant: #262626; 
+}
+
+body {
+  background-color: var(--surface);
+  color: var(--on-surface);
+  transition: background-color 0.4s ease, color 0.4s ease;
+}
+
+* {
+  border-color: var(--outline-variant);
+}
+
+/* Custom Jagged Frame Simulation for the Gothic Cards */
+.gothic-frame {
+  border: 4px solid var(--surface-container-high);
+  background-color: var(--surface-container-low);
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.05), 0 10px 30px rgba(0,0,0,0.05);
+  position: relative;
+  transition: background-color 0.4s ease, border-color 0.4s ease;
+}
+
+.dark .gothic-frame {
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.4), 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.gothic-frame::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 1px solid var(--outline-variant);
+  opacity: 0.5;
+  pointer-events: none;
+}
