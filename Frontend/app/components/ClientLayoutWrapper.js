@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { usePathname } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
@@ -42,7 +42,9 @@ export default function ClientLayoutWrapper({ children }) {
 
   return (
     <>
-      <Navbar />
+      <Suspense fallback={null}>
+        <Navbar />
+      </Suspense>
       <div className={`${isAuthPage ? '' : 'pt-16'} min-h-screen relative z-10 transition-colors duration-300`}>
         {children}
       </div>

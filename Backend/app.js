@@ -30,6 +30,16 @@ app.use('/api/admin', adminRoutes);
 const adminController = require('./controllers/adminController');
 app.get('/api/settings/public', adminController.getPublicSettings);
 
+// Production Landing Heartbeat (Render/Deploy Fix)
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'Operational',
+    message: 'KaaliKahani Editorial Registry is online.',
+    version: '2.0.4',
+    timestamp: new Date().toISOString()
+  });
+});
+
 // Global Error Handler Array (Must be at the bottom of the map)
 app.use(errorHandler);
 

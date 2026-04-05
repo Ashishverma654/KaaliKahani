@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { Suspense } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import ThemeToggle from '@/app/components/ThemeToggle';
@@ -33,7 +33,9 @@ const Navbar = () => {
             KaaliKahani
           </Link>
           <div className="hidden md:flex items-center gap-6 font-sans text-sm font-bold tracking-widest uppercase">
-            <HeaderCategoryDropdown />
+            <Suspense fallback={<div className="text-[10px] font-bold tracking-widest uppercase opacity-50">Loading...</div>}>
+              <HeaderCategoryDropdown />
+            </Suspense>
           </div>
         </div>
         

@@ -4,7 +4,8 @@ import path from 'path';
 const nextConfig = {
   serverExternalPackages: [],
   turbopack: {
-    root: path.resolve('.'),
+    // Only apply turbopack root locally to avoid Vercel build-root conflicts map
+    root: process.env.NODE_ENV === 'development' ? path.resolve('.') : undefined,
   },
 };
 
