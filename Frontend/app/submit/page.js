@@ -41,7 +41,8 @@ export default function SubmitStory() {
       newImages[slotIndex] = res.data.data.imageUrl;
       setImages(newImages);
     } catch (err) {
-      setError(`Slot ${slotIndex + 1} Uplink Failed: Please try a different frequency.`);
+      const serverMessage = err.response?.data?.message || 'Please try a different frequency.';
+      setError(`Slot ${slotIndex + 1} Uplink Failed: ${serverMessage}`);
     } finally {
       setUploadingSlot(null);
     }
@@ -212,8 +213,7 @@ export default function SubmitStory() {
             <button 
               type="button" 
               onClick={handleAIAnalyze}
-              onMouseEnter={() => setFormData({...formData})} // Force re-render for glow effect
-              className={`flex items-center gap-2 group transition-all px-4 py-1 rounded-lg ${isAnalyzing ? 'animate-pulse' : ''}`}
+              className={`relative flex items-center gap-2 group transition-all px-4 py-1 rounded-lg ${isAnalyzing ? 'animate-pulse' : ''}`}
             >
                <span className={`material-symbols-outlined text-sm ${isAnalyzing ? 'text-primary animate-spin' : 'text-on-surface-variant group-hover:text-primary'}`}>
                  {isAnalyzing ? 'sync' : 'auto_fix'}
@@ -221,7 +221,7 @@ export default function SubmitStory() {
                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant group-hover:text-white">
                  {isAnalyzing ? 'Consulting Archive...' : 'AI Sense Analysis'}
                </span>
-               <div className="absolute inset-0 bg-primary/5 rounded-lg filter blur-lg opacity-0 group-hover:opacity-100 transition-opacity"></div>
+               <div className="absolute inset-0 bg-primary/5 rounded-lg filter blur-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
             </button>
           </div>
           <textarea 
