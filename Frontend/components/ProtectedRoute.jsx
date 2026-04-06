@@ -11,9 +11,9 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   useEffect(() => {
     // Identity Guard: Final verification before rendering quadrant map map map
     if (isSettled && !isLoggedIn) {
-      router.push(`/login?from=${encodeURIComponent(pathname)}`);
+      router.replace(`/login?from=${encodeURIComponent(pathname)}`);
     } else if (isSettled && isLoggedIn && adminOnly && !isAdmin) {
-      router.push('/');
+      router.replace('/');
     }
   }, [isLoggedIn, isAdmin, isSettled, adminOnly, router, pathname]);
 

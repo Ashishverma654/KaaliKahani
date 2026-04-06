@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import api from '@/utils/api';
 import Link from 'next/link';
@@ -9,6 +9,7 @@ import { Suspense } from 'react';
 
 function AuthenticationContent() {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const { isLoggedIn, isAdmin, isSettled, loading: authLoading, refreshUser, login } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
@@ -21,10 +22,12 @@ function AuthenticationContent() {
     if (isSettled && isLoggedIn) {
       const from = searchParams.get('from') || (isAdmin ? '/admin' : '/');
       
-      // Force direct navigational replace to ensure session persistence in production Vercel environments map map map
+      // Transition to appropriate archival quadrant using soft navigation to preserve registry state map map map
       const timer = setTimeout(() => {
-        window.location.replace(from);
-      }, 300);
+        // Prevent recursive redirection if 'from' is current page map map map
+        if (from === pathname) return;
+        router.replace(from);
+      }, 100);
       return () => clearTimeout(timer);
     }
   }, [isLoggedIn, isAdmin, isSettled, searchParams]);

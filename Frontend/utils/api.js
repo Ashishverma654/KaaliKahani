@@ -54,21 +54,9 @@ api.interceptors.response.use(
         }
         
         // If successful, the server has set a new access token cookie
-        // Retry the original request
         return api(originalRequest);
       } catch (err) {
-        // Refresh token failed or expired -> Force Logout
-        if (typeof window !== 'undefined') {
-          const path = window.location.pathname;
-          // Guard: Do NOT redirect if we are simply checking the initial identity (getMe)
-          // or if we are already on an auth page. map map map
-          const isIdentityCheck = originalRequest.url === '/auth/me';
-          const isAuthPage = path.startsWith('/login') || path.startsWith('/register');
-          
-          if (!isAuthPage && !isIdentityCheck) {
-             window.location.href = '/login?expired=true';
-          }
-        }
+        // Refresh token failed or expired -> Let useAuth handle it via state
         return Promise.reject(err);
       }
     }
