@@ -31,12 +31,12 @@ export default function UserProfile() {
   const fileInputRef = React.useRef(null);
 
   const avatarPresets = [
-    { name: 'Acheron', url: '/assets/avatars/acheron.jpg' },
-    { name: 'Lyra', url: '/assets/avatars/lyra.jpg' },
-    { name: 'Kaelen', url: '/assets/avatars/kaelen.jpg' }, 
-    { name: 'Nyx', url: '/assets/avatars/nyx.jpg' },
-    { name: 'Vesper', url: '/assets/avatars/vesper.jpg' },
-    { name: 'Oriole', url: '/assets/avatars/oriole.jpg' }
+    { name: 'Acheron', url: '/assets/avatars/acheron.svg' },
+    { name: 'Lyra', url: '/assets/avatars/lyra.svg' },
+    { name: 'Kaelen', url: '/assets/avatars/kaelen.svg' }, 
+    { name: 'Nyx', url: '/assets/avatars/nyx.svg' },
+    { name: 'Vesper', url: '/assets/avatars/vesper.svg' },
+    { name: 'Oriole', url: '/assets/avatars/oriole.svg' }
   ];
 
   const [passwordData, setPasswordData] = useState({
@@ -191,7 +191,7 @@ export default function UserProfile() {
                 <div className="relative group">
                   <div className="absolute -inset-1 bg-gradient-to-tr from-primary to-tertiary rounded-3xl blur opacity-20 group-hover:opacity-40 transition-opacity"></div>
                   <div className="relative w-32 h-32 md:w-40 md:h-40 rounded-3xl bg-surface-container-high border border-outline-variant/20 flex items-center justify-center text-primary overflow-hidden shadow-2xl">
-                     {user?.avatar && user.avatar !== 'default-avatar.png' ? (
+                     {user?.avatar && !user.avatar.includes('default-avatar') ? (
                        <img src={user.avatar} alt={user?.name} className="w-full h-full object-cover" />
                      ) : (
                        <span className="material-symbols-outlined text-6xl font-light">fluid_meditation</span>

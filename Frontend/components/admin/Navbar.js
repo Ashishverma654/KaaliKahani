@@ -44,7 +44,7 @@ const Navbar = ({ isCollapsed }) => {
             
             <Link href="/profile" className="group">
               <div className="w-9 h-9 rounded-xl overflow-hidden grayscale group-hover:grayscale-0 transition-all border border-white/5 group-hover:border-primary/50 shadow-2xl relative">
-                {user?.avatar && user.avatar !== 'default-avatar.png' ? (
+                {user?.avatar && !user.avatar.includes('default-avatar') ? (
                   <img src={user.avatar} alt={user?.name} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-surface-container-highest/30 flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">

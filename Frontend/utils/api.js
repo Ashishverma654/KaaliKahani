@@ -40,7 +40,10 @@ api.interceptors.response.use(
         // Attempt to refresh the access token via the refresh token cookie or localStorage
         const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null;
         const useRefreshToken = refreshToken && refreshToken !== 'undefined' && refreshToken !== 'null';
-        const refreshPayload = useRefreshToken ? { refreshToken } : undefined;
+        if (!useRefreshToken) {
+          return Promise.reject(error);
+        }
+        const refreshPayload = { refreshToken };
         const refreshRes = await api.post('/auth/refresh', refreshPayload);
 
         const newAccessToken = refreshRes?.data?.data?.accessToken;
