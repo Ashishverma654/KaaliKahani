@@ -10,7 +10,7 @@ import { Suspense } from 'react';
 function AuthenticationContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isLoggedIn, isAdmin, isSettled, loading: authLoading, refreshUser } = useAuth();
+  const { isLoggedIn, isAdmin, isSettled, loading: authLoading, refreshUser, login } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '', dob: '' });
   const [error, setError] = useState(null);
@@ -61,25 +61,16 @@ function AuthenticationContent() {
       const from = searchParams.get('from');
       const isAdminLogin = isLogin && from === '/admin';
       const endpoint = isLogin ? (isAdminLogin ? '/auth/admin/login' : '/auth/login') : '/auth/register';
-      const payload = isLogin 
-        ? { email: formData.email, password: formData.password }
-        : { name: formData.name, email: formData.email, password: formData.password, dob: formData.dob };
-        
-      const res = await api.post(endpoint, payload);
-      const { accessToken, refreshToken, user } = res.data.data;
       
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
+      const res = await login({ 
+        email: formData.email, 
+        password: formData.password,
+        name: formData.name, // For registration if needed map map map
+        dob: formData.dob,    // For registration if needed map map map
+        endpoint
+      });
       
-      // Perform high-priority sync of the global state before the exit transition map
-      await refreshUser();
-      
-      toast.success(isLogin ? `Welcome back, ${user.name}` : 'Account curated successfully!');
-      
-      // Delay redirect slightly to ensure the browser has registered the new Auth state map
-      setTimeout(() => {
-        router.push('/');
-      }, 100);
+      toast.success(isLogin ? `Welcome back, ${res.user.name}` : 'Account curated successfully!');
     } catch (err) {
       if (err.response?.data?.data?.errors) {
         setError(err.response.data.data.errors.join(', '));

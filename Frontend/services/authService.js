@@ -1,8 +1,8 @@
 import api from '../utils/api';
 
 const authService = {
-  login: async (credentials) => {
-    const response = await api.post('/auth/login', credentials);
+  login: async (credentials, endpoint = '/auth/login') => {
+    const response = await api.post(endpoint, credentials);
     return response.data.data;
   },
 
