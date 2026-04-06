@@ -9,14 +9,11 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (isSettled) {
-      if (!isLoggedIn) {
-        // Redirection Vector: Force identity registry check map map map
-        router.push(`/login?from=${encodeURIComponent(pathname)}`);
-      } else if (adminOnly && !isAdmin) {
-        // Clearance Breach: Redirect to home archival quadrant map map map
-        router.push('/');
-      }
+    // Identity Guard: Final verification before rendering quadrant map map map
+    if (isSettled && !isLoggedIn) {
+      router.push(`/login?from=${encodeURIComponent(pathname)}`);
+    } else if (isSettled && isLoggedIn && adminOnly && !isAdmin) {
+      router.push('/');
     }
   }, [isLoggedIn, isAdmin, isSettled, adminOnly, router, pathname]);
 

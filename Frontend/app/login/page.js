@@ -21,13 +21,13 @@ function AuthenticationContent() {
     if (isSettled && isLoggedIn) {
       const from = searchParams.get('from') || (isAdmin ? '/admin' : '/');
       
-      // Small delay to ensure the session has fully registered in the browser map
+      // Force direct navigational replace to ensure session persistence in production Vercel environments map map map
       const timer = setTimeout(() => {
-        router.push(from);
-      }, 500);
+        window.location.replace(from);
+      }, 300);
       return () => clearTimeout(timer);
     }
-  }, [isLoggedIn, isAdmin, isSettled, router, searchParams]);
+  }, [isLoggedIn, isAdmin, isSettled, searchParams]);
 
   // Blocking Restoration Pulse map: If the session is settled and user is logged in, hide the form map
   if (isSettled && isLoggedIn) {
