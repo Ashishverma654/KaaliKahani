@@ -27,17 +27,39 @@ export function AuthProvider({ children }) {
       if (data) {
         setUser(data);
         setStatus('AUTHENTICATED');
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('userCache', JSON.stringify(data));
+        }
       } else {
         setUser(null);
         setStatus('UNAUTHENTICATED');
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('userCache');
+        }
       }
     } catch (err) {
       setUser(null);
       setStatus('UNAUTHENTICATED');
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('userCache');
+      }
     }
   };
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('accessToken');
+      const cached = localStorage.getItem('userCache');
+      if (token && cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          setUser(parsed);
+          setStatus('AUTHENTICATED');
+        } catch {
+          localStorage.removeItem('userCache');
+        }
+      }
+    }
     refreshUser();
   }, []);
 
@@ -46,6 +68,7 @@ export function AuthProvider({ children }) {
     if (typeof window !== 'undefined') {
       if (data?.accessToken) localStorage.setItem('accessToken', data.accessToken);
       if (data?.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+      if (data?.user) localStorage.setItem('userCache', JSON.stringify(data.user));
     }
     setUser(data.user);
     setStatus('AUTHENTICATED');
@@ -57,6 +80,7 @@ export function AuthProvider({ children }) {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('userCache');
     }
     setUser(null);
     setStatus('UNAUTHENTICATED');
