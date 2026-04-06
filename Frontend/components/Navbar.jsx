@@ -8,7 +8,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 const Navbar = () => {
-  const { user, isLoggedIn, logout } = useAuth();
+  const { user, isLoggedIn, isAdmin, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const isAuthPage = pathname === '/login';
@@ -55,7 +55,7 @@ const Navbar = () => {
               {isLoggedIn ? (
                 <div className="flex items-center gap-5">
                   <div className="flex items-center gap-3">
-                    {user?.role === 'admin' && (
+                    {isAdmin && (
                       <Link 
                         href="/admin" 
                         className="bg-primary/10 text-primary border border-primary/20 px-4 py-1.5 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-primary/20 transition-all flex items-center h-8"

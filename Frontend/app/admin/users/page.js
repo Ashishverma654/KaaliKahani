@@ -176,7 +176,7 @@ export default function UserManagement() {
                  </div>
               </td>
               <td className="py-5">
-                 <span className={`text-[10px] font-black uppercase tracking-widest ${user.role === 'admin' ? 'text-primary' : 'text-on-surface-variant'}`}>
+                 <span className={`text-[10px] font-black uppercase tracking-widest ${['admin', 'superadmin'].includes(user.role) ? 'text-primary' : 'text-on-surface-variant'}`}>
                     {user.role}
                  </span>
               </td>
