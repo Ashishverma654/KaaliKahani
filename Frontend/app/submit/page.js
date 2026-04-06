@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import api from '@/utils/api';
 import { useAuth } from '@/hooks/useAuth';
@@ -7,7 +7,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import storyService from '@/services/storyService';
 import seriesService from '@/services/seriesService';
 
-export default function SubmitStory() {
+function SubmitStoryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAdmin } = useAuth();
@@ -465,5 +465,18 @@ export default function SubmitStory() {
         </form>
       </main>
     </ProtectedRoute>
+  );
+}
+
+export default function SubmitStory() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center space-y-8 animate-pulse">
+        <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-[10px] font-black tracking-[0.5em] uppercase text-on-surface-variant/40">Synchronizing Draft Registry...</p>
+      </div>
+    }>
+      <SubmitStoryContent />
+    </Suspense>
   );
 }
