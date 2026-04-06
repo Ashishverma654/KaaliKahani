@@ -66,9 +66,10 @@ const Navbar = () => {
                     {isAdmin && (
                       <Link 
                         href="/admin" 
-                        className="bg-primary/10 text-primary border border-primary/20 px-4 py-1.5 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-primary/20 transition-all flex items-center h-8"
+                        className="bg-primary/10 text-primary border border-primary/20 px-4 py-1.5 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-primary/20 transition-all flex items-center gap-2 h-8"
                       >
-                        Admin Desk
+                        <span>Admin Dashboard</span>
+                        <span className="bg-primary/20 text-primary px-2 py-0.5 rounded-full text-[7px] tracking-[0.2em]">Direct</span>
                       </Link>
                     )}
                     <Link 
