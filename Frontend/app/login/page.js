@@ -8,11 +8,18 @@ import toast from 'react-hot-toast';
 
 export default function AuthenticatonPortal() {
   const router = useRouter();
-  const { refreshUser } = useAuth();
+  const { isLoggedIn, loading: authLoading, refreshUser } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '', dob: '' });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  // Identity Guard: Prevent logged-in users from accessing the portal map
+  React.useEffect(() => {
+    if (!authLoading && isLoggedIn) {
+      router.push('/');
+    }
+  }, [isLoggedIn, authLoading, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -39,16 +46,15 @@ export default function AuthenticatonPortal() {
       localStorage.setItem('accessToken', accessToken);
       localStorage.setItem('refreshToken', refreshToken);
       
-      // Refresh the global auth state before redirecting
+      // Perform high-priority sync of the global state before the exit transition map
       await refreshUser();
       
       toast.success(isLogin ? `Welcome back, ${user.name}` : 'Account curated successfully!');
       
-      if (user?.role === 'admin') {
-        router.push('/admin');
-      } else {
+      // Delay redirect slightly to ensure the browser has registered the new Auth state map
+      setTimeout(() => {
         router.push('/');
-      }
+      }, 100);
     } catch (err) {
       if (err.response?.data?.data?.errors) {
         setError(err.response.data.data.errors.join(', '));

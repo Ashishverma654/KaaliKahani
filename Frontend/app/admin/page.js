@@ -5,15 +5,29 @@ import Table from '@/components/admin/Table';
 import NarrativeGraph from '@/components/admin/NarrativeGraph';
 import adminService from '@/services/adminService';
 import api from '@/utils/api';
-import toast from 'react-hot-toast';
+import { useAuth } from '@/hooks/useAuth';
+import { useRouter } from 'next/navigation';
 
 export default function AdminDashboard() {
+  const { user, isAdmin, loading: authLoading } = useAuth();
+  const router = useRouter();
   const [stats, setStats] = useState(null);
   const [stories, setStories] = useState([]);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Auth Guard Execution map
   useEffect(() => {
+    if (!authLoading && !isAdmin) {
+      toast.error('Identity Conflict: Administrative access denied.');
+      router.push('/login');
+    }
+  }, [authLoading, isAdmin, router]);
+
+  useEffect(() => {
+    // Only proceed with data fetch if the identity is confirmed map
+    if (authLoading || !isAdmin) return;
+    
     const fetchDashboardData = async () => {
       try {
         const [statsData, storiesData, logsData] = await Promise.all([
