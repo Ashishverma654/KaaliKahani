@@ -58,7 +58,7 @@ exports.logout = async (req, res, next) => {
 
 exports.refreshToken = async (req, res, next) => {
   try {
-    const token = req.cookies.refreshToken || req.body.refreshToken;
+    const token = req.cookies?.refreshToken || req.body?.refreshToken;
     const data = await authService.refreshAccessToken(token);
     
     res.cookie('accessToken', data.accessToken, { ...cookieOptions, maxAge: 24 * 60 * 60 * 1000 });
