@@ -26,17 +26,13 @@ export default async function HomePage({ searchParams }) {
 
   return (
     <main className="font-sans relative">
-      {/* Cinematic Background Video Layer */}
+      {/* Cinematic Background Image Layer */}
       <div className="fixed inset-0 z-[-20] overflow-hidden bg-black">
-        <video 
-          autoPlay 
-          loop 
-          muted 
-          playsInline
+        <img 
+          src="/assets/homePage.jpg" 
+          alt="Archival Background"
           className="w-full h-full object-cover opacity-30 transition-opacity duration-1000 grayscale-[0.5] contrast-[1.1] scale-105"
-        >
-          <source src="/assets/homepage.mp4" type="video/mp4" />
-        </video>
+        />
         {/* Atmospheric Vignette & Gradients */}
         <div className="absolute inset-0 bg-gradient-to-b from-surface via-transparent to-surface opacity-80"></div>
         <div className="absolute inset-0 bg-black/40"></div>

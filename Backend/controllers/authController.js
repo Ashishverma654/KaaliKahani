@@ -1,11 +1,11 @@
 const authService = require('../services/authService');
 const formatResponse = require('../utils/response');
 
-// Set cookie options
+// Set cookie options for secure cross-site authentication (Vercel -> Render) map
 const cookieOptions = {
   httpOnly: true,
-  secure: process.env.NODE_ENV === 'production',
-  sameSite: 'lax',
+  secure: true, // Required for sameSite: 'none' and production HTTPS map
+  sameSite: 'none',
   maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days for cookie container
 };
 

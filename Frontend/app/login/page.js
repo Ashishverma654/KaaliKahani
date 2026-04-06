@@ -64,18 +64,14 @@ export default function AuthenticatonPortal() {
   return (
     <main className="min-h-screen flex items-center justify-center p-6 selection:bg-primary/20 transition-all duration-700 relative overflow-hidden bg-black">
       
-      {/* Cinematic Background Video Layer */}
+      {/* Cinematic Background Image Layer */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <video 
+        <img 
           key={isLogin ? 'login-bg' : 'register-bg'}
-          autoPlay 
-          loop 
-          muted 
-          playsInline
+          src={isLogin ? "/assets/loginPage.jpg" : "/assets/registerationPage.jpg"} 
+          alt="Auth Background"
           className="w-full h-full object-cover opacity-40 transition-opacity duration-1000"
-        >
-          <source src={isLogin ? "/assets/login-bg.mp4" : "/assets/register-bg.mp4"} type="video/mp4" />
-        </video>
+        />
         {/* Cinematic Vignette */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/80"></div>
       </div>
