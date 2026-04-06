@@ -35,8 +35,12 @@ api.interceptors.response.use(
         // Refresh token failed or expired -> Force Logout
         if (typeof window !== 'undefined') {
           const path = window.location.pathname;
-          // Guard: Do not redirect if we are already on an auth page or if the current path is /login
-          if (!path.startsWith('/login') && !path.startsWith('/register')) {
+          // Guard: Do NOT redirect if we are simply checking the initial identity (getMe)
+          // or if we are already on an auth page. map map map
+          const isIdentityCheck = originalRequest.url === '/auth/me';
+          const isAuthPage = path.startsWith('/login') || path.startsWith('/register');
+          
+          if (!isAuthPage && !isIdentityCheck) {
              window.location.href = '/login?expired=true';
           }
         }

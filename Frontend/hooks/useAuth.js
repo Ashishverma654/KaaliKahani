@@ -16,19 +16,21 @@ const AuthContext = createContext({
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [isSettled, setIsSettled] = useState(false);
+  const [status, setStatus] = useState('LOADING'); // 'LOADING' | 'AUTHENTICATED' | 'UNAUTHENTICATED'
 
   const refreshUser = async () => {
     try {
       const data = await authService.getMe();
-      setUser(data);
+      if (data) {
+        setUser(data);
+        setStatus('AUTHENTICATED');
+      } else {
+        setUser(null);
+        setStatus('UNAUTHENTICATED');
+      }
     } catch (err) {
-      // 401 is normal for guest users, silenlty ignore and set user to null
       setUser(null);
-    } finally {
-      setLoading(false);
-      setIsSettled(true);
+      setStatus('UNAUTHENTICATED');
     }
   };
 
@@ -39,26 +41,27 @@ export function AuthProvider({ children }) {
   const login = async (credentials) => {
     const data = await authService.login(credentials);
     setUser(data.user);
-    setIsSettled(true);
+    setStatus('AUTHENTICATED');
     return data;
   };
 
   const logout = async () => {
     await authService.logout();
     setUser(null);
-    setIsSettled(true);
+    setStatus('UNAUTHENTICATED');
   };
 
   const value = React.useMemo(() => ({
     user,
-    loading,
-    isSettled,
-    isLoggedIn: !!user,
-    isAdmin: user?.role === 'admin',
+    status,
+    loading: status === 'LOADING',
+    isSettled: status !== 'LOADING',
+    isLoggedIn: status === 'AUTHENTICATED',
+    isAdmin: status === 'AUTHENTICATED' && user?.role === 'admin',
     login,
     logout,
     refreshUser
-  }), [user, loading, isSettled]);
+  }), [user, status]);
 
   return (
     <AuthContext.Provider value={value}>
