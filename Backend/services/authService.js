@@ -102,7 +102,8 @@ exports.loginAdmin = async (email, password) => {
   
   // Verify admin status post-login verification
   const user = await User.findOne({ email });
-  if (user?.role !== 'admin' && user?.role !== 'superadmin') {
+  const role = (user?.role || '').toLowerCase().replace(/[^a-z]/g, '');
+  if (role !== 'admin' && role !== 'superadmin') {
     throw new Error('Access denied. Administrative privileges required for this endpoint.');
   }
 

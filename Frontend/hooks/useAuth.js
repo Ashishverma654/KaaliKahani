@@ -86,17 +86,24 @@ export function AuthProvider({ children }) {
     setStatus('UNAUTHENTICATED');
   };
 
-  const value = React.useMemo(() => ({
-    user,
-    status,
-    loading: status === 'LOADING',
-    isSettled: status !== 'LOADING',
-    isLoggedIn: status === 'AUTHENTICATED',
-    isAdmin: status === 'AUTHENTICATED' && (user?.role === 'admin' || user?.role === 'superadmin'),
-    login,
-    logout,
-    refreshUser
-  }), [user, status]);
+  const value = React.useMemo(() => {
+    const normalizeRole = (role) => {
+      if (!role) return '';
+      return String(role).toLowerCase().replace(/[^a-z]/g, '');
+    };
+    const role = normalizeRole(user?.role);
+    return {
+      user,
+      status,
+      loading: status === 'LOADING',
+      isSettled: status !== 'LOADING',
+      isLoggedIn: status === 'AUTHENTICATED',
+      isAdmin: status === 'AUTHENTICATED' && (role === 'admin' || role === 'superadmin'),
+      login,
+      logout,
+      refreshUser
+    };
+  }, [user, status]);
 
   return (
     <AuthContext.Provider value={value}>
