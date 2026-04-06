@@ -20,7 +20,10 @@ export function AuthProvider({ children }) {
 
   const refreshUser = async () => {
     try {
-      const data = await authService.getMe();
+      const data = await Promise.race([
+        authService.getMe(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Auth timeout')), 8000))
+      ]);
       if (data) {
         setUser(data);
         setStatus('AUTHENTICATED');
