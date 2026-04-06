@@ -79,3 +79,28 @@ exports.getMe = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.updateProfile = async (req, res, next) => {
+  try {
+    const user = await authService.updateUser(req.user._id, req.body);
+    return formatResponse(res, 200, 'Profile updated successfully', { user });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.changePassword = async (req, res, next) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    await authService.changePassword(req.user._id, currentPassword, newPassword);
+    
+    // Clear cookies for all sessions (User needs to re-login on current device too)
+    const cookieOptions = { httpOnly: true, secure: true, sameSite: 'none' };
+    res.cookie('accessToken', 'none', { ...cookieOptions, expires: new Date(0) });
+    res.cookie('refreshToken', 'none', { ...cookieOptions, expires: new Date(0) });
+
+    return formatResponse(res, 200, 'Password rotated successfully. All sessions terminated.');
+  } catch (error) {
+    next(error);
+  }
+};

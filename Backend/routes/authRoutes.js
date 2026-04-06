@@ -51,6 +51,12 @@ router.post(
 // Get current logged in user
 router.get('/me', protect, authController.getMe);
 
+// Update profile
+router.put('/profile', protect, authController.updateProfile);
+
+// Change password
+router.post('/change-password', protect, authController.changePassword);
+
 // Logout
 router.post('/logout', authController.logout);
 

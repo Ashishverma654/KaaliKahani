@@ -14,6 +14,7 @@ router.get('/pending', adminController.getPendingStories);
 
 router.put('/stories/:id/approve', adminController.approveStory);
 router.put('/stories/:id/reject', adminController.rejectStory);
+router.put('/stories/:id', adminController.updateStory);
 router.delete('/stories/:id', adminController.deleteStory);
 
 router.get('/users', adminController.getUsers);

@@ -6,6 +6,7 @@ import authService from '../services/authService';
 const AuthContext = createContext({
   user: null,
   loading: true,
+  isSettled: false,
   isLoggedIn: false,
   isAdmin: false,
   login: async () => {},
@@ -16,6 +17,7 @@ const AuthContext = createContext({
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isSettled, setIsSettled] = useState(false);
 
   const refreshUser = async () => {
     try {
@@ -26,6 +28,7 @@ export function AuthProvider({ children }) {
       setUser(null);
     } finally {
       setLoading(false);
+      setIsSettled(true);
     }
   };
 
@@ -36,17 +39,20 @@ export function AuthProvider({ children }) {
   const login = async (credentials) => {
     const data = await authService.login(credentials);
     setUser(data.user);
+    setIsSettled(true);
     return data;
   };
 
   const logout = async () => {
     await authService.logout();
     setUser(null);
+    setIsSettled(true);
   };
 
   const value = {
     user,
     loading,
+    isSettled,
     isLoggedIn: !!user,
     isAdmin: user?.role === 'admin',
     login,

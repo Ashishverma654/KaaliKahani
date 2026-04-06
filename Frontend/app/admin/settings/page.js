@@ -58,10 +58,10 @@ export default function AdminSettings() {
       <header className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <h1 className="text-4xl font-black font-display tracking-tight text-on-surface flex items-center gap-4 pt-8 pb-2 leading-relaxed">
-            <span className="material-symbols-outlined text-primary text-4xl">settings_account_box</span>
-            Registry Configuration
+            <span className="material-symbols-outlined text-primary text-4xl">terminal</span>
+            System Protocols
           </h1>
-          <p className="text-on-surface-variant text-sm mt-2 font-medium">Calibrate the global narrative protocols and archival visibility.</p>
+          <p className="text-on-surface-variant text-sm mt-2 font-medium">Calibrate high-tier archival intelligence and narrative gatekeeping.</p>
         </div>
       </header>
 
@@ -75,22 +75,8 @@ export default function AdminSettings() {
         
         {/* Core Protocols */}
         <div className="space-y-8">
-          <Card title="Operational Protocols" icon="security">
+          <Card title="Operational Intelligence" icon="security">
             <div className="space-y-6 pt-4">
-               {/* Maintenance Mode */}
-               <div className="flex items-center justify-between p-4 rounded-2xl bg-surface-bright/5 hover:bg-surface-bright/10 transition-colors border border-outline-variant/30">
-                  <div>
-                    <p className="text-on-surface font-bold text-sm">Archival Maintenance Mode</p>
-                    <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mt-1">Status: {settings.maintenanceMode ? 'ACTIVE BREACH' : 'STABLE'}</p>
-                  </div>
-                  <button 
-                    onClick={() => handleUpdate('maintenanceMode', !settings.maintenanceMode)}
-                    className={`w-14 h-7 rounded-full relative transition-all duration-500 ${settings.maintenanceMode ? 'bg-primary shadow-[0_0_15px_rgba(163,29,29,0.5)]' : 'bg-surface-container-highest'}`}
-                  >
-                     <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all duration-500 ${settings.maintenanceMode ? 'left-8' : 'left-1'}`}></div>
-                  </button>
-               </div>
-
                {/* AI Intelligence Access */}
                <div className="flex items-center justify-between p-4 rounded-2xl bg-surface-bright/5 hover:bg-surface-bright/10 transition-colors border border-outline-variant/30">
                   <div>
@@ -104,47 +90,7 @@ export default function AdminSettings() {
                      <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all duration-500 ${settings.allowAIAnalysis ? 'left-8' : 'left-1'}`}></div>
                   </button>
                </div>
-
-               {/* Public Archive Visibility */}
-               <div className="flex items-center justify-between p-4 rounded-2xl bg-surface-bright/5 hover:bg-surface-bright/10 transition-colors border border-outline-variant/30">
-                  <div>
-                    <p className="text-on-surface font-bold text-sm">Public Archive Visibility</p>
-                    <p className="text-[10px] text-on-surface-variant uppercase tracking-widest mt-1">Status: {settings.archivePublicAccess ? 'OPEN' : 'RESTRICTED'}</p>
-                  </div>
-                  <button 
-                    onClick={() => handleUpdate('archivePublicAccess', !settings.archivePublicAccess)}
-                    className={`w-14 h-7 rounded-full relative transition-all duration-500 ${settings.archivePublicAccess ? 'bg-primary' : 'bg-surface-container-highest'}`}
-                  >
-                     <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all duration-500 ${settings.archivePublicAccess ? 'left-8' : 'left-1'}`}></div>
-                  </button>
-               </div>
             </div>
-          </Card>
-
-          <Card title="Registry Metadata" icon="database">
-             <div className="space-y-6 pt-4">
-                <div className="space-y-2">
-                   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant mb-1 block">Administrative Proxy Title</label>
-                   <input 
-                     type="text" 
-                     value={settings.siteTitle}
-                     onChange={(e) => handleUpdate('siteTitle', e.target.value)}
-                     className="w-full bg-surface-bright/5 border border-outline-variant rounded-xl px-4 py-3 text-sm text-on-surface focus:outline-none focus:border-primary transition-all"
-                   />
-                </div>
-                <div className="space-y-2">
-                   <label className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant mb-1 block">Curator Approval Threshold</label>
-                   <div className="flex items-center gap-4">
-                      <input 
-                        type="range" min="1" max="5" 
-                        value={settings.curatorApprovalThreshold}
-                        onChange={(e) => handleUpdate('curatorApprovalThreshold', parseInt(e.target.value))}
-                        className="flex-1 accent-primary"
-                      />
-                      <span className="text-xl font-display font-black text-primary">{settings.curatorApprovalThreshold}</span>
-                   </div>
-                </div>
-             </div>
           </Card>
         </div>
 

@@ -27,6 +27,11 @@ const UserSchema = new mongoose.Schema({
   dob: {
     type: Date
   },
+  gender: {
+    type: String,
+    enum: ['male', 'female', 'other', 'prefer_not_to_say'],
+    default: 'prefer_not_to_say'
+  },
   role: {
     type: String,
     enum: ['user', 'admin'],
@@ -35,6 +40,10 @@ const UserSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  tokenVersion: {
+    type: Number,
+    default: 0
   }
 }, { timestamps: true });
 

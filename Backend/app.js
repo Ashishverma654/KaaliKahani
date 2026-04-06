@@ -24,6 +24,10 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
+// Static Content Protocol (Archive Media) map map map
+const path = require('path');
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 // Route Injections
 const authRoutes = require('./routes/authRoutes');
 const storyRoutes = require('./routes/storyRoutes');

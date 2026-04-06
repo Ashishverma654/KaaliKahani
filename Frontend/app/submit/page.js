@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/utils/api';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function SubmitStory() {
   const router = useRouter();
+  const { isAdmin } = useAuth();
   const [formData, setFormData] = useState({ title: '', content: '', category: 'General Horror' });
   const [images, setImages] = useState([null, null, null]);
   const [imagePreviews, setImagePreviews] = useState([null, null, null]);
@@ -210,19 +212,21 @@ export default function SubmitStory() {
               <button type="button" className="material-symbols-outlined text-on-surface-variant hover:text-primary text-sm">link</button>
             </div>
             
-            <button 
-              type="button" 
-              onClick={handleAIAnalyze}
-              className={`relative flex items-center gap-2 group transition-all px-4 py-1 rounded-lg ${isAnalyzing ? 'animate-pulse' : ''}`}
-            >
-               <span className={`material-symbols-outlined text-sm ${isAnalyzing ? 'text-primary animate-spin' : 'text-on-surface-variant group-hover:text-primary'}`}>
-                 {isAnalyzing ? 'sync' : 'auto_fix'}
-               </span>
-               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant group-hover:text-white">
-                 {isAnalyzing ? 'Consulting Archive...' : 'AI Sense Analysis'}
-               </span>
-               <div className="absolute inset-0 bg-primary/5 rounded-lg filter blur-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-            </button>
+            {isAdmin && (
+              <button 
+                type="button" 
+                onClick={handleAIAnalyze}
+                className={`relative flex items-center gap-2 group transition-all px-4 py-1 rounded-lg ${isAnalyzing ? 'animate-pulse' : ''}`}
+              >
+                <span className={`material-symbols-outlined text-sm ${isAnalyzing ? 'text-primary animate-spin' : 'text-on-surface-variant group-hover:text-primary'}`}>
+                  {isAnalyzing ? 'sync' : 'auto_fix'}
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant group-hover:text-white">
+                  {isAnalyzing ? 'Consulting Archive...' : 'AI Sense Analysis'}
+                </span>
+                <div className="absolute inset-0 bg-primary/5 rounded-lg filter blur-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+              </button>
+            )}
           </div>
           <textarea 
             className="w-full bg-transparent border-0 focus:outline-none p-8 text-on-surface text-lg leading-relaxed placeholder:text-surface-bright resize-none min-h-[300px]" 

@@ -23,6 +23,12 @@ exports.protect = async (req, res, next) => {
     if (!req.user) {
       return formatResponse(res, 401, 'User account no longer exists');
     }
+
+    // Verify token version matches user's current version (Invalidates sessions after password change)
+    if (decoded.tokenVersion !== undefined && decoded.tokenVersion !== req.user.tokenVersion) {
+      return formatResponse(res, 401, 'Session expired due to security update. Please log in again.');
+    }
+
     next();
   } catch (err) {
     return formatResponse(res, 401, 'Not authorized to access this route - Token failed');

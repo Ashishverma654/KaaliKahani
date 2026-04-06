@@ -35,17 +35,17 @@ const Navbar = ({ isCollapsed }) => {
           
           <div className="flex items-center gap-4 pl-6 border-l border-white/10">
             <div className="text-right hidden sm:block">
-              <p className="text-[10px] font-black text-white uppercase tracking-widest leading-none mb-1">{user?.name}</p>
+              <p className="text-[10px] font-black text-white uppercase tracking-widest leading-none mb-1">{user?.name || 'Chief Curator'}</p>
               <span className="text-[8px] font-bold text-on-surface-variant/40 uppercase tracking-widest flex items-center justify-end gap-1">
                  <span className="w-1 h-1 bg-green-500 rounded-full"></span>
-                 Chief Curator
+                 Administrator Profile
               </span>
             </div>
             
             <Link href="/profile" className="group">
               <div className="w-9 h-9 rounded-xl overflow-hidden grayscale group-hover:grayscale-0 transition-all border border-white/5 group-hover:border-primary/50 shadow-2xl relative">
-                {user?.avatar ? (
-                  <img src={user.avatar} alt={user.name} className="w-full h-full object-cover" />
+                {user?.avatar && user.avatar !== 'default-avatar.png' ? (
+                  <img src={user.avatar} alt={user?.name} className="w-full h-full object-cover" />
                 ) : (
                   <div className="w-full h-full bg-surface-container-highest/30 flex items-center justify-center text-on-surface-variant group-hover:text-primary transition-colors">
                     <span className="material-symbols-outlined text-xl">account_circle</span>

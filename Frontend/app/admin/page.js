@@ -9,24 +9,32 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter } from 'next/navigation';
 
 export default function AdminDashboard() {
-  const { user, isAdmin, loading: authLoading } = useAuth();
+  const { user, isAdmin, isSettled, loading: authLoading } = useAuth();
   const router = useRouter();
   const [stats, setStats] = useState(null);
   const [stories, setStories] = useState([]);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Operational Identity Guard map
+  // High-Authority Identity Guard map
   useEffect(() => {
-    // Only trigger redirect if we are 100% certain the user is not an admin map
-    if (!authLoading && !isAdmin) {
-      router.push('/login');
+    // Only proceed once the session has fully settled across the registry map
+    if (isSettled) {
+      if (!isAdmin) {
+        // If the identity is not an admin, we must determine if they are a guest or regular curator map
+        if (user) {
+          toast.error('Identity Conflict: Administrative clearance required.');
+          router.push('/');
+        } else {
+          router.push('/login?from=/admin');
+        }
+      }
     }
-  }, [authLoading, isAdmin, router]);
+  }, [isSettled, isAdmin, user, router]);
 
   // Primary Data Fetch: Only execute after successful identity clearance map
   useEffect(() => {
-    if (authLoading || !isAdmin) return;
+    if (authLoading || !isAdmin || !isSettled) return;
     
     const fetchDashboardData = async () => {
       try {

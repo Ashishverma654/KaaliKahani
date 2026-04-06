@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 
 export default function AuthenticatonPortal() {
   const router = useRouter();
-  const { isLoggedIn, isAdmin, loading: authLoading, refreshUser } = useAuth();
+  const { isLoggedIn, isAdmin, isSettled, loading: authLoading, refreshUser } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '', dob: '' });
   const [error, setError] = useState(null);
@@ -16,7 +16,7 @@ export default function AuthenticatonPortal() {
 
   // Identity Guard: Prevent logged-in users from accessing the portal map
   React.useEffect(() => {
-    if (!authLoading && isLoggedIn) {
+    if (isSettled && isLoggedIn) {
       // If the curator possesses administrative clearance, send them to the Desk map
       if (isAdmin) {
         router.push('/admin');
@@ -24,7 +24,22 @@ export default function AuthenticatonPortal() {
         router.push('/');
       }
     }
-  }, [isLoggedIn, isAdmin, authLoading, router]);
+  }, [isLoggedIn, isAdmin, isSettled, router]);
+
+  // Blocking Restoration Pulse map: If the session is settled and user is logged in, hide the form map
+  if (isSettled && isLoggedIn) {
+    return (
+      <main className="min-h-screen bg-black flex flex-col items-center justify-center p-6 text-center">
+        <div className="relative w-48 h-48 mb-8 flex items-center justify-center">
+          <div className="absolute inset-0 border-2 border-primary/20 rounded-full animate-ping"></div>
+          <div className="absolute inset-4 border border-primary/40 rounded-full animate-[ping_2s_linear_infinite]"></div>
+          <span className="material-symbols-outlined text- primary text-6xl animate-pulse">lock_person</span>
+        </div>
+        <h2 className="text-2xl font-display font-black text-white tracking-widest uppercase mb-4">Archival Synchronization</h2>
+        <p className="text-on-surface-variant text-[10px] uppercase tracking-[0.4em] opacity-40">Verifying clearance level... Redirecting to appropriate quadrant.</p>
+      </main>
+    );
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();

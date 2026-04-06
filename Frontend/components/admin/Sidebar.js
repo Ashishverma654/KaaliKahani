@@ -10,7 +10,7 @@ const Sidebar = ({ isCollapsed, toggleCollapse }) => {
     { label: 'Mission Control', icon: 'dashboard', path: '/admin' },
     { label: 'Story Registry', icon: 'auto_stories', path: '/admin/stories' },
     { label: 'Curator Directory', icon: 'group', path: '/admin/users' },
-    { label: 'Archival Settings', icon: 'settings', path: '/admin/settings' },
+    { label: 'System Protocols', icon: 'terminal', path: '/admin/settings' },
     { label: 'Return to Archive', icon: 'arrow_back', path: '/' },
   ];
 

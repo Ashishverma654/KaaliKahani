@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 
-const Card = ({ title, icon, children, className = "" }) => {
+const Card = ({ title, icon, children, className = "", actions }) => {
   return (
     <div className={`bg-black/5 backdrop-blur-3xl border border-white/5 rounded-[2rem] p-8 shadow-2xl transition-all duration-500 hover:border-white/10 relative overflow-hidden group ${className}`}>
       {/* Background architectural glow */}
@@ -19,11 +19,15 @@ const Card = ({ title, icon, children, className = "" }) => {
               {title}
             </h4>
           </div>
-          {/* Decorative element */}
-          <div className="flex gap-1.5 opacity-20 group-hover:opacity-40 transition-opacity">
-             <div className="w-1 h-1 rounded-full bg-white"></div>
-             <div className="w-1 h-1 rounded-full bg-white"></div>
-             <div className="w-1 h-1 rounded-full bg-white"></div>
+          {/* Action Registry Trigger map map map */}
+          <div className="relative z-[20]">
+             {actions ? actions : (
+               <div className="flex gap-1.5 opacity-20 group-hover:opacity-40 transition-opacity">
+                  <div className="w-1 h-1 rounded-full bg-white"></div>
+                  <div className="w-1 h-1 rounded-full bg-white"></div>
+                  <div className="w-1 h-1 rounded-full bg-white"></div>
+               </div>
+             )}
           </div>
         </div>
       )}

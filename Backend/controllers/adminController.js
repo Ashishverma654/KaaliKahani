@@ -104,6 +104,36 @@ exports.rejectStory = async (req, res, next) => {
     next(error);
   }
 };
+exports.updateStory = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { title, content, category, status } = req.body;
+    
+    const story = await Story.findById(id);
+    if (!story) return formatResponse(res, 404, 'Story not found');
+
+    if (title) story.title = title;
+    if (content) story.content = content;
+    if (category) story.category = category;
+    
+    if (status) {
+      story.status = status;
+      if (status === 'approved') {
+        story.isPublished = true;
+        story.approvedAt = Date.now();
+      } else if (status === 'rejected') {
+        story.isPublished = false;
+      }
+    }
+
+    await story.save();
+    await createAuditLog(req.user._id, 'STORY_UPDATED', `Updated and synchronized narrative: ${story.title}`, story._id);
+
+    return formatResponse(res, 200, 'Narrative synchronized successfully', story);
+  } catch (error) {
+    next(error);
+  }
+};
 
 exports.deleteStory = async (req, res, next) => {
   try {

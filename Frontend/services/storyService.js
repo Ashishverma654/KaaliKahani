@@ -25,6 +25,11 @@ const storyService = {
     const response = await api.delete(`/admin/stories/${id}`);
     return response.data.data;
   },
+
+  updateStory: async (id, data) => {
+    const response = await api.put(`/admin/stories/${id}`, data);
+    return response.data.data;
+  },
   
   getMyStories: async () => {
     const response = await api.get('/stories/me');
