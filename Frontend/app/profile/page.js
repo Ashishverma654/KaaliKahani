@@ -12,6 +12,7 @@ export default function UserProfile() {
   const { user, isLoggedIn, isSettled, logout, refreshUser } = useAuth();
   const router = useRouter();
   const [stories, setStories] = useState([]);
+  const [drafts, setDrafts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [authChecked, setAuthChecked] = useState(false);
   const [activeTab, setActiveTab] = useState('archive'); // 'archive' | 'registry' | 'integrity'
@@ -66,6 +67,8 @@ export default function UserProfile() {
       try {
         const data = await storyService.getMyStories();
         setStories(data || []);
+        const draftData = await storyService.getMyDrafts();
+        setDrafts(draftData || []);
       } catch (error) {
         console.error('Failed to fetch stories:', error);
       } finally {
@@ -361,6 +364,54 @@ export default function UserProfile() {
                         </Link>
                      </div>
                   )}
+
+                  {/* Drafts Section */}
+                  <div className="mt-12 border-t border-outline-variant/10 pt-8 space-y-6">
+                     <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="text-xl font-black font-display uppercase tracking-widest text-on-surface mb-1">Drafts</h3>
+                          <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.4em] opacity-60">Private narratives not yet submitted</p>
+                        </div>
+                        <Link href="/submit" className="bg-surface-container-high hover:bg-primary hover:text-on-primary px-6 py-2.5 rounded-xl border border-outline-variant/30 text-[10px] font-black uppercase tracking-widest transition-all shadow-sm">
+                           New Draft
+                        </Link>
+                     </div>
+                     {drafts.length > 0 ? (
+                       <div className="grid grid-cols-1 gap-6">
+                         {drafts.map((draft) => (
+                           <div 
+                             key={draft._id}
+                             className="group bg-surface-container-low hover:bg-surface-container transition-all duration-500 rounded-[2rem] p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 cursor-default border border-outline-variant/5 hover:shadow-2xl hover:shadow-black/20"
+                           >
+                           <div className="flex flex-col gap-3">
+                              <div className="flex items-center gap-3">
+                                 <span className="text-[8px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full border bg-primary/10 text-primary border-primary/20">
+                                    draft
+                                 </span>
+                                 <span className="text-[9px] font-bold text-on-surface-variant/40 uppercase tracking-widest">ID: {draft._id.slice(-8)}</span>
+                              </div>
+                              <h3 className="text-xl md:text-2xl font-black font-display text-on-surface group-hover:text-primary transition-colors tracking-tight">
+                                 {typeof draft.title === 'string' ? draft.title : draft.title?.en}
+                              </h3>
+                              <div className="flex items-center gap-6 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
+                                 <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-[12px]">calendar_today</span> {draft.updatedAt ? new Date(draft.updatedAt).toLocaleDateString() : 'N/A'}</span>
+                              </div>
+                           </div>
+                             <Link 
+                              href={`/submit?draftId=${draft._id}`}
+                              className="px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all bg-surface-container-high text-on-surface hover:bg-primary hover:text-on-primary"
+                             >
+                                Continue Draft
+                             </Link>
+                           </div>
+                         ))}
+                       </div>
+                     ) : (
+                       <div className="bg-surface-container-low rounded-[2rem] p-8 text-center text-on-surface-variant text-sm font-bold tracking-[0.2em] uppercase border border-outline-variant/10">
+                         No drafts yet
+                       </div>
+                     )}
+                  </div>
                 </>
               )}
 

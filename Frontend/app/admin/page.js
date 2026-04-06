@@ -134,14 +134,14 @@ export default function AdminDashboard() {
                 loading={loading}
                 data={logs}
                 renderRow={(log) => (
-                  <tr key={log._id} className="border-b border-white/5 hover:bg-white/5 transition-colors group">
-                    <td className="py-6 px-4">
+                  <>
+                    <td className="py-4 px-4 align-middle">
                       <div className="flex items-center gap-3">
                          <span className="material-symbols-outlined text-xs text-primary">terminal</span>
                          <span className="text-xs font-bold text-white tracking-wide">{log.details}</span>
                       </div>
                     </td>
-                    <td className="py-6 px-4">
+                    <td className="py-4 px-4 align-middle">
                       <div className="flex items-center gap-3">
                          <div className="w-6 h-6 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-[8px] font-black text-on-surface-variant">
                             {log.admin?.name?.charAt(0) || 'S'}
@@ -149,16 +149,16 @@ export default function AdminDashboard() {
                          <span className="text-[10px] uppercase font-black tracking-widest text-on-surface-variant">{log.admin?.name || 'System'}</span>
                       </div>
                     </td>
-                    <td className="py-6 px-4 text-[10px] uppercase font-black tracking-widest text-on-surface-variant/40">
+                    <td className="py-4 px-4 align-middle text-[10px] uppercase font-black tracking-widest text-on-surface-variant/40">
                       {new Date(log.timestamp).toLocaleTimeString()}
                     </td>
-                    <td className="py-6 px-4">
+                    <td className="py-4 px-4 align-middle">
                       <div className="flex items-center gap-2 py-1 px-3 bg-green-500/10 border border-green-500/20 rounded-full w-fit">
                          <span className="w-1 h-1 bg-green-500 rounded-full"></span>
                          <span className="text-[8px] font-black text-green-500 uppercase tracking-widest">Success</span>
                       </div>
                     </td>
-                  </tr>
+                  </>
                 )}
               />
             </Card>

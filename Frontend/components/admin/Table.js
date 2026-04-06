@@ -10,7 +10,7 @@ const Table = ({ headers, data, renderRow, loading }) => {
             {headers.map((header, i) => (
               <th 
                 key={i} 
-                className="text-left py-6 px-4 text-[10px] font-black uppercase text-on-surface-variant/40 tracking-[0.3em]"
+                className="text-left py-4 px-4 text-[10px] font-black uppercase text-on-surface-variant/40 tracking-[0.3em]"
               >
                 {header}
               </th>
@@ -22,7 +22,7 @@ const Table = ({ headers, data, renderRow, loading }) => {
             Array(5).fill(0).map((_, i) => (
               <tr key={i} className="animate-pulse">
                 {headers.map((_, j) => (
-                  <td key={j} className="py-6 px-4">
+                  <td key={j} className="py-4 px-4 align-middle">
                     <div className="h-2 bg-white/5 rounded-full w-24"></div>
                   </td>
                 ))}
@@ -36,7 +36,7 @@ const Table = ({ headers, data, renderRow, loading }) => {
             ))
           ) : (
             <tr>
-              <td colSpan={headers.length} className="py-20 text-center">
+              <td colSpan={headers.length} className="py-16 text-center align-middle">
                 <p className="text-[10px] font-black uppercase text-on-surface-variant/20 tracking-widest">
                   No Archival Data Found
                 </p>

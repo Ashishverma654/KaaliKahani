@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '@/utils/api';
 import Card from '@/components/admin/Card';
+import adminService from '@/services/adminService';
 
 export default function AdminSettings() {
   const [settings, setSettings] = useState({
@@ -12,6 +13,7 @@ export default function AdminSettings() {
     curatorApprovalThreshold: 1
   });
   const [logs, setLogs] = useState([]);
+  const [approvedStories, setApprovedStories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
@@ -25,6 +27,8 @@ export default function AdminSettings() {
         ]);
         setSettings(settingsRes.data.data);
         setLogs(logsRes.data.data);
+        const stories = await adminService.getStories('approved');
+        setApprovedStories(stories || []);
       } catch (err) {
         setError('Archival Retrieval Failed: Master registry unreachable.');
       } finally {
@@ -89,7 +93,25 @@ export default function AdminSettings() {
                   >
                      <div className={`absolute top-1 w-5 h-5 bg-white rounded-full transition-all duration-500 ${settings.allowAIAnalysis ? 'left-8' : 'left-1'}`}></div>
                   </button>
-               </div>
+              </div>
+            </div>
+          </Card>
+
+          <Card title="Featured Story" icon="star">
+            <div className="space-y-4 pt-4">
+              <p className="text-[10px] text-on-surface-variant uppercase tracking-widest">Select a single featured story for homepage</p>
+              <select
+                value={settings.featuredStoryId || ''}
+                onChange={(e) => handleUpdate('featuredStoryId', e.target.value || null)}
+                className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-5 py-3 text-sm text-on-surface focus:outline-none focus:border-primary"
+              >
+                <option value="">None</option>
+                {approvedStories.map((story) => (
+                  <option key={story._id} value={story._id}>
+                    {story.title?.en || story.title} ({story._id.slice(-6)})
+                  </option>
+                ))}
+              </select>
             </div>
           </Card>
         </div>

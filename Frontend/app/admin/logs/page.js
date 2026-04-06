@@ -36,7 +36,7 @@ export default function SystemLogs() {
           data={logs}
           renderRow={(log) => (
             <>
-              <td className="py-5 px-6">
+              <td className="py-4 px-6 align-middle">
                  <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-lg bg-primary/10 text-primary border border-primary/20 flex items-center justify-center">
                        <span className="material-symbols-outlined text-sm">history</span>
@@ -44,16 +44,16 @@ export default function SystemLogs() {
                     <span className="text-[10px] font-black uppercase tracking-widest text-on-surface">{log.action.replace(/_/g, ' ')}</span>
                  </div>
               </td>
-              <td className="py-5">
+              <td className="py-4 align-middle">
                  <span className="text-xs text-on-surface-variant font-medium leading-relaxed">{log.details}</span>
               </td>
-              <td className="py-5">
+              <td className="py-4 align-middle">
                 <div className="flex flex-col">
                    <span className="text-[10px] font-bold text-on-surface uppercase tracking-widest">{log.admin?.name || 'System'}</span>
                    <span className="text-[8px] font-bold text-on-surface-variant uppercase tracking-tighter">{log.admin?.email}</span>
                 </div>
               </td>
-              <td className="py-5 pr-6">
+              <td className="py-4 pr-6 align-middle">
                  <span className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
                     {new Date(log.timestamp).toLocaleString()}
                  </span>

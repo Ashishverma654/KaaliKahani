@@ -4,7 +4,15 @@ import Table from '@/components/admin/Table';
 import Modal from '@/components/admin/Modal';
 import storyService from '@/services/storyService';
 import toast from 'react-hot-toast';
-import { API_BASE_URL } from '@/utils/api';
+import api, { API_BASE_URL } from '@/utils/api';
+
+const CATEGORY_LABELS = {
+  'real-horror': 'Real Horror',
+  'paranormal': 'Paranormal',
+  'haunted-places': 'Haunted Places',
+  'urban-legends': 'Urban Legends',
+  'general-horror': 'General Horror'
+};
 
 export default function StoriesModeration() {
   const [activeTab, setActiveTab] = useState('Pending');
@@ -23,6 +31,8 @@ export default function StoriesModeration() {
   const [editData, setEditData] = useState({ title: '', content: '', category: '', images: [] });
   const [actionType, setActionType] = useState(null); // 'approve' | 'reject' | 'delete' | 'review'
   const [isAiAnalyzing, setIsAiAnalyzing] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState('all');
 
   const fetchStories = async () => {
     setLoading(true);
@@ -40,6 +50,13 @@ export default function StoriesModeration() {
     fetchStories();
   }, [activeTab]);
 
+  const filteredStories = stories.filter((story) => {
+    const title = story.title?.en || story.title || '';
+    const matchesSearch = title.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory = categoryFilter === 'all' || story.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
   const handleAIReview = async () => {
     if (!editData.content) return;
     setIsAiAnalyzing(true);
@@ -53,7 +70,8 @@ export default function StoriesModeration() {
       });
       toast.success('AI Oracle has enhanced the narrative.');
     } catch (err) {
-      toast.error('AI Oracle is silent. Check system frequency.');
+      const msg = err.response?.data?.message || 'AI Oracle is silent. Check system frequency.';
+      toast.error(msg);
     } finally {
       setIsAiAnalyzing(false);
     }
@@ -125,33 +143,58 @@ export default function StoriesModeration() {
            ))}
         </div>
 
+        <div className="flex flex-col md:flex-row gap-4 items-start md:items-center">
+          <input
+            type="text"
+            placeholder="Search by title..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full md:w-72 bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-xs text-white focus:border-primary focus:outline-none transition-all"
+          />
+          <select
+            value={categoryFilter}
+            onChange={(e) => setCategoryFilter(e.target.value)}
+            className="w-full md:w-56 bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-xs text-white focus:border-primary focus:outline-none transition-all appearance-none"
+          >
+            <option value="all">All Categories</option>
+            <option value="real-horror">Real Horror</option>
+            <option value="paranormal">Paranormal</option>
+            <option value="haunted-places">Haunted Places</option>
+            <option value="urban-legends">Urban Legends</option>
+            <option value="general-horror">General Horror</option>
+          </select>
+        </div>
+
         <div className="bg-black/20 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
           <Table 
-            headers={['#', 'Narrative', 'Author', 'Category', 'Timestamp', 'Actions']}
+            headers={['#', 'Narrative', 'Reading', 'Author', 'Category', 'Timestamp', 'Actions']}
             loading={loading}
-            data={stories}
+            data={filteredStories}
             renderRow={(story, i) => (
               <>
-                <td className="py-6 pl-8 text-[11px] font-black text-on-surface-variant/40 font-mono">
+                <td className="py-4 pl-8 align-middle text-[11px] font-black text-on-surface-variant/40 font-mono">
                    {String(i + 1).padStart(2, '0')}
                 </td>
-                <td className="py-6 px-4">
+                <td className="py-4 px-4 align-middle">
                    <div className="flex flex-col gap-1">
-                      <span className="text-xs font-black text-white group-hover:text-primary transition-colors">{story.title?.en || story.title}</span>
-                      <span className="text-[9px] font-bold text-on-surface-variant uppercase tracking-tighter opacity-40">ID: {story._id.slice(-8)}</span>
+                      <span className="text-xs font-black text-white group-hover:text-primary transition-colors leading-tight">{story.title?.en || story.title}</span>
+                      <span className="text-[9px] font-bold text-on-surface-variant uppercase tracking-tighter opacity-40 leading-none">ID: {story._id.slice(-8)}</span>
                    </div>
                 </td>
-                <td className="py-6 text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em]">{story.author?.name || 'Anonymous'}</td>
-                <td className="py-6 text-white text-xs">
+                <td className="py-4 align-middle text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
+                   {story.readingStats?.readers || 0} readers • {story.readingStats?.avgProgress || 0}% avg • {story.readingStats?.completed || 0} finished
+                </td>
+                <td className="py-4 align-middle text-[10px] font-black text-on-surface-variant uppercase tracking-[0.2em]">{story.author?.name || 'Anonymous'}</td>
+                <td className="py-4 align-middle text-white text-xs">
                    <span className="bg-white/5 px-4 py-1.5 rounded-full text-[9px] font-black uppercase tracking-widest text-[#9ca3af] border border-white/5">
-                      {story.category || 'General'}
+                      {CATEGORY_LABELS[story.category] || story.category || 'General'}
                    </span>
                 </td>
-                <td className="py-6 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-40">
+                <td className="py-4 align-middle text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-40">
                    {new Date(story.createdAt).toLocaleDateString()}
                 </td>
-                <td className="py-6 pr-8">
-                   <div className="flex items-center gap-3">
+                <td className="py-4 pr-8 align-middle">
+                   <div className="flex items-center justify-end gap-2">
                       {activeTab === 'Pending' && (
                         <>
                           <button 
@@ -227,11 +270,11 @@ export default function StoriesModeration() {
                        onChange={(e) => setEditData({ ...editData, category: e.target.value })}
                        className="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-8 py-5 text-sm text-white focus:border-primary focus:outline-none transition-all appearance-none cursor-pointer"
                      >
-                        <option value="Real Horror">Real Horror</option>
-                        <option value="Paranormal">Paranormal</option>
-                        <option value="Haunted Places">Haunted Places</option>
-                        <option value="Urban Legends">Urban Legends</option>
-                        <option value="General Horror">General Horror</option>
+                        <option value="real-horror">Real Horror</option>
+                        <option value="paranormal">Paranormal</option>
+                        <option value="haunted-places">Haunted Places</option>
+                        <option value="urban-legends">Urban Legends</option>
+                        <option value="general-horror">General Horror</option>
                      </select>
                    </div>
                    <div className="flex flex-col justify-end">

@@ -8,8 +8,12 @@ const { validateResult } = require('../middlewares/validate');
 const upload = require('../middlewares/upload');
 
 // Public Routes
+router.get('/featured', storyController.getFeaturedStory);
+router.get('/search', storyController.searchStories);
 router.get('/', storyController.getStories);
 router.get('/me', protect, storyController.getMyStories);
+router.get('/drafts', protect, storyController.getMyDrafts);
+router.get('/draft/:id', protect, storyController.getDraftById);
 router.get('/:slug', storyController.getStoryBySlug);
 
 // Protected User Routes (Implicitly blocks unauthenticated traffic map)
@@ -24,6 +28,10 @@ router.post(
   validateResult,
   storyController.submitStory
 );
+
+// Draft Routes
+router.post('/draft', protect, storyController.saveDraft);
+router.put('/draft/:id', protect, storyController.updateDraft);
 
 // Advanced Archival Routes (Image Uplink & AI Sense)
 router.post('/upload', protect, upload.single('image'), storyController.uploadImage);

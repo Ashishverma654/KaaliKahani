@@ -25,6 +25,11 @@ const SettingsSchema = new mongoose.Schema({
     type: String,
     default: 'KaaliKahani'
   },
+  featuredStoryId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Story',
+    default: null
+  },
   archivalAlerts: [{
     type: String, // Dynamic alerts displayed globally
   }]

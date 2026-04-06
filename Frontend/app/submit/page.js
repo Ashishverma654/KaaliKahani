@@ -1,14 +1,18 @@
 "use client";
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import api from '@/utils/api';
 import { useAuth } from '@/hooks/useAuth';
 import ProtectedRoute from '@/components/ProtectedRoute';
+import storyService from '@/services/storyService';
+import seriesService from '@/services/seriesService';
 
 export default function SubmitStory() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isAdmin } = useAuth();
-  const [formData, setFormData] = useState({ title: '', content: '', category: 'General Horror' });
+  const [formData, setFormData] = useState({ title: '', content: '', category: 'general-horror' });
+  const [draftId, setDraftId] = useState(null);
   const [images, setImages] = useState([null, null, null]);
   const [imagePreviews, setImagePreviews] = useState([null, null, null]);
   const [uploadingSlot, setUploadingSlot] = useState(null); // Track specific slot being uploaded map
@@ -16,6 +20,50 @@ export default function SubmitStory() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [seriesList, setSeriesList] = useState([]);
+  const [seriesId, setSeriesId] = useState('');
+  const [seriesOrder, setSeriesOrder] = useState(1);
+  const [newSeriesTitle, setNewSeriesTitle] = useState('');
+  const [newSeriesDescription, setNewSeriesDescription] = useState('');
+  const [isCreatingSeries, setIsCreatingSeries] = useState(false);
+
+  React.useEffect(() => {
+    const loadSeries = async () => {
+      try {
+        const data = await seriesService.getMySeries();
+        setSeriesList(data || []);
+      } catch (e) {
+        // Silent fail; series is optional
+      }
+    };
+    loadSeries();
+  }, []);
+
+  React.useEffect(() => {
+    const draftParam = searchParams.get('draftId');
+    if (!draftParam) return;
+    const loadDraft = async () => {
+      try {
+        const draft = await storyService.getDraftById(draftParam);
+        setDraftId(draft._id);
+        setFormData({
+          title: typeof draft.title === 'string' ? draft.title : draft.title?.en || '',
+          content: typeof draft.content === 'string' ? draft.content : draft.content?.en || '',
+          category: draft.category || 'general-horror'
+        });
+        setSeriesId(draft.seriesId || '');
+        setSeriesOrder(draft.seriesOrder || 1);
+        if (Array.isArray(draft.images)) {
+          const imgs = [draft.images[0] || null, draft.images[1] || null, draft.images[2] || null];
+          setImages(imgs);
+          setImagePreviews(imgs);
+        }
+      } catch (e) {
+        setError('Unable to load draft.');
+      }
+    };
+    loadDraft();
+  }, [searchParams]);
 
   // Handle Image Uplink for a specific slot map
   const handleImageChange = async (slotIndex, e) => {
@@ -83,6 +131,53 @@ export default function SubmitStory() {
     setAiSuggestions(null);
   };
 
+  const handleSaveDraft = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const payload = {
+        title: formData.title,
+        content: formData.content,
+        language: 'en',
+        category: formData.category,
+        images: images.filter(Boolean),
+        seriesId: seriesId || null,
+        seriesOrder: seriesOrder || 1
+      };
+      if (draftId) {
+        const updated = await storyService.updateDraft(draftId, payload);
+        setDraftId(updated._id);
+      } else {
+        const draft = await storyService.saveDraft(payload);
+        setDraftId(draft._id);
+      }
+      alert('Draft saved successfully.');
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to save draft.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCreateSeries = async () => {
+    if (!newSeriesTitle.trim()) return;
+    setIsCreatingSeries(true);
+    try {
+      const created = await seriesService.createSeries({
+        title: newSeriesTitle.trim(),
+        description: newSeriesDescription.trim()
+      });
+      setSeriesList((prev) => [created, ...prev]);
+      setSeriesId(created._id);
+      setNewSeriesTitle('');
+      setNewSeriesDescription('');
+    } catch (e) {
+      setError('Failed to create series.');
+    } finally {
+      setIsCreatingSeries(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -94,7 +189,9 @@ export default function SubmitStory() {
         content: formData.content,
         language: 'en',
         category: formData.category,
-        images: images.filter(Boolean) // Filter only successfully uploaded URLs map
+        images: images.filter(Boolean), // Filter only successfully uploaded URLs map
+        seriesId: seriesId || null,
+        seriesOrder: seriesOrder || 1
       });
       alert('Archive Entry Successful: Your narrative has been filed.');
       router.push('/');
@@ -182,22 +279,81 @@ export default function SubmitStory() {
             </div>
           </section>
 
+          {/* Series Section */}
+          <section>
+            <label className="text-on-surface-variant font-display font-bold text-sm tracking-widest uppercase mb-6 block">02B. Series (Optional)</label>
+            <div className="space-y-4">
+              <select
+                value={seriesId}
+                onChange={(e) => setSeriesId(e.target.value)}
+                className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-6 py-4 text-sm text-on-surface focus:outline-none focus:border-primary transition-all"
+              >
+                <option value="">No Series</option>
+                {seriesList.map((s) => (
+                  <option key={s._id} value={s._id}>{s.title}</option>
+                ))}
+              </select>
+              {seriesId && (
+                <div className="flex items-center gap-4">
+                  <label className="text-[10px] uppercase tracking-widest text-on-surface-variant">Series Order</label>
+                  <input
+                    type="number"
+                    min="1"
+                    value={seriesOrder}
+                    onChange={(e) => setSeriesOrder(parseInt(e.target.value || '1', 10))}
+                    className="w-24 bg-surface-container-low border border-outline-variant rounded-lg px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary"
+                  />
+                </div>
+              )}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <input
+                  type="text"
+                  value={newSeriesTitle}
+                  onChange={(e) => setNewSeriesTitle(e.target.value)}
+                  placeholder="Create new series title..."
+                  className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-6 py-4 text-sm text-on-surface focus:outline-none focus:border-primary transition-all"
+                />
+                <input
+                  type="text"
+                  value={newSeriesDescription}
+                  onChange={(e) => setNewSeriesDescription(e.target.value)}
+                  placeholder="Series description (optional)"
+                  className="w-full bg-surface-container-low border border-outline-variant rounded-xl px-6 py-4 text-sm text-on-surface focus:outline-none focus:border-primary transition-all"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleCreateSeries}
+                disabled={isCreatingSeries}
+                className="px-6 py-3 rounded-xl bg-surface-container-high text-on-surface font-bold text-[10px] uppercase tracking-widest border border-outline-variant hover:bg-surface-container transition-all"
+              >
+                {isCreatingSeries ? 'Creating...' : 'Create Series'}
+              </button>
+            </div>
+          </section>
+
           {/* Category Chips */}
           <section>
             <label className="text-on-surface-variant font-display font-bold text-sm tracking-widest uppercase mb-6 block">03. Contextual Filing</label>
             <div className="flex flex-wrap gap-3">
-              {['Real Horror', 'Paranormal', 'Haunted Places', 'Urban Legends', 'General Horror'].map((cat) => (
+              {[
+                { label: 'Real Horror', value: 'real-horror' },
+                { label: 'Paranormal', value: 'paranormal' },
+                { label: 'Haunted Places', value: 'haunted-places' },
+                { label: 'Urban Legends', value: 'urban-legends' },
+                { label: 'General Horror', value: 'general-horror' }
+              ].map((cat) => (
                 <button 
                   type="button"
-                  key={cat}
-                  onClick={() => setFormData({...formData, category: cat})}
+                  key={cat.value}
+                  onClick={() => setFormData({...formData, category: cat.value})}
                   className={`px-6 py-2 rounded-full text-sm font-bold h-10 flex items-center justify-center transition-all ${
-                    formData.category === cat 
+                    formData.category === cat.value 
                       ? 'bg-primary-container text-on-surface border border-primary-container shadow-lg' 
                       : 'border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary'
                   }`}
                 >
-                  {cat}
+                  {cat.label}
                 </button>
               ))}
             </div>
@@ -240,6 +396,48 @@ export default function SubmitStory() {
             ></textarea>
           </section>
 
+          {/* AI Suggestions Panel */}
+          {aiSuggestions && (
+            <section className="bg-surface-container-high rounded-2xl border border-outline-variant p-6 space-y-4">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-black uppercase tracking-widest text-on-surface">AI Suggestions</h3>
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant">
+                  Believability: {aiSuggestions.realismScore}%
+                </div>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Suggested Title</p>
+                <p className="text-on-surface font-bold">{aiSuggestions.suggestedTitle.en}</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Suggested Category</p>
+                <p className="text-on-surface font-bold">{aiSuggestions.suggestedCategory}</p>
+              </div>
+              <div>
+                <p className="text-[10px] uppercase tracking-widest text-on-surface-variant mb-2">Suggested Content</p>
+                <div className="text-sm text-on-surface-variant whitespace-pre-wrap max-h-64 overflow-y-auto">
+                  {aiSuggestions.enhancedContent.en}
+                </div>
+              </div>
+              <div className="flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={applyAISuggestion}
+                  className="px-6 py-3 rounded-full bg-primary text-white text-[10px] font-black uppercase tracking-widest"
+                >
+                  Apply Suggestions
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAiSuggestions(null)}
+                  className="px-6 py-3 rounded-full border border-outline-variant text-on-surface text-[10px] font-black uppercase tracking-widest"
+                >
+                  Discard
+                </button>
+              </div>
+            </section>
+          )}
+
           {/* Bottom Actions */}
           <footer className="flex flex-col md:flex-row items-center justify-between gap-6 pt-8 border-t border-outline-variant">
              <div className="flex items-center justify-center md:justify-start gap-2 text-on-surface-variant text-sm w-full md:w-auto">
@@ -247,7 +445,13 @@ export default function SubmitStory() {
                <span className="flex items-center h-full mt-1">Autosaved 2 minutes ago</span>
              </div>
              <div className="flex items-center gap-4 w-full md:w-auto">
-               <button type="button" className="flex-1 md:flex-none px-8 py-3 rounded-full border border-outline-variant text-on-surface font-display font-bold transition-all hover:bg-surface-container-high h-12 flex items-center justify-center">Preview Draft</button>
+               <button
+                 type="button"
+                 onClick={handleSaveDraft}
+                 className="flex-1 md:flex-none px-8 py-3 rounded-full border border-outline-variant text-on-surface font-display font-bold transition-all hover:bg-surface-container-high h-12 flex items-center justify-center"
+               >
+                 {draftId ? 'Update Draft' : 'Save Draft'}
+               </button>
                <button 
                  type="submit" 
                  disabled={loading}
@@ -259,82 +463,6 @@ export default function SubmitStory() {
           </footer>
 
         </form>
-
-        {/* AI Suggestion Comparison Overlay */}
-        {aiSuggestions && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-6 backdrop-blur-md bg-black/60 animate-in fade-in duration-300">
-            <div className="bg-surface-container-high rounded-3xl border border-outline-variant shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-hidden flex flex-col scale-in duration-300">
-              <header className="p-8 border-b border-outline-variant flex items-center justify-between bg-primary/5">
-                <div>
-                  <h2 className="text-2xl font-display font-black text-on-surface tracking-tight flex items-center gap-3">
-                    <span className="material-symbols-outlined text-primary">auto_fix</span>
-                    Archive Intelligence Results
-                  </h2>
-                  <p className="text-on-surface-variant text-sm mt-1">Review Gemini's suggested enhancements for your narrative.</p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <span className="text-[10px] font-black uppercase tracking-[0.2em] text-on-surface-variant block mb-1">Believability Index</span>
-                    <div className="h-2 w-32 bg-outline-variant rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary transition-all duration-1000" 
-                        style={{ width: `${aiSuggestions.realismScore}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                  <button onClick={() => setAiSuggestions(null)} className="p-2 hover:bg-surface-bright rounded-full transition-colors">
-                    <span className="material-symbols-outlined">close</span>
-                  </button>
-                </div>
-              </header>
-
-              <div className="flex-1 overflow-y-auto p-8 grid grid-cols-1 md:grid-cols-2 gap-12">
-                {/* Original Content */}
-                <div className="space-y-6 opacity-60">
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-on-surface-variant border-l-2 border-outline-variant pl-3">Original Registry</span>
-                  <div className="space-y-4">
-                    <h3 className="text-xl font-bold font-display text-on-surface italic line-through">{formData.title}</h3>
-                    <p className="text-sm leading-relaxed text-on-surface-variant">{formData.content}</p>
-                  </div>
-                </div>
-
-                {/* AI Suggested Content */}
-                <div className="space-y-6">
-                  <span className="text-[10px] font-black uppercase tracking-[0.3em] text-primary border-l-2 border-primary pl-3">AI Suggestion</span>
-                  <div className="space-y-4">
-                    <h3 className="text-xl font-bold font-display text-primary">{aiSuggestions.suggestedTitle.en}</h3>
-                    <div className="text-sm leading-relaxed text-on-surface whitespace-pre-wrap">
-                      {aiSuggestions.enhancedContent.en}
-                    </div>
-                    <div className="pt-4 flex flex-wrap gap-2">
-                      <span className="text-[9px] font-black uppercase tracking-[0.2em] bg-primary/10 text-primary px-3 py-1 rounded">
-                        Category: {aiSuggestions.suggestedCategory}
-                      </span>
-                      <span className="text-[9px] font-black uppercase tracking-[0.2em] bg-primary/10 text-primary px-3 py-1 rounded">
-                        Sense: Immersive
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <footer className="p-8 border-t border-outline-variant flex items-center justify-end gap-6 bg-surface-container">
-                <button 
-                  onClick={() => setAiSuggestions(null)}
-                  className="px-8 py-3 rounded-full border border-outline-variant text-on-surface font-display font-bold hover:bg-surface-bright transition-all"
-                >
-                  Discard Suggestions
-                </button>
-                <button 
-                  onClick={applyAISuggestion}
-                  className="px-12 py-3 rounded-full bg-primary text-on-primary font-display font-bold shadow-xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all"
-                >
-                  Apply Archive Changes
-                </button>
-              </footer>
-            </div>
-          </div>
-        )}
       </main>
     </ProtectedRoute>
   );

@@ -7,7 +7,16 @@ const adminService = {
   },
 
   getStories: async (status = '') => {
+    if (status && status.toLowerCase() === 'pending') {
+      const response = await api.get('/admin/pending');
+      return response.data.data;
+    }
     const response = await api.get(`/admin/stories${status ? `?status=${status.toLowerCase()}` : ''}`);
+    return response.data.data;
+  },
+
+  getStoryById: async (id) => {
+    const response = await api.get(`/admin/stories/${id}`);
     return response.data.data;
   },
 

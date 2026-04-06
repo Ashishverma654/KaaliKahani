@@ -58,7 +58,9 @@ function AuthenticationContent() {
     setLoading(true);
     
     try {
-      const endpoint = isLogin ? '/auth/login' : '/auth/register';
+      const from = searchParams.get('from');
+      const isAdminLogin = isLogin && from === '/admin';
+      const endpoint = isLogin ? (isAdminLogin ? '/auth/admin/login' : '/auth/login') : '/auth/register';
       const payload = isLogin 
         ? { email: formData.email, password: formData.password }
         : { name: formData.name, email: formData.email, password: formData.password, dob: formData.dob };

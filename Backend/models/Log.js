@@ -5,7 +5,7 @@ const LogSchema = new mongoose.Schema({
   action: {
     type: String,
     required: true,
-    enum: ['STORY_APPROVED', 'STORY_REJECTED', 'STORY_DELETED', 'USER_BLOCKED', 'USER_UNBLOCKED', 'COMMENT_DELETED', 'SYSTEM_MAINTENANCE', 'SETTINGS_UPDATED', 'AI_ANALYSIS']
+    enum: ['STORY_APPROVED', 'STORY_REJECTED', 'STORY_DELETED', 'USER_BLOCKED', 'USER_UNBLOCKED', 'COMMENT_APPROVED', 'COMMENT_REJECTED', 'COMMENT_DELETED', 'SYSTEM_MAINTENANCE', 'SETTINGS_UPDATED', 'AI_ANALYSIS']
   },
   admin: {
     type: mongoose.Schema.Types.ObjectId,

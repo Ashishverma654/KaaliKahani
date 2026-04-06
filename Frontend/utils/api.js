@@ -9,6 +9,17 @@ const api = axios.create({
   },
 });
 
+// Attach access token from localStorage when available (fallback for cookie issues)
+api.interceptors.request.use((config) => {
+  if (typeof window !== 'undefined') {
+    const accessToken = localStorage.getItem('accessToken');
+    if (accessToken && accessToken !== 'undefined' && accessToken !== 'null' && !config.headers.Authorization) {
+      config.headers.Authorization = `Bearer ${accessToken}`;
+    }
+  }
+  return config;
+});
+
 // Response interceptor for global error handling
 api.interceptors.response.use(
   (response) => response,
@@ -25,8 +36,18 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        // Attempt to refresh the access token via the refresh token cookie
-        await api.post('/auth/refresh');
+        // Attempt to refresh the access token via the refresh token cookie or localStorage
+        const refreshToken = typeof window !== 'undefined' ? localStorage.getItem('refreshToken') : null;
+        const useRefreshToken = refreshToken && refreshToken !== 'undefined' && refreshToken !== 'null';
+        const refreshPayload = useRefreshToken ? { refreshToken } : undefined;
+        const refreshRes = await api.post('/auth/refresh', refreshPayload);
+
+        const newAccessToken = refreshRes?.data?.data?.accessToken;
+        const newRefreshToken = refreshRes?.data?.data?.refreshToken;
+        if (typeof window !== 'undefined') {
+          if (newAccessToken) localStorage.setItem('accessToken', newAccessToken);
+          if (newRefreshToken) localStorage.setItem('refreshToken', newRefreshToken);
+        }
         
         // If successful, the server has set a new access token cookie
         // Retry the original request

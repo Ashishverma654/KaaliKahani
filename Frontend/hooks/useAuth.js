@@ -40,6 +40,10 @@ export function AuthProvider({ children }) {
 
   const login = async (credentials) => {
     const data = await authService.login(credentials);
+    if (typeof window !== 'undefined') {
+      if (data?.accessToken) localStorage.setItem('accessToken', data.accessToken);
+      if (data?.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+    }
     setUser(data.user);
     setStatus('AUTHENTICATED');
     return data;
@@ -47,6 +51,10 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     await authService.logout();
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+    }
     setUser(null);
     setStatus('UNAUTHENTICATED');
   };

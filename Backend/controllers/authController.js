@@ -16,7 +16,7 @@ exports.register = async (req, res, next) => {
     res.cookie('accessToken', accessToken, { ...cookieOptions, maxAge: 24 * 60 * 60 * 1000 });
     res.cookie('refreshToken', refreshToken, cookieOptions);
 
-    return formatResponse(res, 201, 'User registered successfully', { user });
+    return formatResponse(res, 201, 'User registered successfully', { user, accessToken, refreshToken });
   } catch (error) {
     next(error);
   }
@@ -30,7 +30,7 @@ exports.login = async (req, res, next) => {
     res.cookie('accessToken', accessToken, { ...cookieOptions, maxAge: 24 * 60 * 60 * 1000 });
     res.cookie('refreshToken', refreshToken, cookieOptions);
 
-    return formatResponse(res, 200, 'Login successful', { user });
+    return formatResponse(res, 200, 'Login successful', { user, accessToken, refreshToken });
   } catch (error) {
     next(error);
   }
@@ -44,7 +44,7 @@ exports.adminLogin = async (req, res, next) => {
     res.cookie('accessToken', accessToken, { ...cookieOptions, maxAge: 24 * 60 * 60 * 1000 });
     res.cookie('refreshToken', refreshToken, cookieOptions);
 
-    return formatResponse(res, 200, 'Admin login successful', { user });
+    return formatResponse(res, 200, 'Admin login successful', { user, accessToken, refreshToken });
   } catch (error) {
     next(error);
   }
@@ -64,7 +64,10 @@ exports.refreshToken = async (req, res, next) => {
     res.cookie('accessToken', data.accessToken, { ...cookieOptions, maxAge: 24 * 60 * 60 * 1000 });
     res.cookie('refreshToken', data.refreshToken, cookieOptions);
 
-    return formatResponse(res, 200, 'Token refreshed successfully');
+    return formatResponse(res, 200, 'Token refreshed successfully', {
+      accessToken: data.accessToken,
+      refreshToken: data.refreshToken
+    });
   } catch (error) {
     next(error);
   }

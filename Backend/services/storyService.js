@@ -36,6 +36,9 @@ exports.submitStory = async (authorId, payload) => {
     slug: slugObj,
     language: [lang],
     images: payload.images || [],
+    seriesId: payload.seriesId || null,
+    seriesOrder: payload.seriesOrder || 1,
+    category: payload.category || 'general-horror',
     author: authorId,
     readTime,
     isPublished: false
@@ -109,19 +112,128 @@ exports.getStoryBySlug = async (slug, language = 'en') => {
     query, 
     { $inc: { views: 1 } }, // Increment view explicitly atomically
     { new: true }
-  ).populate('author', 'name avatar').lean();
+  ).populate('author', 'name avatar').populate('seriesId', 'title description').lean();
 
   if (!story) {
     throw new Error('Story not found or not published');
   }
 
   // Pull associated comments
-  const comments = await Comment.find({ storyId: story._id })
+  const comments = await Comment.find({ storyId: story._id, status: 'approved' })
     .sort({ createdAt: -1 })
     .populate('userId', 'name avatar')
     .lean();
 
-  return { story, comments };
+  // Aggregate reading progress stats
+  const ReadingProgress = require('../models/ReadingProgress');
+  const progressAgg = await ReadingProgress.aggregate([
+    { $match: { storyId: story._id } },
+    {
+      $group: {
+        _id: null,
+        readers: { $sum: 1 },
+        avgProgress: { $avg: '$progress' },
+        completed: { $sum: { $cond: [{ $gte: ['$progress', 90] }, 1, 0] } }
+      }
+    }
+  ]);
+
+  const progressStats = progressAgg?.[0]
+    ? {
+        readers: progressAgg[0].readers || 0,
+        avgProgress: Math.round(progressAgg[0].avgProgress || 0),
+        completed: progressAgg[0].completed || 0
+      }
+    : { readers: 0, avgProgress: 0, completed: 0 };
+
+  return { story, comments, progressStats };
+};
+
+exports.getFeaturedStory = async () => {
+  const Settings = require('../models/Settings');
+  const settings = await Settings.findOne().select('featuredStoryId').lean();
+  if (!settings?.featuredStoryId) return null;
+
+  const story = await Story.findOne({
+    _id: settings.featuredStoryId,
+    status: 'approved',
+    isPublished: true
+  })
+    .populate('author', 'name avatar')
+    .lean();
+
+  return story;
+};
+
+exports.searchStories = async (query, language = 'en') => {
+  if (!query) return [];
+  const filter = {
+    status: 'approved',
+    isPublished: true,
+    language: { $in: [language] },
+    $text: { $search: query }
+  };
+
+  const stories = await Story.find(filter, { score: { $meta: 'textScore' } })
+    .sort({ score: { $meta: 'textScore' } })
+    .limit(20)
+    .lean();
+
+  return stories;
+};
+
+exports.saveDraft = async (authorId, payload) => {
+  const lang = payload.language || 'en';
+  const titleText = payload.title || '';
+  const contentText = payload.content || '';
+
+  const titleObj = { [lang]: titleText };
+  const contentObj = { [lang]: contentText };
+
+  const draft = await Story.create({
+    title: titleObj,
+    content: contentObj,
+    originalContent: contentObj,
+    language: [lang],
+    images: payload.images || [],
+    seriesId: payload.seriesId || null,
+    seriesOrder: payload.seriesOrder || 1,
+    category: payload.category || 'general-horror',
+    author: authorId,
+    readTime: calculateReadTime(contentObj),
+    status: 'draft',
+    isPublished: false
+  });
+
+  return draft;
+};
+
+exports.updateDraft = async (authorId, draftId, payload) => {
+  const draft = await Story.findOne({ _id: draftId, author: authorId, status: 'draft' });
+  if (!draft) throw new Error('Draft not found');
+
+  const lang = payload.language || 'en';
+  if (payload.title !== undefined) draft.title = { ...draft.title, [lang]: payload.title };
+  if (payload.content !== undefined) draft.content = { ...draft.content, [lang]: payload.content };
+  if (payload.images) draft.images = payload.images;
+  if (payload.category) draft.category = payload.category;
+  if (payload.seriesId !== undefined) draft.seriesId = payload.seriesId || null;
+  if (payload.seriesOrder !== undefined) draft.seriesOrder = payload.seriesOrder || 1;
+  draft.readTime = calculateReadTime(draft.content);
+
+  await draft.save();
+  return draft;
+};
+
+exports.getMyDrafts = async (authorId) => {
+  return Story.find({ author: authorId, status: 'draft' })
+    .sort({ updatedAt: -1 })
+    .lean();
+};
+
+exports.getDraftById = async (authorId, draftId) => {
+  const draft = await Story.findOne({ _id: draftId, author: authorId, status: 'draft' }).lean();
+  return draft;
 };
 
 exports.toggleLike = async (userId, storyId) => {
@@ -153,17 +265,15 @@ exports.addComment = async (userId, storyId, content) => {
   const comment = await Comment.create({
     storyId,
     userId,
-    content
+    content,
+    status: 'pending'
   });
-
-  // Atomic aggregate bump
-  await Story.findByIdAndUpdate(storyId, { $inc: { commentsCount: 1 } });
 
   return comment;
 };
 
 exports.getMyStories = async (userId) => {
-  const stories = await Story.find({ author: userId })
+  const stories = await Story.find({ author: userId, status: { $ne: 'draft' } })
     .sort({ createdAt: -1 })
     .lean();
     

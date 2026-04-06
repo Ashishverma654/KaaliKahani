@@ -11,10 +11,10 @@ export default function HeaderCategoryDropdown() {
   const currentCategory = searchParams.get('category');
 
   const categories = [
-    'Real Horror',
-    'Paranormal',
-    'Haunted Places',
-    'Urban Legends'
+    { label: 'Real Horror', value: 'real-horror' },
+    { label: 'Paranormal', value: 'paranormal' },
+    { label: 'Haunted Places', value: 'haunted-places' },
+    { label: 'Urban Legends', value: 'urban-legends' }
   ];
 
   // Close dropdown when clicking outside
@@ -63,14 +63,14 @@ export default function HeaderCategoryDropdown() {
           <div className="h-px bg-outline-variant/30 my-2 mx-5"></div>
           {categories.map((cat) => (
             <button 
-              key={cat}
-              onClick={() => handleCategorySelect(cat)}
+              key={cat.value}
+              onClick={() => handleCategorySelect(cat.value)}
               className={`w-full text-left px-5 py-2.5 text-[10px] font-bold tracking-widest uppercase hover:bg-surface-container transition-colors flex items-center justify-between ${
-                currentCategory === cat ? 'text-primary bg-primary/5' : 'text-on-surface-variant hover:text-primary'
+                currentCategory === cat.value ? 'text-primary bg-primary/5' : 'text-on-surface-variant hover:text-primary'
               }`}
             >
-              {cat}
-              {currentCategory === cat && <span className="w-1 h-1 rounded-full bg-primary"></span>}
+              {cat.label}
+              {currentCategory === cat.value && <span className="w-1 h-1 rounded-full bg-primary"></span>}
             </button>
           ))}
         </div>

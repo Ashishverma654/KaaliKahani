@@ -33,11 +33,15 @@ const authRoutes = require('./routes/authRoutes');
 const storyRoutes = require('./routes/storyRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
+const seriesRoutes = require('./routes/seriesRoutes');
+const progressRoutes = require('./routes/progressRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/stories', storyRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/series', seriesRoutes);
+app.use('/api/progress', progressRoutes);
 
 // Public Heartbeat (No Protection)
 const adminController = require('./controllers/adminController');

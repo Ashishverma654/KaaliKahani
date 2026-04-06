@@ -31,6 +31,15 @@ const StorySchema = new mongoose.Schema({
     default: 'general-horror',
     index: true
   },
+  seriesId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Series',
+    default: null
+  },
+  seriesOrder: {
+    type: Number,
+    default: 1
+  },
   aiSuggestions: {
     title: {
       en: { type: String },
@@ -53,7 +62,7 @@ const StorySchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'approved', 'rejected'],
+    enum: ['draft', 'pending', 'approved', 'rejected'],
     default: 'pending'
   },
   isPublished: {
@@ -83,5 +92,11 @@ const StorySchema = new mongoose.Schema({
 
 // Optimize query routing: Fetch by Status and Date
 StorySchema.index({ status: 1, createdAt: -1 });
+StorySchema.index({
+  'title.en': 'text',
+  'title.hi': 'text',
+  'content.en': 'text',
+  'content.hi': 'text'
+});
 
 module.exports = mongoose.model('Story', StorySchema);

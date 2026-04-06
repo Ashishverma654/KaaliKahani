@@ -20,6 +20,21 @@ export const commentService = {
     return response.data.data;
   },
 
+  approveComment: async (id) => {
+    const response = await api.put(`/admin/comments/${id}/approve`);
+    return response.data.data;
+  },
+
+  rejectComment: async (id) => {
+    const response = await api.put(`/admin/comments/${id}/reject`);
+    return response.data.data;
+  },
+
+  bulkApprove: async (ids = []) => {
+    const response = await api.post('/admin/comments/approve-bulk', { ids });
+    return response.data.data;
+  },
+
   deleteComment: async (id) => {
     const response = await api.delete(`/admin/comments/${id}`);
     return response.data.data;

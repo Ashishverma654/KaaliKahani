@@ -161,10 +161,10 @@ export default function UserManagement() {
           data={filteredUsers}
           renderRow={(user, i) => (
             <>
-              <td className="py-5 pl-6 text-[11px] font-black text-on-surface-variant/40 font-mono">
+              <td className="py-4 pl-6 align-middle text-[11px] font-black text-on-surface-variant/40 font-mono">
                  {String(i + 1).padStart(2, '0')}
               </td>
-              <td className="py-5 px-4">
+              <td className="py-4 px-4 align-middle">
                  <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl bg-surface-container-high border border-outline-variant flex items-center justify-center text-primary font-black uppercase text-xs">
                        {user.name.charAt(0)}
@@ -175,12 +175,12 @@ export default function UserManagement() {
                     </div>
                  </div>
               </td>
-              <td className="py-5">
+              <td className="py-4 align-middle">
                  <span className={`text-[10px] font-black uppercase tracking-widest ${['admin', 'superadmin'].includes(user.role) ? 'text-primary' : 'text-on-surface-variant'}`}>
                     {user.role}
                  </span>
               </td>
-              <td className="py-5">
+              <td className="py-4 align-middle">
                  <div className="flex items-center gap-2">
                     <div className={`w-1.5 h-1.5 rounded-full ${user.isActive ? 'bg-green-500' : 'bg-red-500'}`}></div>
                     <span className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
@@ -188,11 +188,11 @@ export default function UserManagement() {
                     </span>
                  </div>
               </td>
-              <td className="py-5 text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
+              <td className="py-4 align-middle text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
                  {new Date(user.createdAt).toLocaleDateString()}
               </td>
-              <td className="py-5 pr-6">
-                 <div className="flex items-center gap-2">
+              <td className="py-4 pr-6 align-middle">
+                 <div className="flex items-center justify-end gap-2">
                     <button 
                       onClick={() => handleToggleBlock(user._id, user.isActive)}
                       className={`w-8 h-8 rounded-lg transition-all flex items-center justify-center border ${

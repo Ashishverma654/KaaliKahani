@@ -12,6 +12,7 @@ const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
   const isAuthPage = pathname === '/login';
+  const [searchQuery, setSearchQuery] = React.useState('');
 
   const [showUserMenu, setShowUserMenu] = React.useState(false);
 
@@ -47,6 +48,13 @@ const Navbar = () => {
               className="bg-transparent border-none focus:outline-none text-xs w-full placeholder:text-on-surface-variant flex items-center h-full outline-none text-on-surface" 
               placeholder="Search stories..." 
               type="text" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && searchQuery.trim()) {
+                  router.push(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
+                }
+              }}
             />
           </div>
 

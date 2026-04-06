@@ -4,21 +4,32 @@ import React, { useState, useEffect } from 'react';
 import adminService from '@/services/adminService';
 import Link from 'next/link';
 
-export default function StoryPreview({ params: paramsPromise }) {
+const getText = (value) => {
+  if (!value) return '';
+  if (typeof value === 'string') return value;
+  return value.en || value.hi || '';
+};
+
+const CATEGORY_LABELS = {
+  'real-horror': 'Real Horror',
+  'paranormal': 'Paranormal',
+  'haunted-places': 'Haunted Places',
+  'urban-legends': 'Urban Legends',
+  'general-horror': 'General Horror'
+};
+
+export default function StoryPreview({ params }) {
   const [story, setStory] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [params, setParams] = useState(null);
 
   useEffect(() => {
-    paramsPromise.then(setParams);
-  }, [paramsPromise]);
-
-  useEffect(() => {
-    if (!params) return;
     const loadStory = async () => {
-      const data = await adminService.getStoryById(params.id);
-      setStory(data);
-      setLoading(false);
+      try {
+        const data = await adminService.getStoryById(params.id);
+        setStory(data);
+      } finally {
+        setLoading(false);
+      }
     };
     loadStory();
   }, [params]);
@@ -59,16 +70,14 @@ export default function StoryPreview({ params: paramsPromise }) {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
               <div className="absolute bottom-0 left-0 p-10">
-                 <span className="bg-primary text-on-primary px-3 py-1 rounded text-[10px] font-black uppercase tracking-widest mb-4 inline-block">{story.category}</span>
-                 <h2 className="text-4xl md:text-5xl font-black font-gothic text-white drop-shadow-xl">{story.title}</h2>
+                 <span className="bg-primary text-on-primary px-3 py-1 rounded text-[10px] font-black uppercase tracking-widest mb-4 inline-block">{CATEGORY_LABELS[story.category] || story.category}</span>
+                 <h2 className="text-4xl md:text-5xl font-black font-gothic text-white drop-shadow-xl">{getText(story.title)}</h2>
               </div>
            </div>
 
            <div className="bg-surface-container border border-outline-variant rounded-[32px] p-10 md:p-16">
               <div className="prose prose-invert max-w-none text-on-surface-variant font-medium text-lg leading-relaxed">
-                 <p className="mb-6">The archives are heavy with the weight of unsaid things. The Pines don't just whisper; they scream in frequencies that humans weren't meant to perceive.</p>
-                 <p className="mb-6">It began with the static. Not the digital static of a broken television, but the organic, grinding static of a forest that has forgotten how to grow silently. Marcus took the recorder, his hands shaking slightly, and pointed it toward the epicenter of the grey-green blur.</p>
-                 <p>“Tell me,” he urged. The forest replied with a silence so loud it left his ears ringing for weeks. This is the first chapter of what we now call the Great Inversion.</p>
+                 <p className="mb-6">{getText(story.content)}</p>
               </div>
            </div>
         </div>
@@ -85,14 +94,14 @@ export default function StoryPreview({ params: paramsPromise }) {
                           <span className="material-symbols-outlined text-sm">person</span>
                        </div>
                        <div>
-                          <p className="text-xs font-bold text-on-surface">@{story.author}</p>
+                          <p className="text-xs font-bold text-on-surface">@{story.author?.name || 'Unknown'}</p>
                           <p className="text-[10px] text-on-surface-variant font-medium uppercase tracking-widest">Level 4 Writer</p>
                        </div>
                     </div>
                  </div>
                  <div>
                     <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-2">Language Protocol</p>
-                    <p className="text-xs font-bold text-on-surface uppercase tracking-[0.2em]">{story.language}</p>
+                    <p className="text-xs font-bold text-on-surface uppercase tracking-[0.2em]">{Array.isArray(story.language) ? story.language.join(', ') : story.language}</p>
                  </div>
                  <div>
                     <p className="text-[10px] font-black text-on-surface-variant uppercase tracking-widest mb-2">Content Safety Rating</p>

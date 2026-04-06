@@ -25,6 +25,26 @@ exports.getStories = async (req, res, next) => {
   }
 };
 
+exports.getFeaturedStory = async (req, res, next) => {
+  try {
+    const story = await storyService.getFeaturedStory();
+    return formatResponse(res, 200, 'Featured story loaded', story);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.searchStories = async (req, res, next) => {
+  try {
+    const query = req.query.query || '';
+    const lang = req.query.lang || 'en';
+    const stories = await storyService.searchStories(query, lang);
+    return formatResponse(res, 200, 'Search complete', stories);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.getStoryBySlug = async (req, res, next) => {
   try {
     const lang = req.query.lang || 'en';
@@ -62,6 +82,44 @@ exports.getMyStories = async (req, res, next) => {
   }
 };
 
+exports.getMyDrafts = async (req, res, next) => {
+  try {
+    const data = await storyService.getMyDrafts(req.user._id);
+    return formatResponse(res, 200, 'Drafts fetched', data);
+  } catch (error) {
+    console.error('Get Drafts Error:', error.message);
+    return formatResponse(res, 200, 'Drafts fetched', []);
+  }
+};
+
+exports.getDraftById = async (req, res, next) => {
+  try {
+    const draft = await storyService.getDraftById(req.user._id, req.params.id);
+    if (!draft) return formatResponse(res, 404, 'Draft not found');
+    return formatResponse(res, 200, 'Draft loaded', draft);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.saveDraft = async (req, res, next) => {
+  try {
+    const draft = await storyService.saveDraft(req.user._id, req.body);
+    return formatResponse(res, 201, 'Draft saved', draft);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.updateDraft = async (req, res, next) => {
+  try {
+    const draft = await storyService.updateDraft(req.user._id, req.params.id, req.body);
+    return formatResponse(res, 200, 'Draft updated', draft);
+  } catch (error) {
+    next(error);
+  }
+};
+
 /**
  * Handle Image Uplink to Cloudinary
  */
@@ -90,7 +148,7 @@ exports.analyzeStory = async (req, res, next) => {
 
     const aiResults = await geminiService.analyzeStory(content, lang || 'en');
     if (!aiResults) {
-      return formatResponse(res, 503, 'Gemini intelligence is currently unreachable');
+      return formatResponse(res, 503, 'AI analysis is disabled or unavailable');
     }
 
     return formatResponse(res, 200, 'AI Sense Analysis Complete', aiResults);

@@ -6,8 +6,13 @@ const { GoogleGenerativeAI } = require("@google/generative-ai");
  */
 class GeminiService {
   constructor() {
-    this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-    this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    this.disabled = !process.env.GEMINI_API_KEY;
+    this.genAI = null;
+    this.model = null;
+    if (!this.disabled) {
+      this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+      this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    }
   }
 
   /**
@@ -15,8 +20,12 @@ class GeminiService {
    * Generates enhanced prose, titles, and translations in a single pass.
    */
   async analyzeStory(originalContent, sourceLang = 'en') {
-    if (!process.env.GEMINI_API_KEY) {
+    if (this.disabled || !process.env.GEMINI_API_KEY) {
       console.warn("GEMINI_API_KEY missing. AI intelligence disabled.");
+      return null;
+    }
+    if (!this.model) {
+      console.warn("Gemini model not initialized. AI intelligence disabled.");
       return null;
     }
 
