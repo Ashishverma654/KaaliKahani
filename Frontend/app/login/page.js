@@ -1,30 +1,33 @@
 "use client";
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/hooks/useAuth';
 import api from '@/utils/api';
 import Link from 'next/link';
 import toast from 'react-hot-toast';
+import { Suspense } from 'react';
 
-export default function AuthenticatonPortal() {
+function AuthenticationContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { isLoggedIn, isAdmin, isSettled, loading: authLoading, refreshUser } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '', dob: '' });
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  // Identity Guard: Prevent logged-in users from accessing the portal map
+  // Identity Guard: Redirect based on clearance and 'from' vector map
   React.useEffect(() => {
     if (isSettled && isLoggedIn) {
-      // If the curator possesses administrative clearance, send them to the Desk map
-      if (isAdmin) {
-        router.push('/admin');
-      } else {
-        router.push('/');
-      }
+      const from = searchParams.get('from') || (isAdmin ? '/admin' : '/');
+      
+      // Small delay to ensure the session has fully registered in the browser map
+      const timer = setTimeout(() => {
+        router.push(from);
+      }, 500);
+      return () => clearTimeout(timer);
     }
-  }, [isLoggedIn, isAdmin, isSettled, router]);
+  }, [isLoggedIn, isAdmin, isSettled, router, searchParams]);
 
   // Blocking Restoration Pulse map: If the session is settled and user is logged in, hide the form map
   if (isSettled && isLoggedIn) {
@@ -237,5 +240,18 @@ export default function AuthenticatonPortal() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function AuthenticatonPortal() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-black flex flex-col items-center justify-center space-y-8 animate-pulse">
+        <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-[10px] font-black tracking-[0.5em] uppercase text-on-surface-variant/40">Synchronizing Identity Registry...</p>
+      </div>
+    }>
+      <AuthenticationContent />
+    </Suspense>
   );
 }

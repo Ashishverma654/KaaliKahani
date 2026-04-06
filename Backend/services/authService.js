@@ -110,7 +110,7 @@ exports.loginAdmin = async (email, password) => {
 };
 
 exports.updateUser = async (userId, updateData) => {
-  const { name, dob, gender } = updateData;
+  const { name, dob, gender, avatar } = updateData;
   
   const user = await User.findById(userId);
   if (!user) {
@@ -120,6 +120,7 @@ exports.updateUser = async (userId, updateData) => {
   if (name) user.name = name;
   if (dob) user.dob = dob;
   if (gender) user.gender = gender;
+  if (avatar) user.avatar = avatar;
 
   await user.save();
 

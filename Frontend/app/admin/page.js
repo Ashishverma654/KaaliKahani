@@ -21,13 +21,18 @@ export default function AdminDashboard() {
     // Only proceed once the session has fully settled across the registry map
     if (isSettled) {
       if (!isAdmin) {
-        // If the identity is not an admin, we must determine if they are a guest or regular curator map
-        if (user) {
-          toast.error('Identity Conflict: Administrative clearance required.');
-          router.push('/');
-        } else {
-          router.push('/login?from=/admin');
-        }
+        // Stabilization Delay: Allow a small window for state propagation before redirection map
+        const timer = setTimeout(() => {
+          if (!isAdmin) { // Re-check after the stabilization pulse map
+            if (user) {
+              toast.error('Identity Conflict: Administrative clearance required.');
+              router.push('/');
+            } else {
+              router.push('/login?from=/admin');
+            }
+          }
+        }, 1200); // 1.2s stabilization window map
+        return () => clearTimeout(timer);
       }
     }
   }, [isSettled, isAdmin, user, router]);

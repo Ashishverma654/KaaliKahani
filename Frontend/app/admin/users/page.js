@@ -156,12 +156,15 @@ export default function UserManagement() {
         )}
       >
         <Table 
-          headers={['Curator', 'Role', 'Status', 'Joined', 'Actions']}
+          headers={['#', 'Curator', 'Role', 'Status', 'Joined', 'Actions']}
           loading={loading}
           data={filteredUsers}
-          renderRow={(user) => (
+          renderRow={(user, i) => (
             <>
-              <td className="py-5 px-6">
+              <td className="py-5 pl-6 text-[11px] font-black text-on-surface-variant/40 font-mono">
+                 {String(i + 1).padStart(2, '0')}
+              </td>
+              <td className="py-5 px-4">
                  <div className="flex items-center gap-4">
                     <div className="w-10 h-10 rounded-xl bg-surface-container-high border border-outline-variant flex items-center justify-center text-primary font-black uppercase text-xs">
                        {user.name.charAt(0)}

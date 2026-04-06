@@ -49,7 +49,7 @@ export function AuthProvider({ children }) {
     setIsSettled(true);
   };
 
-  const value = {
+  const value = React.useMemo(() => ({
     user,
     loading,
     isSettled,
@@ -58,7 +58,7 @@ export function AuthProvider({ children }) {
     login,
     logout,
     refreshUser
-  };
+  }), [user, loading, isSettled]);
 
   return (
     <AuthContext.Provider value={value}>

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import storyService from '@/services/storyService';
+import authService from '@/services/authService';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
@@ -20,8 +21,21 @@ export default function UserProfile() {
   const [formData, setFormData] = useState({
     name: '',
     dob: '',
-    gender: ''
+    gender: '',
+    avatar: ''
   });
+
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = React.useRef(null);
+
+  const avatarPresets = [
+    { name: 'Acheron', url: '/assets/avatars/acheron.jpg' },
+    { name: 'Lyra', url: '/assets/avatars/lyra.jpg' },
+    { name: 'Kaelen', url: '/assets/avatars/kaelen.jpg' }, // Existing or to be created
+    { name: 'Nyx', url: '/assets/avatars/nyx.jpg' },
+    { name: 'Vesper', url: '/assets/avatars/vesper.jpg' },
+    { name: 'Oriole', url: '/assets/avatars/oriole.jpg' }
+  ];
 
   const [passwordData, setPasswordData] = useState({
     currentPassword: '',
@@ -66,10 +80,46 @@ export default function UserProfile() {
       setFormData({
         name: user.name || '',
         dob: user.dob ? new Date(user.dob).toISOString().split('T')[0] : '',
-        gender: user.gender || 'prefer_not_to_say'
+        gender: user.gender || 'prefer_not_to_say',
+        avatar: user.avatar || ''
       });
     }
   }, [user]);
+
+  const handleFileUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      return toast.error('Selection Error: File size exceeds the 5MB archival limit.');
+    }
+
+    const uploadData = new FormData();
+    uploadData.append('avatar', file);
+
+    setUploading(true);
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/upload/avatar`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('accessToken')}`
+        },
+        body: uploadData
+      });
+
+      const result = await response.json();
+      if (result.success) {
+        setFormData({ ...formData, avatar: result.data.url });
+        toast.success('Portrait synchronized with the archival stream.');
+      } else {
+        throw new Error(result.message);
+      }
+    } catch (error) {
+      toast.error('Ingestion Failure: Failed to synchronize personal portrait.');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const handleUpdateProfile = async (e) => {
     e.preventDefault();
@@ -352,7 +402,54 @@ export default function UserProfile() {
                 </div>
 
                 {isEditing ? (
-                   <form onSubmit={handleUpdateProfile} className="space-y-10">
+                   <form onSubmit={handleUpdateProfile} className="space-y-12">
+                      {/* Persona Selection Portal */}
+                      <div className="space-y-6 mb-10">
+                         <div className="flex items-center justify-between">
+                            <label className="text-[10px] font-black uppercase text-primary tracking-[0.3em]">Select Curator Persona</label>
+                            <button 
+                               type="button"
+                               onClick={() => fileInputRef.current?.click()}
+                               disabled={uploading}
+                               className="flex items-center gap-2 text-primary hover:text-white transition-colors text-[9px] font-black uppercase tracking-widest border-b border-primary/20 pb-0.5"
+                            >
+                               <span className="material-symbols-outlined text-[14px]">{uploading ? 'sync' : 'add_photo_alternate'}</span>
+                               {uploading ? 'Ingesting...' : 'Upload Custom Portrait'}
+                            </button>
+                            <input 
+                               type="file" 
+                               ref={fileInputRef} 
+                               onChange={handleFileUpload} 
+                               className="hidden" 
+                               accept="image/*" 
+                            />
+                         </div>
+                         
+                         <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
+                            {avatarPresets.map((preset) => (
+                               <button
+                                  key={preset.name}
+                                  type="button"
+                                  onClick={() => setFormData({...formData, avatar: preset.url})}
+                                  className={`relative group aspect-square rounded-2xl overflow-hidden border-2 transition-all duration-500 ${
+                                     formData.avatar === preset.url 
+                                        ? 'border-primary shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] scale-[1.05]' 
+                                        : 'border-outline-variant/10 hover:border-primary/40'
+                                  }`}
+                               >
+                                  <img src={preset.url} alt={preset.name} className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 transition-all duration-500" />
+                                  {formData.avatar === preset.url && (
+                                     <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                                        <span className="material-symbols-outlined text-on-primary text-xl font-black drop-shadow-lg">check_circle</span>
+                                     </div>
+                                  )}
+                                  <div className="absolute bottom-0 left-0 w-full bg-black/60 backdrop-blur-md py-1 text-[7px] font-black uppercase tracking-widest text-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                     {preset.name}
+                                  </div>
+                               </button>
+                            ))}
+                         </div>
+                      </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                          <div className="space-y-2">
                             <label className="text-[9px] font-black uppercase text-primary tracking-[0.2em]">Curator Name</label>
@@ -466,8 +563,17 @@ export default function UserProfile() {
                          </div>
                       </div>
 
-                      <div className="p-8 bg-primary/5 border border-primary/10 rounded-3xl">
-                         <p className="text-xs text-on-surface-variant font-medium leading-relaxed italic">"Identities are the keys to the archive. Ensure your personal details remain synchronized with the central registry to maintain access integrity."</p>
+                      <div className="flex flex-col md:flex-row items-center gap-8 py-8 border-t border-outline-variant/10">
+                         <div className="flex-1 space-y-2">
+                            <p className="text-xs text-on-surface-variant font-medium leading-relaxed italic">"Identities are the keys to the archive. Ensure your personal details remain synchronized with the central registry to maintain access integrity."</p>
+                         </div>
+                         <button 
+                            onClick={() => setIsEditing(true)}
+                            className="w-full md:w-auto px-10 py-5 bg-primary text-on-primary rounded-full font-black text-[10px] uppercase tracking-widest shadow-2xl transition-all hover:scale-[1.02] flex items-center justify-center gap-3"
+                         >
+                            <span className="material-symbols-outlined text-sm">edit_note</span>
+                            Edit Identity Registry
+                         </button>
                       </div>
                    </>
                 )}

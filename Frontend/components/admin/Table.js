@@ -31,7 +31,7 @@ const Table = ({ headers, data, renderRow, loading }) => {
           ) : data && data.length > 0 ? (
             data.map((item, i) => (
               <tr key={i} className="group hover:bg-white/[0.02] transition-colors duration-300">
-                {renderRow(item)}
+                {renderRow(item, i)}
               </tr>
             ))
           ) : (

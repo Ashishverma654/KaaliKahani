@@ -96,7 +96,15 @@ export default function StoriesModeration() {
       <div className="flex justify-between items-end text-white">
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl md:text-5xl font-black font-gothic tracking-[0.2em] uppercase pt-12 pb-2 leading-relaxed">Narrative Curation</h1>
-          <p className="text-[10px] font-bold tracking-[0.4em] uppercase text-on-surface-variant/40">Gatekeeper Protocol & Review Queue</p>
+          <div className="flex items-center justify-between gap-8">
+             <p className="text-[10px] font-bold tracking-[0.4em] uppercase text-on-surface-variant/40">Gatekeeper Protocol & Review Queue</p>
+             <div className="flex items-center gap-4 bg-primary/10 border border-primary/20 px-6 py-2.5 rounded-full">
+                <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                <span className="text-[9px] font-black uppercase tracking-[0.2em] text-primary">
+                   {stories.length} Narratives in {activeTab} Vector
+                </span>
+             </div>
+          </div>
         </div>
       </div>
 
@@ -119,12 +127,15 @@ export default function StoriesModeration() {
 
         <div className="bg-black/20 backdrop-blur-3xl border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl">
           <Table 
-            headers={['Narrative', 'Author', 'Category', 'Timestamp', 'Actions']}
+            headers={['#', 'Narrative', 'Author', 'Category', 'Timestamp', 'Actions']}
             loading={loading}
             data={stories}
-            renderRow={(story) => (
+            renderRow={(story, i) => (
               <>
-                <td className="py-6 px-8">
+                <td className="py-6 pl-8 text-[11px] font-black text-on-surface-variant/40 font-mono">
+                   {String(i + 1).padStart(2, '0')}
+                </td>
+                <td className="py-6 px-4">
                    <div className="flex flex-col gap-1">
                       <span className="text-xs font-black text-white group-hover:text-primary transition-colors">{story.title?.en || story.title}</span>
                       <span className="text-[9px] font-bold text-on-surface-variant uppercase tracking-tighter opacity-40">ID: {story._id.slice(-8)}</span>
