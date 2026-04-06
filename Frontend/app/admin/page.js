@@ -16,20 +16,21 @@ export default function AdminDashboard() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Auth Guard Execution map
+  // Operational Identity Guard map
   useEffect(() => {
+    // Only trigger redirect if we are 100% certain the user is not an admin map
     if (!authLoading && !isAdmin) {
-      toast.error('Identity Conflict: Administrative access denied.');
       router.push('/login');
     }
   }, [authLoading, isAdmin, router]);
 
+  // Primary Data Fetch: Only execute after successful identity clearance map
   useEffect(() => {
-    // Only proceed with data fetch if the identity is confirmed map
     if (authLoading || !isAdmin) return;
     
     const fetchDashboardData = async () => {
       try {
+        setLoading(true);
         const [statsData, storiesData, logsData] = await Promise.all([
           adminService.getStats(),
           adminService.getStories(),
@@ -39,13 +40,32 @@ export default function AdminDashboard() {
         setStories(storiesData || []);
         setLogs(logsData || []);
       } catch (error) {
-        toast.error('Failed to load dashboard data');
+        toast.error('Registry Access Error: Failed to synchronize telemetry.');
       } finally {
         setLoading(false);
       }
     };
     fetchDashboardData();
-  }, []);
+  }, [authLoading, isAdmin]);
+
+  // Loading Screen: Prevent UI flickering before the identity is confirmed map
+  if (authLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-[80vh] space-y-8 animate-pulse text-center">
+        <div className="relative w-20 h-20">
+          <div className="absolute inset-0 border-4 border-primary/10 rounded-full"></div>
+          <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin shadow-[0_0_20px_rgba(163,29,29,0.2)]"></div>
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-black font-gothic tracking-[0.3em] uppercase text-white">Archive Clearance In Progress</h2>
+          <p className="text-[10px] font-black tracking-[0.5em] uppercase text-on-surface-variant/40">Synchronizing Curator Registry...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Final Guard Bypass: Prevent ghost rendering of unauthorized content map
+  if (!isAdmin) return null;
 
   const metricCards = [
     { label: 'Pending Verifications', value: stats?.pendingSubmissions || 0, icon: 'pending_actions', trend: '+12% flux', color: 'text-amber-500', sparkline: [40, 70, 50, 90, 60, 80] },

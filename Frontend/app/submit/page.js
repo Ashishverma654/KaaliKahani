@@ -6,26 +6,30 @@ import api from '@/utils/api';
 export default function SubmitStory() {
   const router = useRouter();
   const [formData, setFormData] = useState({ title: '', content: '', category: 'General Horror' });
-  const [image, setImage] = useState(null);
-  const [imagePreview, setImagePreview] = useState(null);
-  const [isUploading, setIsUploading] = useState(false);
+  const [images, setImages] = useState([null, null, null]);
+  const [imagePreviews, setImagePreviews] = useState([null, null, null]);
+  const [uploadingSlot, setUploadingSlot] = useState(null); // Track specific slot being uploaded map
   const [aiSuggestions, setAiSuggestions] = useState(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Handle Image Uplink to the Registry
-  const handleImageChange = async (e) => {
+  // Handle Image Uplink for a specific slot map
+  const handleImageChange = async (slotIndex, e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Local Preview
+    // Local Preview Update map
     const reader = new FileReader();
-    reader.onloadend = () => setImagePreview(reader.result);
+    reader.onloadend = () => {
+      const newPreviews = [...imagePreviews];
+      newPreviews[slotIndex] = reader.result;
+      setImagePreviews(newPreviews);
+    };
     reader.readAsDataURL(file);
 
-    // Immediate Upload to Registry
-    setIsUploading(true);
+    // Immediate Upload to Registry map
+    setUploadingSlot(slotIndex);
     const uploadData = new FormData();
     uploadData.append('image', file);
 
@@ -33,11 +37,13 @@ export default function SubmitStory() {
       const res = await api.post('/stories/upload', uploadData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      setImage(res.data.data.imageUrl);
+      const newImages = [...images];
+      newImages[slotIndex] = res.data.data.imageUrl;
+      setImages(newImages);
     } catch (err) {
-      setError('Image Uplink Failed: Please try a different frequency.');
+      setError(`Slot ${slotIndex + 1} Uplink Failed: Please try a different frequency.`);
     } finally {
-      setIsUploading(false);
+      setUploadingSlot(null);
     }
   };
 
@@ -84,7 +90,7 @@ export default function SubmitStory() {
         content: formData.content,
         language: 'en',
         category: formData.category,
-        images: image ? [image] : []
+        images: images.filter(Boolean) // Filter only successfully uploaded URLs map
       });
       alert('Archive Entry Successful: Your narrative has been filed.');
       router.push('/');
@@ -93,6 +99,35 @@ export default function SubmitStory() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const renderUploadBlock = (index, isHero = false) => {
+    const isUploading = uploadingSlot === index;
+    const preview = imagePreviews[index];
+    
+    return (
+      <label className={`relative group overflow-hidden rounded-xl bg-surface-container-low border border-dashed border-outline-variant flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-surface-container hover:border-primary/50 ${preview ? 'border-none' : ''} ${isHero ? 'md:col-span-2' : 'flex-1'}`}>
+        {preview ? (
+          <>
+            <img src={preview} alt={`Slot ${index} Preview`} className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity" />
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+               <span className="material-symbols-outlined text-white text-3xl">edit</span>
+            </div>
+          </>
+        ) : (
+          <>
+            <span className={`material-symbols-outlined ${isHero ? 'text-4xl' : 'text-2xl'} text-primary mb-3 ${isUploading ? 'animate-spin' : ''}`}>
+              {isUploading ? 'sync' : (isHero ? 'add_a_photo' : 'imagesmode')}
+            </span>
+            <p className={`${isHero ? 'text-sm' : 'text-[10px]'} text-on-surface font-semibold uppercase tracking-widest`}>
+              {isUploading ? 'Beaming...' : (isHero ? 'Hero Atmos' : `Slot ${index + 1}`)}
+            </p>
+            {isHero && <p className="text-on-surface-variant text-[9px] mt-1 italic tracking-normal uppercase opacity-40">PNG, JPG or WebP (Max 10MB)</p>}
+          </>
+        )}
+        <input type="file" className="hidden" accept="image/*" onChange={(e) => handleImageChange(index, e)} disabled={uploadingSlot !== null} />
+      </label>
+    );
   };
 
   return (
@@ -130,37 +165,14 @@ export default function SubmitStory() {
           />
         </section>
 
-        {/* Media Upload Section */}
+        {/* Media Upload Section map */}
         <section>
           <label className="text-on-surface-variant font-display font-bold text-sm tracking-widest uppercase mb-6 block">02. Visual Atmosphere</label>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[300px]">
-             <label className={`md:col-span-2 relative group overflow-hidden rounded-xl bg-surface-container-low border border-dashed border-outline-variant flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-surface-container hover:border-primary/50 ${imagePreview ? 'border-none' : ''}`}>
-               {imagePreview ? (
-                 <>
-                   <img src={imagePreview} alt="Preview" className="absolute inset-0 w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity" />
-                   <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <span className="material-symbols-outlined text-white text-3xl">edit</span>
-                   </div>
-                 </>
-               ) : (
-                 <>
-                   <span className={`material-symbols-outlined text-4xl text-primary mb-3 ${isUploading ? 'animate-spin' : ''}`}>
-                     {isUploading ? 'sync' : 'add_a_photo'}
-                   </span>
-                   <p className="text-on-surface font-semibold">{isUploading ? 'Beaming to Registry...' : 'Upload Hero Image'}</p>
-                   <p className="text-on-surface-variant text-xs mt-1 italic">Atmospheric PNG, JPG or WebP (Max 10MB)</p>
-                 </>
-               )}
-               <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} disabled={isUploading} />
-             </label>
-             
+             {renderUploadBlock(0, true)}
              <div className="hidden md:flex flex-col gap-4">
-                <div className="flex-1 bg-surface-container-low rounded-xl border border-dashed border-outline-variant flex items-center justify-center text-outline-variant hover:text-primary transition-colors cursor-pointer group">
-                  <span className="material-symbols-outlined transition-transform group-hover:scale-125">imagesmode</span>
-                </div>
-                <div className="flex-1 bg-surface-container-low rounded-xl border border-dashed border-outline-variant flex items-center justify-center text-outline-variant hover:text-primary transition-colors cursor-pointer group">
-                  <span className="material-symbols-outlined transition-transform group-hover:scale-125">auto_graph</span>
-                </div>
+                {renderUploadBlock(1)}
+                {renderUploadBlock(2)}
              </div>
           </div>
         </section>
