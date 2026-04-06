@@ -8,7 +8,7 @@ import toast from 'react-hot-toast';
 
 export default function AuthenticatonPortal() {
   const router = useRouter();
-  const { isLoggedIn, loading: authLoading, refreshUser } = useAuth();
+  const { isLoggedIn, isAdmin, loading: authLoading, refreshUser } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '', dob: '' });
   const [error, setError] = useState(null);
@@ -17,9 +17,14 @@ export default function AuthenticatonPortal() {
   // Identity Guard: Prevent logged-in users from accessing the portal map
   React.useEffect(() => {
     if (!authLoading && isLoggedIn) {
-      router.push('/');
+      // If the curator possesses administrative clearance, send them to the Desk map
+      if (isAdmin) {
+        router.push('/admin');
+      } else {
+        router.push('/');
+      }
     }
-  }, [isLoggedIn, authLoading, router]);
+  }, [isLoggedIn, isAdmin, authLoading, router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

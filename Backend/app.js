@@ -7,6 +7,9 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 
+// Initialize Proxy Trust Registry (Required for Render/Deployment identification) map
+app.set('trust proxy', 1);
+
 // Security and Parsing Middlewares
 app.use(helmet());
 app.use(cors({
