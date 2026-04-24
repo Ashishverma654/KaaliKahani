@@ -14,12 +14,13 @@ app.set('trust proxy', 1);
 app.use(helmet());
 app.use(cors({
   origin: [
-    'http://localhost:3000', // Public Site Local
-    'http://localhost:3001', // Admin Dashboard Local Vector 1
-    'http://localhost:3002', // Admin Dashboard Local Vector 2
-    'https://kaali-kahani-tpkx.vercel.app', // Public Site Deployed 1
-    'https://kaali-kahani.vercel.app', // Public Site Deployed 2
-    'https://kaali-kahani-admin.vercel.app', // Admin Dashboard Deployed
+    'http://localhost:3000', 
+    'http://localhost:3001', 
+    'http://localhost:3002',
+    'https://kaali-kahani-tpkx.vercel.app', 
+    'https://kaali-kahani.vercel.app',
+    'https://kaali-kahani-admin.vercel.app',
+    'https://kaalikahani.onrender.com',
     process.env.FRONTEND_URL,
     process.env.ADMIN_URL
   ].filter(Boolean),
