@@ -19,7 +19,7 @@ exports.getStories = async (req, res, next) => {
     const category = req.query.category || null;
     
     const data = await storyService.getPublicStories(lang, page, limit, category);
-    return formatResponse(res, 200, 'Stories fetched gracefully', data);
+    return formatResponse(res, 200, 'Stories fetched successfully', data);
   } catch (error) {
     next(error);
   }
@@ -49,7 +49,7 @@ exports.getStoryBySlug = async (req, res, next) => {
   try {
     const lang = req.query.lang || 'en';
     const data = await storyService.getStoryBySlug(req.params.slug, lang);
-    return formatResponse(res, 200, 'Story loaded securely', data);
+    return formatResponse(res, 200, 'Story loaded successfully', data);
   } catch (error) {
     next(error);
   }
@@ -128,7 +128,7 @@ exports.uploadImage = async (req, res, next) => {
     if (!req.file) {
       return formatResponse(res, 400, 'No file provided');
     }
-    return formatResponse(res, 200, 'Image beamed to registry', {
+    return formatResponse(res, 200, 'Image uploaded successfully', {
       imageUrl: req.file.path
     });
   } catch (error) {
@@ -151,7 +151,7 @@ exports.analyzeStory = async (req, res, next) => {
       return formatResponse(res, 503, 'AI analysis is disabled or unavailable');
     }
 
-    return formatResponse(res, 200, 'AI Sense Analysis Complete', aiResults);
+    return formatResponse(res, 200, 'AI Analysis Complete', aiResults);
   } catch (error) {
     next(error);
   }

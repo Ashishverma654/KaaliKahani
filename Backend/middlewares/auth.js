@@ -35,19 +35,13 @@ exports.protect = async (req, res, next) => {
   }
 };
 
-const normalizeRole = (role) => {
-  if (!role) return '';
-  return String(role).toLowerCase().replace(/[^a-z]/g, '');
-};
-
-// Grant access to specific roles
-exports.authorize = (...roles) => {
+// Grant access to specific roles (Industry Standard RBAC)
+exports.restrictTo = (...roles) => {
   return (req, res, next) => {
-    const userRole = normalizeRole(req.user.role);
-    const allowed = roles.map(normalizeRole);
-    if (!allowed.includes(userRole)) {
-      return formatResponse(res, 403, `User role '${req.user.role}' is not authorized to access this route`);
+    if (!roles.includes(req.user.role)) {
+      return formatResponse(res, 403, `User role ${req.user.role} is not authorized to access this route`);
     }
     next();
   };
 };
+

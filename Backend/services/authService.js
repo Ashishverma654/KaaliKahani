@@ -27,8 +27,7 @@ exports.registerUser = async (userData) => {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
 
-  const isFirstUser = (await User.countDocuments({})) === 0;
-  const role = isFirstUser ? 'admin' : 'user';
+  const role = 'user';
 
   const user = await User.create({
     name,
@@ -97,18 +96,7 @@ exports.refreshAccessToken = async (token) => {
   }
 };
 
-exports.loginAdmin = async (email, password) => {
-  const result = await exports.loginUser(email, password);
-  
-  // Verify admin status post-login verification
-  const user = await User.findOne({ email });
-  const role = (user?.role || '').toLowerCase().replace(/[^a-z]/g, '');
-  if (role !== 'admin' && role !== 'superadmin') {
-    throw new Error('Access denied. Administrative privileges required for this endpoint.');
-  }
 
-  return result;
-};
 
 exports.updateUser = async (userId, updateData) => {
   const { name, dob, gender, avatar } = updateData;

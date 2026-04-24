@@ -8,7 +8,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 const Navbar = () => {
-  const { user, isLoggedIn, isAdmin, logout } = useAuth();
+  const { user, isLoggedIn, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const isAuthPage = pathname === '/login';
@@ -63,31 +63,23 @@ const Navbar = () => {
               {isLoggedIn ? (
                 <div className="flex items-center gap-5">
                   <div className="flex items-center gap-3">
-                    {isAdmin && (
-                      <Link 
-                        href="/admin" 
-                        className="bg-primary/10 text-primary border border-primary/20 px-4 py-1.5 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-primary/20 transition-all flex items-center gap-2 h-8"
-                      >
-                        <span>Admin Dashboard</span>
-                        <span className="bg-primary/20 text-primary px-2 py-0.5 rounded-full text-[7px] tracking-[0.2em]">Direct</span>
-                      </Link>
-                    )}
+
                     <Link 
                       href="/submit" 
-                      className="bg-white/5 text-on-surface-variant border border-white/10 px-4 py-1.5 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-white/10 transition-all flex items-center h-8"
+                      className="bg-surface-container text-on-surface-variant border border-outline-variant/30 px-4 py-1.5 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-primary hover:text-white transition-all flex items-center h-8"
                     >
                       New Story
                     </Link>
                   </div>
                   
-                  {/* Cinematic Curator Dropdown */}
+                  {/* User Profile Dropdown */}
                   <div className="relative pl-4 border-l border-white/10">
                     <button 
                       onClick={() => setShowUserMenu(!showUserMenu)}
                       className="group relative flex items-center"
-                      title={`Curator: ${user?.name}`}
+                      title={`User: ${user?.name}`}
                     >
-                      <div className="w-9 h-9 rounded-full ring-2 ring-white/10 ring-offset-2 ring-offset-black transition-all group-hover:ring-primary/50 overflow-hidden bg-surface-container-highest/30 backdrop-blur-xl flex items-center justify-center">
+                      <div className="w-9 h-9 rounded-full ring-2 ring-outline-variant/30 ring-offset-2 ring-offset-surface transition-all group-hover:ring-primary/50 overflow-hidden bg-surface-container-high backdrop-blur-xl flex items-center justify-center">
                         {user?.avatar ? (
                           <img src={user.avatar} alt={user.name} className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all" />
                         ) : (
@@ -98,21 +90,21 @@ const Navbar = () => {
                       <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-black"></div>
                     </button>
 
-                    {/* Editorial Dropdown Menu */}
+                    {/* User Menu */}
                     {showUserMenu && (
-                      <div className="absolute top-12 right-0 w-48 bg-black/80 backdrop-blur-3xl border border-white/10 rounded-2xl shadow-2xl py-3 animate-in fade-in slide-in-from-top-2 duration-300 z-50 overflow-hidden">
-                        <div className="px-5 py-2 border-b border-white/5 mb-2">
-                          <p className="text-[8px] font-black text-primary uppercase tracking-[0.3em]">Curator Identified</p>
-                          <p className="text-[10px] text-white font-bold truncate max-w-full">{user?.name}</p>
+                      <div className="absolute top-12 right-0 w-48 bg-surface-container-high backdrop-blur-3xl border border-outline-variant/30 rounded-2xl shadow-2xl py-3 animate-in fade-in slide-in-from-top-2 duration-300 z-50 overflow-hidden">
+                        <div className="px-5 py-2 border-b border-outline-variant/10 mb-2">
+                          <p className="text-[8px] font-black text-primary uppercase tracking-[0.3em]">Logged In As</p>
+                          <p className="text-[10px] text-on-surface font-bold truncate max-w-full">{user?.name}</p>
                         </div>
                         
                         <Link 
                           href="/profile" 
                           onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-3 px-5 py-3 text-[9px] font-black uppercase tracking-[0.2em] text-on-surface-variant hover:text-white hover:bg-white/5 transition-all group"
+                          className="flex items-center gap-3 px-5 py-3 text-[9px] font-black uppercase tracking-[0.2em] text-on-surface-variant hover:text-primary hover:bg-primary/5 transition-all group"
                         >
-                          <span className="material-symbols-outlined text-sm group-hover:text-primary transition-colors">person_search</span>
-                          Profile Archive
+                          <span className="material-symbols-outlined text-sm group-hover:text-primary transition-colors">person</span>
+                          Profile
                         </Link>
                         
                         <button 
@@ -120,10 +112,10 @@ const Navbar = () => {
                             handleLogout();
                             setShowUserMenu(false);
                           }}
-                          className="w-full flex items-center gap-3 px-5 py-3 text-[9px] font-black uppercase tracking-[0.2em] text-red-500 hover:bg-red-500/10 transition-all border-t border-white/5 group"
+                          className="w-full flex items-center gap-3 px-5 py-3 text-[9px] font-black uppercase tracking-[0.2em] text-red-500 hover:bg-red-500/10 transition-all border-t border-outline-variant/10 group"
                         >
-                          <span className="material-symbols-outlined text-sm group-hover:animate-pulse">power_settings_new</span>
-                          Terminate Session
+                          <span className="material-symbols-outlined text-sm group-hover:animate-pulse">logout</span>
+                          Logout
                         </button>
                       </div>
                     )}
@@ -132,9 +124,9 @@ const Navbar = () => {
               ) : (
                 <Link 
                   href="/login" 
-                  className="bg-white/5 text-on-surface border border-white/10 px-6 py-2 rounded-full font-black text-[9px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all shadow-2xl backdrop-blur-xl flex items-center h-9"
+                  className="bg-surface-container text-on-surface border border-outline-variant/30 px-6 py-2 rounded-full font-black text-[9px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all shadow-2xl backdrop-blur-xl flex items-center h-9"
                 >
-                  Initiate Access
+                  Login / Sign Up
                 </Link>
               )}
             </div>

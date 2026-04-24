@@ -11,7 +11,7 @@ function AuthenticationContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const { isLoggedIn, isAdmin, isSettled, loading: authLoading, refreshUser, login } = useAuth();
+  const { isLoggedIn, isSettled, loading: authLoading, refreshUser, login } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '', dob: '' });
   const [error, setError] = useState(null);
@@ -20,17 +20,15 @@ function AuthenticationContent() {
   // Identity Guard: Redirect based on clearance and 'from' vector map
   React.useEffect(() => {
     if (isSettled && isLoggedIn) {
-      const from = searchParams.get('from') || (isAdmin ? '/admin' : '/');
+      const from = searchParams.get('from') || '/';
       
-      // Transition to appropriate archival quadrant using soft navigation to preserve registry state map map map
       const timer = setTimeout(() => {
-        // Prevent recursive redirection if 'from' is current page map map map
         if (from === pathname) return;
         router.replace(from);
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [isLoggedIn, isAdmin, isSettled, searchParams]);
+  }, [isLoggedIn, isSettled, searchParams]);
 
   // Blocking Restoration Pulse map: If the session is settled and user is logged in, hide the form map
   if (isSettled && isLoggedIn) {
@@ -41,8 +39,8 @@ function AuthenticationContent() {
           <div className="absolute inset-4 border border-primary/40 rounded-full animate-[ping_2s_linear_infinite]"></div>
           <span className="material-symbols-outlined text- primary text-6xl animate-pulse">lock_person</span>
         </div>
-        <h2 className="text-2xl font-display font-black text-white tracking-widest uppercase mb-4">Archival Synchronization</h2>
-        <p className="text-on-surface-variant text-[10px] uppercase tracking-[0.4em] opacity-40">Verifying clearance level... Redirecting to appropriate quadrant.</p>
+        <h2 className="text-2xl font-display font-black text-white tracking-widest uppercase mb-4">Logging In</h2>
+        <p className="text-on-surface-variant text-[10px] uppercase tracking-[0.4em] opacity-40">Redirecting to your dashboard...</p>
       </main>
     );
   }
@@ -53,7 +51,7 @@ function AuthenticationContent() {
 
     // Validation for matching passwords in registration
     if (!isLogin && formData.password !== formData.confirmPassword) {
-      setError("Passphrases do not align. Integrity compromised.");
+      setError("Passwords do not match.");
       toast.error('Alignment Error');
       return;
     }
@@ -62,8 +60,7 @@ function AuthenticationContent() {
     
     try {
       const from = searchParams.get('from');
-      const isAdminLogin = isLogin && from === '/admin';
-      const endpoint = isLogin ? (isAdminLogin ? '/auth/admin/login' : '/auth/login') : '/auth/register';
+      const endpoint = isLogin ? '/auth/login' : '/auth/register';
       
       const res = await login({ 
         email: formData.email, 
@@ -73,12 +70,12 @@ function AuthenticationContent() {
         endpoint
       });
       
-      toast.success(isLogin ? `Welcome back, ${res.user.name}` : 'Account curated successfully!');
+      toast.success(isLogin ? `Welcome back, ${res.user.name}` : 'Account created successfully!');
     } catch (err) {
       if (err.response?.data?.data?.errors) {
         setError(err.response.data.data.errors.join(', '));
       } else {
-        setError(err.response?.data?.message || 'Authentication failed. Integrity compromised.');
+        setError(err.response?.data?.message || 'Authentication failed.');
       }
       toast.error('Authentication Error');
     } finally {
@@ -107,10 +104,10 @@ function AuthenticationContent() {
         {/* Minimalist Brand Header */}
         <div className="text-center mb-8">
           <h1 className="text-4xl md:text-5xl font-black font-display tracking-tight text-white uppercase leading-none drop-shadow-2xl mb-4">
-            {isLogin ? 'Welcome Back.' : 'Become a Curator.'}
+            {isLogin ? 'Welcome Back.' : 'Create an Account.'}
           </h1>
           <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-[0.4em] opacity-60">
-            {isLogin ? 'Identify yourself' : 'Initiate your registration'}
+            {isLogin ? 'Please log in to continue' : 'Please sign up to continue'}
           </p>
         </div>
 
@@ -128,7 +125,7 @@ function AuthenticationContent() {
               {!isLogin && (
                 <>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1 opacity-60">Full Identity</label>
+                    <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1 opacity-60">Full Name</label>
                     <input 
                       type="text" 
                       placeholder="e.g. Ashish Verma"
@@ -152,10 +149,10 @@ function AuthenticationContent() {
               )}
               
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1 opacity-60">Registry Email</label>
+                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1 opacity-60">Email Address</label>
                 <input 
                   type="email" 
-                  placeholder="curator@kahani.com"
+                  placeholder="user@example.com"
                   required
                   className="w-full bg-[#f0f3ff]/5 border border-white/5 rounded-2xl px-6 py-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-red-500/40 transition-all backdrop-blur-xl shadow-inner font-bold"
                   value={formData.email}
@@ -164,7 +161,7 @@ function AuthenticationContent() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1 opacity-60">Secret Passphrase</label>
+                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1 opacity-60">Password</label>
                 <input 
                   type="password" 
                   placeholder="••••••••••••"
@@ -178,7 +175,7 @@ function AuthenticationContent() {
               {!isLogin && (
                 <>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1 opacity-60">Confirm Secret Passphrase</label>
+                    <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1 opacity-60">Confirm Password</label>
                     <input 
                       type="password" 
                       placeholder="••••••••••••"
@@ -191,7 +188,7 @@ function AuthenticationContent() {
                   <div className="flex flex-col justify-end pb-4">
                     <Link href="/" className="inline-flex items-center gap-2 text-on-surface-variant hover:text-white font-bold uppercase text-[9px] tracking-[0.3em] transition-all group opacity-40 hover:opacity-100">
                       <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
-                      Return to Archive
+                      Return to Home
                     </Link>
                   </div>
                 </>
@@ -204,14 +201,14 @@ function AuthenticationContent() {
                 disabled={loading}
                 className="w-full bg-[#a31d1d] text-white font-black text-[10px] uppercase tracking-[0.4em] py-5 rounded-2xl shadow-2xl hover:bg-[#8b1818] transition-all disabled:opacity-50 active:scale-[0.98]"
               >
-                {loading ? 'Initiating...' : (isLogin ? 'Initiate Access' : 'Register Account')}
+                {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Sign Up')}
               </button>
 
               {isLogin && (
                 <div className="flex justify-center">
                   <Link href="/" className="inline-flex items-center gap-2 text-on-surface-variant hover:text-white font-bold uppercase text-[9px] tracking-[0.3em] transition-all group opacity-40 hover:opacity-100">
                     <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
-                    Return to Archive
+                    Return to Home
                   </Link>
                 </div>
               )}
@@ -220,7 +217,7 @@ function AuthenticationContent() {
 
           <div className="pt-6 text-center border-t border-white/5">
             <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
-              {isLogin ? "Not yet initiated into the archive? " : "Already held in high regard? "}
+              {isLogin ? "Don't have an account? " : "Already have an account? "}
               <button 
                 onClick={() => {
                   setIsLogin(!isLogin);
@@ -244,7 +241,7 @@ export default function AuthenticatonPortal() {
     <Suspense fallback={
       <div className="min-h-screen bg-black flex flex-col items-center justify-center space-y-8 animate-pulse">
         <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-[10px] font-black tracking-[0.5em] uppercase text-on-surface-variant/40">Synchronizing Identity Registry...</p>
+        <p className="text-[10px] font-black tracking-[0.5em] uppercase text-on-surface-variant/40">Loading...</p>
       </div>
     }>
       <AuthenticationContent />

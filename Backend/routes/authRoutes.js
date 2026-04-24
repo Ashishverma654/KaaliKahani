@@ -29,16 +29,7 @@ router.post(
   authController.login
 );
 
-router.post(
-  '/admin/login',
-  authLimiter,
-  [
-    check('email', 'Please include a valid email').isEmail(),
-    check('password', 'Password is required').exists()
-  ],
-  validateResult,
-  authController.adminLogin
-);
+
 
 const { protect } = require('../middlewares/auth');
 

@@ -21,16 +21,16 @@ export default function ArchivalBreach() {
 
         <div className="space-y-4">
           <h1 className="text-4xl md:text-6xl font-black font-display tracking-tighter text-white uppercase italic">
-            ARCHIVAL BREACH DETECTED
+            System Maintenance
           </h1>
           <p className="text-primary font-bold text-xs uppercase tracking-[0.5em] animate-pulse">
-            System Integrity: COMPROMISED • Registry: SHIELDED
+            System Status: UPDATING • Data: PROTECTED
           </p>
         </div>
 
         <div className="max-w-xl mx-auto space-y-6">
           <p className="text-on-surface-variant text-sm leading-relaxed max-w-sm mx-auto">
-            The master registry has been retracted due to an unauthorized atmospheric fluctuation. Curators are currently purging the anomaly.
+            The platform is currently undergoing scheduled maintenance. Our team is working to improve your experience. Please check back shortly.
           </p>
           
           <div className="bg-white/5 border border-white/10 rounded-xl p-4 text-left font-mono text-[10px] space-y-1">
@@ -50,7 +50,7 @@ export default function ArchivalBreach() {
         </div>
 
         <div className="pt-12 text-[9px] font-black uppercase tracking-[0.3em] opacity-40">
-           KaaliKahani Editorial Desk • System Lock V1.5.2
+           KaaliKahani Support • System Status V1.5.2
         </div>
       </div>
 

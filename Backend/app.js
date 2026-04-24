@@ -31,27 +31,27 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // Route Injections
 const authRoutes = require('./routes/authRoutes');
 const storyRoutes = require('./routes/storyRoutes');
-const adminRoutes = require('./routes/adminRoutes');
+
 const uploadRoutes = require('./routes/uploadRoutes');
 const seriesRoutes = require('./routes/seriesRoutes');
 const progressRoutes = require('./routes/progressRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/stories', storyRoutes);
-app.use('/api/admin', adminRoutes);
+
 app.use('/api/upload', uploadRoutes);
 app.use('/api/series', seriesRoutes);
 app.use('/api/progress', progressRoutes);
 
 // Public Heartbeat (No Protection)
-const adminController = require('./controllers/adminController');
-app.get('/api/settings/public', adminController.getPublicSettings);
+const settingsController = require('./controllers/settingsController');
+app.get('/api/settings/public', settingsController.getPublicSettings);
 
 // Production Landing Heartbeat (Render/Deploy Fix)
 app.get('/', (req, res) => {
   res.status(200).json({
     status: 'Operational',
-    message: 'KaaliKahani Editorial Registry is online.',
+    message: 'KaaliKahani API is online.',
     version: '2.0.4',
     timestamp: new Date().toISOString()
   });

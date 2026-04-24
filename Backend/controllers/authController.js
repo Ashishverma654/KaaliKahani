@@ -36,19 +36,7 @@ exports.login = async (req, res, next) => {
   }
 };
 
-exports.adminLogin = async (req, res, next) => {
-  try {
-    const { email, password } = req.body;
-    const { user, accessToken, refreshToken } = await authService.loginAdmin(email, password);
-    
-    res.cookie('accessToken', accessToken, { ...cookieOptions, maxAge: 24 * 60 * 60 * 1000 });
-    res.cookie('refreshToken', refreshToken, cookieOptions);
 
-    return formatResponse(res, 200, 'Admin login successful', { user, accessToken, refreshToken });
-  } catch (error) {
-    next(error);
-  }
-};
 
 exports.logout = async (req, res, next) => {
   res.cookie('accessToken', 'none', { ...cookieOptions, expires: new Date(0) });
@@ -102,7 +90,7 @@ exports.changePassword = async (req, res, next) => {
     res.cookie('accessToken', 'none', { ...cookieOptions, expires: new Date(0) });
     res.cookie('refreshToken', 'none', { ...cookieOptions, expires: new Date(0) });
 
-    return formatResponse(res, 200, 'Password rotated successfully. All sessions terminated.');
+    return formatResponse(res, 200, 'Password updated successfully. All sessions terminated.');
   } catch (error) {
     next(error);
   }

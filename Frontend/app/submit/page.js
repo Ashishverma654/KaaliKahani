@@ -10,7 +10,7 @@ import seriesService from '@/services/seriesService';
 function SubmitStoryContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAdmin } = useAuth();
+  const { user } = useAuth();
   const [formData, setFormData] = useState({ title: '', content: '', category: 'general-horror' });
   const [draftId, setDraftId] = useState(null);
   const [images, setImages] = useState([null, null, null]);
@@ -102,7 +102,7 @@ function SubmitStoryContent() {
   // Perform AI Narrative Analysis
   const handleAIAnalyze = async () => {
     if (!formData.content) {
-       setError("Provide narrative content before invoking the AI Oracle.");
+       setError("Please provide story content before using the AI analysis.");
        return;
     }
     
@@ -114,7 +114,7 @@ function SubmitStoryContent() {
       });
       setAiSuggestions(res.data.data);
     } catch (err) {
-      setError("AI Analysis Unreachable: The machine is silent.");
+      setError("AI Analysis Unreachable: System is currently unavailable.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -193,10 +193,10 @@ function SubmitStoryContent() {
         seriesId: seriesId || null,
         seriesOrder: seriesOrder || 1
       });
-      alert('Archive Entry Successful: Your narrative has been filed.');
+      alert('Story submitted successfully! It will be live once approved by our editorial team.');
       router.push('/');
     } catch (err) {
-      setError(err.response?.data?.message || 'Archival Rejection: Integrity check failed.');
+      setError(err.response?.data?.message || 'Submission Failed: Please try again later.');
     } finally {
       setLoading(false);
     }
@@ -239,7 +239,7 @@ function SubmitStoryContent() {
           <span className="text-secondary font-display font-bold tracking-widest text-xs uppercase mb-4 block">Editorial Desk</span>
           <h1 className="text-5xl md:text-6xl font-black font-display tracking-tighter text-on-surface mb-6">Craft Your Narrative</h1>
           <p className="text-on-surface-variant text-lg max-w-xl mx-auto leading-relaxed">
-            Share your unique perspective with the Curator community. Every great story begins with a single word.
+            Share your unique perspective with the community. Every great story begins with a single word.
           </p>
         </header>
 
@@ -370,21 +370,19 @@ function SubmitStoryContent() {
                 <button type="button" className="material-symbols-outlined text-on-surface-variant hover:text-primary text-sm">link</button>
               </div>
               
-              {isAdmin && (
-                <button 
-                  type="button" 
-                  onClick={handleAIAnalyze}
-                  className={`relative flex items-center gap-2 group transition-all px-4 py-1 rounded-lg ${isAnalyzing ? 'animate-pulse' : ''}`}
-                >
-                  <span className={`material-symbols-outlined text-sm ${isAnalyzing ? 'text-primary animate-spin' : 'text-on-surface-variant group-hover:text-primary'}`}>
-                    {isAnalyzing ? 'sync' : 'auto_fix'}
-                  </span>
-                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant group-hover:text-white">
-                    {isAnalyzing ? 'Consulting Archive...' : 'AI Sense Analysis'}
-                  </span>
-                  <div className="absolute inset-0 bg-primary/5 rounded-lg filter blur-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-                </button>
-              )}
+              <button 
+                type="button" 
+                onClick={handleAIAnalyze}
+                className={`relative flex items-center gap-2 group transition-all px-4 py-1 rounded-lg ${isAnalyzing ? 'animate-pulse' : ''}`}
+              >
+                <span className={`material-symbols-outlined text-sm ${isAnalyzing ? 'text-primary animate-spin' : 'text-on-surface-variant group-hover:text-primary'}`}>
+                  {isAnalyzing ? 'sync' : 'auto_fix'}
+                </span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant group-hover:text-white">
+                  {isAnalyzing ? 'Analyzing Story...' : 'AI Analysis'}
+                </span>
+                <div className="absolute inset-0 bg-primary/5 rounded-lg filter blur-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+              </button>
             </div>
             <textarea 
               className="w-full bg-transparent border-0 focus:outline-none p-8 text-on-surface text-lg leading-relaxed placeholder:text-surface-bright resize-none min-h-[300px]" 
@@ -473,7 +471,7 @@ export default function SubmitStory() {
     <Suspense fallback={
       <div className="min-h-screen bg-black flex flex-col items-center justify-center space-y-8 animate-pulse">
         <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-[10px] font-black tracking-[0.5em] uppercase text-on-surface-variant/40">Synchronizing Draft Registry...</p>
+        <p className="text-[10px] font-black tracking-[0.5em] uppercase text-on-surface-variant/40">Loading...</p>
       </div>
     }>
       <SubmitStoryContent />

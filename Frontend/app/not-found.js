@@ -33,7 +33,7 @@ export default function NotFound() {
             "The story you're looking for has vanished into the dark. It may have been deleted, or perhaps it never existed at all."
           </p>
 
-          {/* Registry Actions */}
+          {/* Navigation Actions */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
             <Link 
               href="/" 
@@ -48,14 +48,14 @@ export default function NotFound() {
               className="group flex items-center gap-4 bg-white/5 border border-white/10 text-on-surface px-10 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white/10 transition-all backdrop-blur-xl active:scale-95"
             >
               <span className="material-symbols-outlined text-sm transition-transform group-hover:scale-110">auto_stories</span>
-              Search the Archives
+              Search Stories
             </Link>
           </div>
         </div>
 
-        {/* Archival Metadata Footer */}
+        {/* Page Footer */}
         <div className="pt-12 border-t border-white/5 opacity-40">
-           <p className="text-[9px] font-black uppercase tracking-[0.5em]">KaaliKahani Registry • Error Location: Null_Space</p>
+           <p className="text-[9px] font-black uppercase tracking-[0.5em]">KaaliKahani • Page Not Found</p>
         </div>
       </div>
 

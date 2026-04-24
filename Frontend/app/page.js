@@ -80,15 +80,14 @@ export default async function HomePage({ searchParams }) {
   return (
     <main className="font-sans relative">
       {/* Cinematic Background Image Layer */}
-      <div className="fixed inset-0 z-[-20] overflow-hidden bg-black">
+      <div className="fixed inset-0 z-[-20] overflow-hidden bg-surface">
         <img 
           src="/assets/homePage.jpg" 
-          alt="Archival Background"
-          className="w-full h-full object-cover opacity-30 transition-opacity duration-1000 grayscale-[0.5] contrast-[1.1] scale-105"
+          alt="Home Background"
+          className="w-full h-full object-cover opacity-10 dark:opacity-40 transition-opacity duration-1000 grayscale-[0.9] dark:grayscale-[0.5] contrast-[1.1] scale-105"
         />
         {/* Atmospheric Vignette & Gradients */}
-        <div className="absolute inset-0 bg-gradient-to-b from-surface via-transparent to-surface opacity-80"></div>
-        <div className="absolute inset-0 bg-black/40"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-surface via-surface/40 to-surface opacity-100"></div>
       </div>
 
       {/* Decorative Ambience Blobs */}
@@ -144,10 +143,10 @@ export default async function HomePage({ searchParams }) {
         <div className="flex items-center gap-3 overflow-x-auto py-10 scrollbar-hide">
           <Link 
             href="/"
-            className={`px-6 py-2.5 text-[9px] font-black tracking-[0.3em] uppercase rounded-full border transition-all backdrop-blur-3xl shadow-lg shadow-black/20 ${
+            className={`px-6 py-2.5 text-[9px] font-black tracking-[0.3em] uppercase rounded-full border transition-all shadow-lg ${
               !category 
-                ? 'bg-primary/50 text-white border-primary/30' 
-                : 'bg-white/5 text-on-surface-variant/70 border-white/5 hover:border-white/20 hover:text-white'
+                ? 'bg-primary text-white border-primary/30' 
+                : 'bg-surface-container text-on-surface border-outline-variant/50 hover:border-primary/40 hover:text-primary'
             }`}
           >
             All Stories
@@ -161,10 +160,10 @@ export default async function HomePage({ searchParams }) {
             <Link 
               key={cat.value}
               href={`/?category=${encodeURIComponent(cat.value)}`}
-              className={`px-6 py-2.5 text-[9px] font-black tracking-[0.3em] uppercase rounded-full border whitespace-nowrap transition-all backdrop-blur-3xl shadow-lg shadow-black/20 ${
+              className={`px-6 py-2.5 text-[9px] font-black tracking-[0.3em] uppercase rounded-full border whitespace-nowrap transition-all shadow-lg ${
                 category === cat.value 
-                  ? 'bg-primary/50 text-white border-primary/30' 
-                  : 'bg-white/5 text-on-surface-variant/70 border-white/5 hover:border-white/20 hover:text-white'
+                  ? 'bg-primary text-white border-primary/30' 
+                  : 'bg-surface-container text-on-surface border-outline-variant/50 hover:border-primary/40 hover:text-primary'
               }`}
             >
               {cat.label}
@@ -175,10 +174,10 @@ export default async function HomePage({ searchParams }) {
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-12 pb-24">
           <div>
-            <h2 className="text-4xl font-gothic text-on-surface mb-6 tracking-wide drop-shadow-sm transition-colors duration-300">Recent Archives</h2>
+            <h2 className="text-4xl font-gothic text-on-surface mb-6 tracking-wide drop-shadow-sm transition-colors duration-300">Recent Stories</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {listStories.length > 0 ? listStories.map((story) => (
-                <Link key={story._id} href={`/detail?slug=${getSlug(story.slug)}`} className="gothic-frame p-3 group bg-white/5 backdrop-blur-3xl rounded-3xl border border-white/5 hover:bg-white/10 transition-all duration-300 shadow-xl overflow-hidden flex flex-col h-full">
+                <Link key={story._id} href={`/detail?slug=${getSlug(story.slug)}`} className="gothic-frame p-3 group bg-surface-container-low/60 backdrop-blur-3xl rounded-3xl border border-outline-variant/10 hover:bg-surface-container transition-all duration-300 shadow-xl overflow-hidden flex flex-col h-full">
                   <div className="relative aspect-[16/9] w-full overflow-hidden mb-4 border border-outline-variant shadow-sm rounded-2xl">
                     <img src={getCoverImage(story) || "https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=800&auto=format&fit=crop"} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 brightness-75 group-hover:brightness-100" alt={getText(story.title)}/>
                     <span className="absolute top-3 left-3 bg-surface-container-low/80 backdrop-blur text-on-surface border border-outline-variant/50 text-[8px] font-bold tracking-widest uppercase px-2 py-0.5 rounded shadow">{CATEGORY_LABELS[story.category] || story.category || "STORY"}</span>
@@ -191,20 +190,20 @@ export default async function HomePage({ searchParams }) {
                   </div>
                 </Link>
               )) : (
-                <div className="col-span-1 md:col-span-2 py-10 text-center text-on-surface-variant text-sm font-bold tracking-[0.2em] uppercase bg-white/5 backdrop-blur-xl rounded-3xl border border-white/5">
-                   Archives Empty
+                <div className="col-span-1 md:col-span-2 py-10 text-center text-on-surface-variant text-sm font-bold tracking-[0.2em] uppercase bg-surface-container-low/40 backdrop-blur-xl rounded-3xl border border-outline-variant/10">
+                   No stories found
                 </div>
               )}
             </div>
           </div>
 
           <aside className="flex flex-col gap-8">
-            <div className="gothic-frame p-6 pb-2 bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/5 shadow-2xl">
-              <h3 className="text-xl font-gothic text-on-surface mb-4 tracking-wide border-b border-white/5 pb-2 uppercase text-[10px] font-black tracking-[0.4em]">Trending Now</h3>
+            <div className="gothic-frame p-6 pb-2 bg-surface-container-low/60 backdrop-blur-2xl rounded-3xl border border-outline-variant/10 shadow-2xl">
+              <h3 className="text-xl font-gothic text-on-surface mb-4 tracking-wide border-b border-outline-variant/10 pb-2 uppercase text-[10px] font-black tracking-[0.4em]">Trending Now</h3>
               <div className="flex flex-col">
                 {trendingStories.length > 0 ? trendingStories.map((story, idx) => (
-                  <Link href={`/detail?slug=${getSlug(story.slug)}`} key={story._id} className="group flex gap-4 border-b border-white/5 py-4 last:border-0 hover:bg-white/5 transition-colors -mx-6 px-6">
-                    <span className="text-2xl font-gothic font-bold text-on-surface-variant group-hover:text-primary transition-colors">{String(idx + 1).padStart(2, '0')}</span>
+                  <Link href={`/detail?slug=${getSlug(story.slug)}`} key={story._id} className="group flex gap-4 border-b border-outline-variant/10 py-4 last:border-0 hover:bg-surface-container transition-colors -mx-6 px-6">
+                    <span className="text-2xl font-gothic font-bold text-on-surface-variant/40 group-hover:text-primary transition-colors">{String(idx + 1).padStart(2, '0')}</span>
                     <div className="mt-1">
                       <h4 className="font-bold text-sm text-on-surface leading-snug group-hover:text-primary transition-colors mb-1">{getText(story.title)}</h4>
                       <span className="text-[9px] text-on-surface-variant tracking-[0.1em] uppercase font-bold">{story.views || 0} READS</span>
@@ -216,7 +215,7 @@ export default async function HomePage({ searchParams }) {
               </div>
             </div>
 
-            <div className="gothic-frame p-6 bg-white/5 backdrop-blur-2xl rounded-3xl border border-white/5 shadow-2xl space-y-4">
+            <div className="gothic-frame p-6 bg-surface-container-low/60 backdrop-blur-2xl rounded-3xl border border-outline-variant/10 shadow-2xl space-y-4">
               <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-on-surface-variant">Live Stats</h3>
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
@@ -227,7 +226,7 @@ export default async function HomePage({ searchParams }) {
                   {mostLiked ? getText(mostLiked.title) : 'No stories yet'}
                 </div>
               </div>
-              <div className="space-y-3 pt-2 border-t border-white/5">
+              <div className="space-y-3 pt-2 border-t border-outline-variant/10">
                 <div className="flex items-center justify-between">
                   <span className="text-[9px] uppercase tracking-widest text-on-surface-variant">Most Read</span>
                   <span className="text-[9px] font-black text-on-surface">{mostRead ? `${mostRead.views || 0}` : '—'}</span>
@@ -236,14 +235,14 @@ export default async function HomePage({ searchParams }) {
                   {mostRead ? getText(mostRead.title) : 'No stories yet'}
                 </div>
               </div>
-              <div className="pt-2 border-t border-white/5">
+              <div className="pt-2 border-t border-outline-variant/10">
                 <div className="flex items-center justify-between">
                   <span className="text-[9px] uppercase tracking-widest text-on-surface-variant">Top Category</span>
                   <span className="text-[9px] font-black text-on-surface">{CATEGORY_LABELS[topCategory] || topCategory}</span>
                 </div>
               </div>
             </div>
-            <div className="aspect-square gothic-frame flex items-center justify-center bg-white/5 backdrop-blur-xl rounded-3xl border border-white/5 border-dashed text-on-surface-variant text-[10px] font-bold tracking-[0.2em] shadow-2xl">
+            <div className="aspect-square gothic-frame flex items-center justify-center bg-surface-container-low/40 backdrop-blur-xl rounded-3xl border border-outline-variant/10 border-dashed text-on-surface-variant text-[10px] font-bold tracking-[0.2em] shadow-2xl">
                AD SPACE
             </div>
           </aside>

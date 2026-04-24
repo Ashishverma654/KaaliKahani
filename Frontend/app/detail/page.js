@@ -57,7 +57,7 @@ export default async function StoryDetail({ searchParams }) {
   if (!story) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center text-center px-4">
-        <h1 className="text-2xl font-gothic text-on-surface-variant uppercase tracking-widest">Story not found in our archives.</h1>
+        <h1 className="text-2xl font-gothic text-on-surface-variant uppercase tracking-widest">Story not found.</h1>
       </div>
     );
   }
@@ -71,10 +71,10 @@ export default async function StoryDetail({ searchParams }) {
 
       {/* Hero Section */}
       <header className="relative w-full h-[716px] max-h-[85vh] overflow-hidden flex items-end shadow-2xl">
-        <img 
-          alt={getText(story.title)} 
-          className="absolute inset-0 w-full h-full object-cover" 
-          src={getCoverImage(story) || "https://images.unsplash.com/photo-1542106311-bfad4bd2e351?q=80&w=2000&auto=format&fit=crop"} 
+        <img
+          alt={getText(story.title)}
+          className="absolute inset-0 w-full h-full object-cover"
+          src={getCoverImage(story) || "https://images.unsplash.com/photo-1542106311-bfad4bd2e351?q=80&w=2000&auto=format&fit=crop"}
           style={{ filter: "brightness(0.6) contrast(1.1) grayscale(30%)" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-surface via-surface/60 to-transparent"></div>
@@ -109,7 +109,7 @@ export default async function StoryDetail({ searchParams }) {
           </h1>
           <div className="flex flex-col items-center justify-center gap-3 text-on-surface-variant font-medium">
             <span className="bg-primary/20 border border-primary/50 text-white rounded-full px-4 py-1 text-xs uppercase tracking-widest font-bold">
-               {story.author?.name || "KaaliKahani Writer"}
+              {story.author?.name || "KaaliKahani Writer"}
             </span>
             <p className="text-xs uppercase tracking-widest font-bold text-white/50">{story.readTime || 5} min read • {story.views || 0} reads</p>
             <p className="text-[10px] uppercase tracking-widest font-bold text-white/40">
@@ -121,7 +121,7 @@ export default async function StoryDetail({ searchParams }) {
 
       {/* Main Content Area */}
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_minmax(auto,720px)_1fr] gap-12 px-6 py-20">
-        
+
         {/* Left Sidebar: Engagement (Statically rendered for now) */}
         <aside className="hidden lg:flex flex-col gap-8 sticky top-32 h-fit">
           <div className="flex flex-col items-center gap-4">
@@ -160,9 +160,9 @@ export default async function StoryDetail({ searchParams }) {
         {/* Right Sidebar: Promo */}
         <aside className="hidden lg:flex flex-col gap-12 sticky top-32 h-fit">
           <div className="w-full bg-surface-container-high rounded-xl flex flex-col items-center justify-center p-6 text-center border border-outline-variant group shadow-lg">
-            <span className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest mb-6">Join The Circle</span>
-            <h4 className="font-gothic font-bold text-lg text-white mb-2 uppercase">Want to publish?</h4>
-            <p className="text-xs text-on-surface-variant mb-6">Sign up today and get your voice heard by thousands.</p>
+            <span className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest mb-6">Join Us</span>
+            <h4 className="font-gothic font-bold text-lg text-white mb-2 uppercase">Interested in publishing?</h4>
+            <p className="text-xs text-on-surface-variant mb-6">Sign up today and share your stories with our community.</p>
             <Link href="/login" className="w-full py-3 bg-white text-surface font-black text-xs rounded-full hover:bg-primary transition-colors text-center uppercase tracking-widest">Register</Link>
           </div>
         </aside>

@@ -11,7 +11,7 @@ cloudinary.config({
 
 /**
  * Archival Storage Protocol: Cloudinary
- * Handles image beaming to the 'KaaliKahani' media registry.
+ * Handles image uploading for stories.
  */
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,

@@ -8,7 +8,6 @@ const AuthContext = createContext({
   loading: true,
   isSettled: false,
   isLoggedIn: false,
-  isAdmin: false,
   login: async () => {},
   logout: async () => {},
   refreshUser: async () => {}
@@ -94,13 +93,13 @@ export function AuthProvider({ children }) {
       return String(role).toLowerCase().replace(/[^a-z]/g, '');
     };
     const role = normalizeRole(user?.role);
+
     return {
       user,
       status,
       loading: status === 'LOADING',
       isSettled: status !== 'LOADING',
       isLoggedIn: status === 'AUTHENTICATED',
-      isAdmin: status === 'AUTHENTICATED' && (role === 'admin' || role === 'superadmin'),
       login,
       logout,
       refreshUser

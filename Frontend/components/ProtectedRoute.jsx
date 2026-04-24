@@ -3,21 +3,18 @@ import React, { useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useRouter, usePathname } from 'next/navigation';
 
-const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const { status, isLoggedIn, isAdmin, isSettled } = useAuth();
+const ProtectedRoute = ({ children }) => {
+  const { status, isLoggedIn, isSettled } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    // Identity Guard: Final verification before rendering quadrant map map map
     if (isSettled && !isLoggedIn) {
       router.replace(`/login?from=${encodeURIComponent(pathname)}`);
-    } else if (isSettled && isLoggedIn && adminOnly && !isAdmin) {
-      router.replace('/');
     }
-  }, [isLoggedIn, isAdmin, isSettled, adminOnly, router, pathname]);
+  }, [isLoggedIn, isSettled, router, pathname]);
 
-  if (!isSettled || (isLoggedIn && adminOnly && !isAdmin)) {
+  if (!isSettled) {
     return (
        <div className="min-h-screen bg-black flex flex-col items-center justify-center space-y-8 animate-in fade-in duration-700">
           <div className="relative w-24 h-24">
@@ -26,15 +23,14 @@ const ProtectedRoute = ({ children, adminOnly = false }) => {
              <div className="absolute inset-4 border border-primary/20 rounded-full animate-pulse"></div>
           </div>
           <div className="text-center space-y-3">
-             <h2 className="text-xl font-black font-display tracking-[0.4em] uppercase text-white drop-shadow-2xl">Archival Verification</h2>
-             <p className="text-[10px] font-black tracking-[0.6em] uppercase text-on-surface-variant/40 animate-pulse">Synchronizing Identity Registry...</p>
+             <h2 className="text-xl font-black font-display tracking-[0.4em] uppercase text-white drop-shadow-2xl">Identity Verification</h2>
+             <p className="text-[10px] font-black tracking-[0.6em] uppercase text-on-surface-variant/40 animate-pulse">Synchronizing Identity...</p>
           </div>
        </div>
     );
   }
 
-  // Final Guard: Only render if criteria are fully synchronized map map map
-  if (isLoggedIn && (!adminOnly || isAdmin)) {
+  if (isLoggedIn) {
     return <>{children}</>;
   }
 

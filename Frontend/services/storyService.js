@@ -1,40 +1,11 @@
 import api from '../utils/api';
 
 const storyService = {
-  getStories: async (status = '') => {
-    if (status && status.toLowerCase() === 'pending') {
-      const response = await api.get('/admin/pending');
-      return response.data.data;
-    }
-    const response = await api.get(`/admin/stories${status ? `?status=${status.toLowerCase()}` : ''}`);
-    return response.data.data;
-  },
-
   getStoryBySlug: async (slug, lang = 'en') => {
     const response = await api.get(`/stories/${slug}?lang=${lang}`);
     return response.data.data;
   },
 
-  approveStory: async (id) => {
-    const response = await api.put(`/admin/stories/${id}/approve`);
-    return response.data.data;
-  },
-
-  rejectStory: async (id) => {
-    const response = await api.put(`/admin/stories/${id}/reject`);
-    return response.data.data;
-  },
-
-  deleteStory: async (id) => {
-    const response = await api.delete(`/admin/stories/${id}`);
-    return response.data.data;
-  },
-
-  updateStory: async (id, data) => {
-    const response = await api.put(`/admin/stories/${id}`, data);
-    return response.data.data;
-  },
-  
   getMyStories: async () => {
     const response = await api.get('/stories/me');
     return response.data.data;

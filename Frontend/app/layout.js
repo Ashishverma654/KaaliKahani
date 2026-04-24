@@ -10,7 +10,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import ClientLayoutWrapper from './components/ClientLayoutWrapper';
 
 export const metadata = {
-  title: 'KaaliKahani | Editorial',
+  title: 'KaaliKahani | Professional Storytelling',
   description: 'Premium editorial narratives',
 };
 
