@@ -1,102 +1,87 @@
-# KaaliKahani - Professional Multilingual Story Platform
+# KaaliKahani - Professional Multilingual Narrative Platform
 
-KaaliKahani is a premium, professional publishing platform designed for high-end narratives. It supports bilingual content (English and Hindi) and features a sophisticated "Editorial Noir" aesthetic. 
-
-The project follows a **Decoupled Architecture**, separating the Public Platform (this repository) from a future Administrative Dashboard, both sharing a unified backend and database core.
+KaaliKahani is an industrial-grade storytelling platform designed for high-end narratives. It features a sophisticated "Editorial Noir" aesthetic, bilingual support (English/Hindi), and a decoupled architecture that separates the Public Platform from the Administrative Backend.
 
 ---
 
-## 🏛 Architecture & Industry Standards
+## 🏛 System Architecture (For AI & Developers)
 
-This project is built to industrial standards, focusing on scalability and security:
+This project follows a **Decoupled Admin Pattern**. The repository contains the Public Frontend and the Shared Backend.
 
-- **Decoupled Back-Office**: The frontend is strictly for authors and readers. Administrative tasks (moderation, user management, analytics) are designed to be handled by a separate project sharing the same database.
-- **RBAC (Role-Based Access Control)**: The backend includes a `restrictTo` middleware for future-proofing sensitive API endpoints.
-- **Moderation Pipeline**: Stories and comments follow a "Pending -> Approved" workflow, allowing for editorial oversight from a separate admin interface.
-- **Linguistic Nesting**: Data models support complex, multi-language mapping (English/Hindi) for titles, slugs, and content.
-
----
-
-## 🚀 Tech Stack
-
-### Frontend
-- **Framework**: Next.js 14+ (App Router)
-- **Styling**: Vanilla CSS with modern variables and glassmorphic components.
-- **State Management**: React Context & Hooks (Custom `useAuth` provider).
-- **Notifications**: React Hot Toast.
-
-### Backend
-- **Runtime**: Node.js & Express
-- **Database**: MongoDB with Mongoose ODM.
-- **Authentication**: JWT (JSON Web Tokens) with Secure Cookie support.
-- **AI Integration**: Google Gemini Pro for narrative analysis.
-- **Media**: Cloudinary integration for image hosting.
+- **Public Frontend**: strictly for authors (submission) and readers (consumption).
+- **Shared Backend**: A unified Node.js/Express API that serves both the Public Site and the **Standalone Admin Dashboard** (hosted in a separate repository).
+- **Administrative Layer**: All administrative actions are located under the `/api/admin` namespace and are protected by `adminOnly` middleware.
 
 ---
 
-## 🛠 Getting Started
+## 🔐 Security & Access Control
 
-### Prerequisites
-- Node.js (v18+)
-- MongoDB Atlas account
-- Gemini API Key
-- Cloudinary Account
-
-### 1. Backend Setup
-1. `cd Backend`
-2. `npm install`
-3. Create `.env` file:
-   ```env
-   PORT=5000
-   MONGODB_URI=your_mongodb_uri
-   JWT_SECRET=your_jwt_secret
-   REFRESH_SECRET=your_refresh_secret
-   GEMINI_API_KEY=your_gemini_key
-   CLOUDINARY_CLOUD_NAME=name
-   CLOUDINARY_API_KEY=key
-   CLOUDINARY_API_SECRET=secret
-   ```
-4. `npm run dev`
-
-### 2. Frontend Setup
-1. `cd Frontend`
-2. `npm install`
-3. Create `.env.local` file:
-   ```env
-   NEXT_PUBLIC_API_URL=http://localhost:5000/api
-   ```
-4. `npm run dev`
+The system uses **JWT-based authentication** (Dual-token: Access + Refresh). 
+- **Admin Verification**: The backend verifies `user.role === 'admin'`.
+- **RBAC**: Any request to `/api/admin/*` must include a valid Admin JWT.
+- **Session Safety**: Administrative actions like "Self-Deactivation" are blocked at the controller level for safety.
 
 ---
 
-## 📖 API Reference
+## 📡 Administrative API Specification (Dashboard Sync)
 
-### Auth Service
-| Endpoint | Method | Description |
+The following endpoints are optimized for the **KaaliKahani-Admin** project:
+
+### 1. Analytics & Overview
+- **`GET /api/admin/stats`**
+    - **Purpose**: Populates dashboard cards and charts.
+    - **Response**: 
+      - `totalStories`: Integer
+      - `pendingStories`: Integer
+      - `activeUsers`: Integer
+      - `totalComments`: Integer
+      - `chartData`: Array of last 7 days (e.g., `{ name: 'Mon', count: 5 }`).
+
+### 2. Story Moderation Queue
+- **`GET /api/admin/stories`**
+    - **Purpose**: Lists all narratives for review.
+    - **Data**: Populates `author` field with `name`, `email`, and `avatar`. Sorted by Newest.
+- **`PATCH /api/admin/stories/:id/status`**
+    - **Purpose**: Approve or Reject a story.
+    - **Payload**: `{ "status": "approved" | "rejected" | "pending" }`.
+    - **Sync Logic**: Setting a story to `approved` automatically sets `isPublished: true` and updates `approvedAt`.
+
+### 3. User Management
+- **`GET /api/admin/users`**
+    - **Purpose**: Full registry of platform users.
+- **`PATCH /api/admin/users/:id/toggle-status`**
+    - **Purpose**: Ban or Unban a user.
+    - **Sync Logic**: Toggles the `isActive` boolean. Users with `isActive: false` are blocked from logging into either platform.
+
+---
+
+## 🔄 Data Synchronization Protocol
+
+When building the Admin Panel, ensure the following logic is maintained:
+
+| Entity | State | Effect on Public Platform |
 | :--- | :--- | :--- |
-| `/auth/register` | `POST` | Register a new author account. |
-| `/auth/login` | `POST` | Authenticate and receive tokens. |
-| `/auth/logout` | `POST` | Terminate session. |
-| `/auth/me` | `GET` | Retrieve profile of logged-in user. |
-| `/auth/profile` | `PUT` | Update account details (Avatar, Name, etc.). |
-
-### Story Service
-| Endpoint | Method | Description |
-| :--- | :--- | :--- |
-| `/stories` | `GET` | Fetch approved public stories. |
-| `/stories/:slug` | `GET` | Get full narrative content by slug. |
-| `/stories` | `POST` | Submit a new narrative (Status: Pending). |
-| `/stories/drafts` | `GET` | Retrieve personal unpublished drafts. |
-| `/stories/analyze` | `POST` | Trigger AI Sense analysis on content. |
-| `/stories/:id/like` | `POST` | Toggle narrative appreciation. |
-
-### Series & Progress
-| Endpoint | Method | Description |
-| :--- | :--- | :--- |
-| `/series` | `POST` | Group stories into a thematic series. |
-| `/progress/:id` | `GET/PUT` | Track and persist reading progress. |
+| **Story** | `pending` | Hidden from public. Appears only in Author's Profile. |
+| **Story** | `approved` | Visible on Home Page and Category lists. `isPublished` becomes `true`. |
+| **Story** | `rejected` | Hidden from public. Marked as rejected in Author's Profile. |
+| **User** | `role: admin` | Grants access to the Admin Dashboard API. |
+| **User** | `isActive: false` | User is immediately logged out and cannot re-authenticate. |
 
 ---
 
-## 📜 License
-This project is licensed under the ISC License.
+## 🛠 Integration Checklist for Admin-AI
+If you are the AI building the **KaaliKahani-Admin** project, use this list to verify your sync:
+- [ ] **Auth Check**: Do I call `/api/auth/me` and verify `role === 'admin'` before showing the dashboard?
+- [ ] **Status Mapping**: Do my "Approve" buttons send the exact string `"approved"` to `/api/admin/stories/:id/status`?
+- [ ] **Analytics Sync**: Does my Dashboard chart correctly map the `chartData` array from `/api/admin/stats`?
+- [ ] **Error Handling**: Do I show the `message` returned by the backend's `formatResponse` utility on 403/401 errors?
+
+---
+
+## 🚀 Deployment & Environment
+- **Backend**: `npm run dev` in `/Backend`.
+- **Frontend**: `npm run dev` in `/Frontend`.
+- **Environment**: Ensure `MONGO_URI` and `JWT_SECRET` are shared between the Backend and any environment connecting to it.
+
+---
+*Version 2.2.0 - Decoupled Admin Integration Edition*

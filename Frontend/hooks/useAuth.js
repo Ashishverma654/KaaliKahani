@@ -64,7 +64,7 @@ export function AuthProvider({ children }) {
 
   const login = async (credentials) => {
     const { endpoint, ...rest } = credentials;
-    // Utilize specific auth target (admin vs curator) if provided map map map
+    // Fetch user profile data map map map
     const data = await authService.login(rest, endpoint);
     if (typeof window !== 'undefined') {
       if (data?.accessToken) localStorage.setItem('accessToken', data.accessToken);

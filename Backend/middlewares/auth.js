@@ -45,3 +45,13 @@ exports.restrictTo = (...roles) => {
   };
 };
 
+// Specialized Admin-only guard map map map
+exports.adminOnly = (req, res, next) => {
+  if (req.user && req.user.role === 'admin') {
+    next();
+  } else {
+    return formatResponse(res, 403, 'Not authorized as an admin');
+  }
+};
+
+

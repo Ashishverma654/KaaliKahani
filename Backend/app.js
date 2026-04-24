@@ -14,9 +14,13 @@ app.set('trust proxy', 1);
 app.use(helmet());
 app.use(cors({
   origin: [
-    'http://localhost:3000',
-    'https://kaali-kahani-tpkx.vercel.app',
-    process.env.FRONTEND_URL
+    'http://localhost:3000', // Public Site Local
+    'http://localhost:3001', // Admin Dashboard Local Vector 1
+    'http://localhost:3002', // Admin Dashboard Local Vector 2
+    'https://kaali-kahani-tpkx.vercel.app', // Public Site Deployed
+    'https://kaali-kahani-admin.vercel.app', // Admin Dashboard Deployed
+    process.env.FRONTEND_URL,
+    process.env.ADMIN_URL
   ].filter(Boolean),
   credentials: true
 }));
@@ -35,6 +39,7 @@ const storyRoutes = require('./routes/storyRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const seriesRoutes = require('./routes/seriesRoutes');
 const progressRoutes = require('./routes/progressRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/stories', storyRoutes);
@@ -42,6 +47,7 @@ app.use('/api/stories', storyRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/series', seriesRoutes);
 app.use('/api/progress', progressRoutes);
+app.use('/api/admin', adminRoutes);
 
 // Public Heartbeat (No Protection)
 const settingsController = require('./controllers/settingsController');
