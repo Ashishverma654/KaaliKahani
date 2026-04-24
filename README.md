@@ -1,72 +1,102 @@
-# KaaliKahani - Multilingual Story Platform
+# KaaliKahani - Professional Multilingual Story Platform
 
-KaaliKahani is a premium, professional storytelling platform that supports bilingual content (English and Hindi). It features a clean, parchment-inspired design and leverages AI for story analysis and enhancement.
+KaaliKahani is a premium, professional publishing platform designed for high-end narratives. It supports bilingual content (English and Hindi) and features a sophisticated "Editorial Noir" aesthetic. 
 
-## Project Structure
-
-- **[Frontend](file:///e:/Projects/Story-Website/Frontend)**: Next.js application with a modern, responsive UI.
-- **[Backend](file:///e:/Projects/Story-Website/Backend)**: Node.js/Express API with MongoDB for data persistence.
-
-## Key Features
-
-- **Multilingual Support**: Write and read stories in English and Hindi.
-- **AI Analysis**: Get suggested titles, categories, and realism scores using Gemini AI.
-- **User Profiles**: Manage your profile, stories, and reading progress.
-- **Story Series**: Organize your stories into series for a better reading experience.
-- **Clean Design**: A warm, readable light theme with professional typography.
-
-## Getting Started
-
-### Backend Setup
-1. Navigate to the `Backend` directory.
-2. Create a `.env` file based on `.env.example`.
-3. Run `npm install`.
-4. Run `npm run dev`.
-
-### Frontend Setup
-1. Navigate to the `Frontend` directory.
-2. Create a `.env.local` file with `NEXT_PUBLIC_API_URL`.
-3. Run `npm install`.
-4. Run `npm run dev`.
+The project follows a **Decoupled Architecture**, separating the Public Platform (this repository) from a future Administrative Dashboard, both sharing a unified backend and database core.
 
 ---
 
-## API Documentation
+## 🏛 Architecture & Industry Standards
 
-### Authentication
-- `POST /api/auth/register`: Register a new user.
-- `POST /api/auth/login`: User login (returns tokens).
-- `POST /api/auth/logout`: Log out the current user.
-- `GET /api/auth/me`: Get current user details.
-- `PUT /api/auth/profile`: Update user profile details.
-- `POST /api/auth/change-password`: Change user password.
-- `POST /api/auth/refresh`: Refresh access token using refresh token.
+This project is built to industrial standards, focusing on scalability and security:
 
-### Stories
-- `GET /api/stories`: Fetch public stories (supports `lang`, `page`, `limit`, `category`).
-- `GET /api/stories/featured`: Get the currently featured story.
-- `GET /api/stories/search`: Search stories by text query.
-- `GET /api/stories/:slug`: Get a single story by its slug.
-- `POST /api/stories`: Submit a new story for review.
-- `GET /api/stories/me`: Get stories submitted by the logged-in user.
-- `POST /api/stories/:id/like`: Toggle like on a story.
-- `POST /api/stories/:id/comment`: Add a comment to a story.
-- `POST /api/stories/upload`: Upload an image to the media registry.
-- `POST /api/stories/analyze`: Analyze story content using AI.
+- **Decoupled Back-Office**: The frontend is strictly for authors and readers. Administrative tasks (moderation, user management, analytics) are designed to be handled by a separate project sharing the same database.
+- **RBAC (Role-Based Access Control)**: The backend includes a `restrictTo` middleware for future-proofing sensitive API endpoints.
+- **Moderation Pipeline**: Stories and comments follow a "Pending -> Approved" workflow, allowing for editorial oversight from a separate admin interface.
+- **Linguistic Nesting**: Data models support complex, multi-language mapping (English/Hindi) for titles, slugs, and content.
 
-### Drafts
-- `GET /api/stories/drafts`: Get all drafts for the logged-in user.
-- `GET /api/stories/draft/:id`: Get a specific draft by ID.
-- `POST /api/stories/draft`: Create a new draft.
-- `PUT /api/stories/draft/:id`: Update an existing draft.
+---
 
-### Series
-- `GET /api/series/me`: Get series created by the logged-in user.
-- `POST /api/series`: Create a new story series.
+## 🚀 Tech Stack
 
-### Progress
-- `GET /api/progress/:storyId`: Get user's reading progress for a story.
-- `PUT /api/progress/:storyId`: Update user's reading progress.
+### Frontend
+- **Framework**: Next.js 14+ (App Router)
+- **Styling**: Vanilla CSS with modern variables and glassmorphic components.
+- **State Management**: React Context & Hooks (Custom `useAuth` provider).
+- **Notifications**: React Hot Toast.
 
-### Settings
-- `GET /api/settings/public`: Fetch public system settings (e.g., maintenance mode).
+### Backend
+- **Runtime**: Node.js & Express
+- **Database**: MongoDB with Mongoose ODM.
+- **Authentication**: JWT (JSON Web Tokens) with Secure Cookie support.
+- **AI Integration**: Google Gemini Pro for narrative analysis.
+- **Media**: Cloudinary integration for image hosting.
+
+---
+
+## 🛠 Getting Started
+
+### Prerequisites
+- Node.js (v18+)
+- MongoDB Atlas account
+- Gemini API Key
+- Cloudinary Account
+
+### 1. Backend Setup
+1. `cd Backend`
+2. `npm install`
+3. Create `.env` file:
+   ```env
+   PORT=5000
+   MONGODB_URI=your_mongodb_uri
+   JWT_SECRET=your_jwt_secret
+   REFRESH_SECRET=your_refresh_secret
+   GEMINI_API_KEY=your_gemini_key
+   CLOUDINARY_CLOUD_NAME=name
+   CLOUDINARY_API_KEY=key
+   CLOUDINARY_API_SECRET=secret
+   ```
+4. `npm run dev`
+
+### 2. Frontend Setup
+1. `cd Frontend`
+2. `npm install`
+3. Create `.env.local` file:
+   ```env
+   NEXT_PUBLIC_API_URL=http://localhost:5000/api
+   ```
+4. `npm run dev`
+
+---
+
+## 📖 API Reference
+
+### Auth Service
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/auth/register` | `POST` | Register a new author account. |
+| `/auth/login` | `POST` | Authenticate and receive tokens. |
+| `/auth/logout` | `POST` | Terminate session. |
+| `/auth/me` | `GET` | Retrieve profile of logged-in user. |
+| `/auth/profile` | `PUT` | Update account details (Avatar, Name, etc.). |
+
+### Story Service
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/stories` | `GET` | Fetch approved public stories. |
+| `/stories/:slug` | `GET` | Get full narrative content by slug. |
+| `/stories` | `POST` | Submit a new narrative (Status: Pending). |
+| `/stories/drafts` | `GET` | Retrieve personal unpublished drafts. |
+| `/stories/analyze` | `POST` | Trigger AI Sense analysis on content. |
+| `/stories/:id/like` | `POST` | Toggle narrative appreciation. |
+
+### Series & Progress
+| Endpoint | Method | Description |
+| :--- | :--- | :--- |
+| `/series` | `POST` | Group stories into a thematic series. |
+| `/progress/:id` | `GET/PUT` | Track and persist reading progress. |
+
+---
+
+## 📜 License
+This project is licensed under the ISC License.

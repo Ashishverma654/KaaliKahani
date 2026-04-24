@@ -1,29 +1,43 @@
-# KaaliKahani API Architecture
+# KaaliKahani API - Technical Documentation
 
-A production-ready Node.js/Express API designed for the "KaaliKahani" multilingual story platform.
+A high-performance Node.js/Express API engineered for the "KaaliKahani" multilingual publishing platform.
 
-## Technical Overview
+## 🏛 Technical Architecture
 
-- **Architecture**: Service-Controller pattern with Mongoose models.
-- **Authentication**: JWT (Access + Refresh tokens) with cookie-based persistence.
-- **Storage**: MongoDB Atlas for data, Cloudinary for media.
-- **AI Integration**: Gemini 1.5 Flash for narrative analysis and translation.
-- **Security**: Rate-limiting, Helmet, CORS, and password hashing with bcrypt.
+- **Pattern**: Service-Controller-Model architecture for clean separation of concerns.
+- **RBAC**: Multi-role support with `restrictTo` middleware for decoupled admin projects.
+- **Security**: 
+  - JWT-based authentication (Dual-token system).
+  - Secure HTTP-Only cookie implementation.
+  - Rate-limiting and Helmet security headers.
+  - Payload validation via `express-validator`.
+- **Integrations**:
+  - **Gemini AI**: Narrative intelligence, realism scoring, and automated translation.
+  - **Cloudinary**: Production-ready media hosting and optimization.
 
-## API Endpoints
+## 🛠 Project Structure
 
-For a full list of available endpoints and descriptions, please refer to the [Root README](file:///e:/Projects/Story-Website/README.md).
+- `controllers/`: Request handling and response formatting.
+- `services/`: Business logic and database operations.
+- `models/`: Mongoose schemas for Users, Stories, Comments, etc.
+- `middlewares/`: Security, Auth, and Upload filters.
+- `routes/`: Express router definitions.
 
-### Core Services
-- `authService.js`: Handles registration, login, and profile management.
-- `storyService.js`: Manages stories, drafts, likes, and comments.
-- `geminiService.js`: Orchestrates AI-powered analysis and translations.
+## 📦 Core Dependencies
 
-## Development
+| Package | Purpose |
+| :--- | :--- |
+| `express` | Main server framework (v5). |
+| `mongoose` | MongoDB ODM. |
+| `jsonwebtoken` | Secure session management. |
+| `@google/generative-ai` | Gemini AI integration. |
+| `cloudinary` | Media registry management. |
+
+## 🚀 Development
 
 1. Install dependencies: `npm install`
-2. Start development server: `npm run dev`
-3. Run seeds (if needed): `node scripts/seedAdmin.js`
+2. Configure environment: Copy `.env.example` to `.env` and fill in secrets.
+3. Start development server: `npm run dev`
 
 ---
-*Version 2.0.4 - Premium API Edition*
+*Version 2.1.0 - Professional Editorial Edition*

@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon --ignore 'logs/*' --ignore '.env' server.js",
-    "seed:admin": "node scripts/seedAdmin.js"
+    "dev": "nodemon --ignore 'logs/*' --ignore '.env' server.js"
   },
   "keywords": [],
   "author": "",
