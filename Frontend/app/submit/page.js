@@ -132,6 +132,16 @@ function SubmitStoryContent() {
   };
 
   const handleSaveDraft = async () => {
+    // Industry Standard: Prevent saving empty or extremely short drafts map map
+    if (!formData.title.trim() || formData.title.trim().length < 3) {
+      setError('A draft requires a title (minimum 3 characters) to be identified.');
+      return;
+    }
+    if (!formData.content.trim() || formData.content.trim().length < 10) {
+      setError('Please add some narrative content (minimum 10 characters) before saving as draft.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {

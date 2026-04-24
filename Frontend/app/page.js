@@ -124,7 +124,7 @@ export default async function HomePage({ searchParams }) {
                 {getText(featuredStory.content)}
               </p>
               <div className="flex items-center gap-3">
-                <Link href={`/detail?slug=${getSlug(featuredStory.slug)}`} className="bg-primary border border-outline-variant text-on-primary-container px-8 py-3 rounded-lg font-bold text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-lg">
+                <Link href={`/detail/${getSlug(featuredStory.slug)}`} className="bg-primary border border-outline-variant text-on-primary-container px-8 py-3 rounded-lg font-bold text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-lg">
                   Read Story
                 </Link>
                 <button className="w-11 h-11 bg-surface-container-low/80 backdrop-blur-md text-on-surface border border-outline-variant rounded-lg flex items-center justify-center hover:bg-surface-container transition-colors shadow">
@@ -177,7 +177,7 @@ export default async function HomePage({ searchParams }) {
             <h2 className="text-4xl font-gothic text-on-surface mb-6 tracking-wide drop-shadow-sm transition-colors duration-300">Recent Stories</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {listStories.length > 0 ? listStories.map((story) => (
-                <Link key={story._id} href={`/detail?slug=${getSlug(story.slug)}`} className="gothic-frame p-3 group bg-surface-container-low/60 backdrop-blur-3xl rounded-3xl border border-outline-variant/10 hover:bg-surface-container transition-all duration-300 shadow-xl overflow-hidden flex flex-col h-full">
+                <Link key={story._id} href={`/detail/${getSlug(story.slug)}`} className="gothic-frame p-3 group bg-surface-container-low/60 backdrop-blur-3xl rounded-3xl border border-outline-variant/10 hover:bg-surface-container transition-all duration-300 shadow-xl overflow-hidden flex flex-col h-full">
                   <div className="relative aspect-[16/9] w-full overflow-hidden mb-4 border border-outline-variant shadow-sm rounded-2xl">
                     <img src={getCoverImage(story) || "https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=800&auto=format&fit=crop"} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 brightness-75 group-hover:brightness-100" alt={getText(story.title)}/>
                     <span className="absolute top-3 left-3 bg-surface-container-low/80 backdrop-blur text-on-surface border border-outline-variant/50 text-[8px] font-bold tracking-widest uppercase px-2 py-0.5 rounded shadow">{CATEGORY_LABELS[story.category] || story.category || "STORY"}</span>
@@ -202,7 +202,7 @@ export default async function HomePage({ searchParams }) {
               <h3 className="text-xl font-gothic text-on-surface mb-4 tracking-wide border-b border-outline-variant/10 pb-2 uppercase text-[10px] font-black tracking-[0.4em]">Trending Now</h3>
               <div className="flex flex-col">
                 {trendingStories.length > 0 ? trendingStories.map((story, idx) => (
-                  <Link href={`/detail?slug=${getSlug(story.slug)}`} key={story._id} className="group flex gap-4 border-b border-outline-variant/10 py-4 last:border-0 hover:bg-surface-container transition-colors -mx-6 px-6">
+                  <Link href={`/detail/${getSlug(story.slug)}`} key={story._id} className="group flex gap-4 border-b border-outline-variant/10 py-4 last:border-0 hover:bg-surface-container transition-colors -mx-6 px-6">
                     <span className="text-2xl font-gothic font-bold text-on-surface-variant/40 group-hover:text-primary transition-colors">{String(idx + 1).padStart(2, '0')}</span>
                     <div className="mt-1">
                       <h4 className="font-bold text-sm text-on-surface leading-snug group-hover:text-primary transition-colors mb-1">{getText(story.title)}</h4>

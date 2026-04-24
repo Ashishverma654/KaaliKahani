@@ -38,7 +38,7 @@ export default async function SearchPage({ searchParams }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {stories.map((story) => (
-            <Link key={story._id} href={`/detail?slug=${story.slug?.en || story.slug?.hi || story.slug}`}>
+            <Link key={story._id} href={`/detail/${story.slug?.en || story.slug?.hi || story.slug}`}>
               <div className="gothic-frame p-6 rounded-3xl border border-outline-variant/20 hover:border-primary transition-all flex flex-col gap-2 min-h-[160px]">
                 <h3 className="text-2xl font-gothic text-on-surface leading-tight">{getText(story.title)}</h3>
                 <p className="text-xs text-on-surface-variant line-clamp-3 leading-relaxed">{getText(story.content)}</p>

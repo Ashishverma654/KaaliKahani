@@ -45,7 +45,7 @@ export default async function SeriesPage({ params }) {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {stories.map((story) => (
-            <Link key={story._id} href={`/detail?slug=${story.slug?.en || story.slug?.hi || story.slug}`}>
+            <Link key={story._id} href={`/detail/${story.slug?.en || story.slug?.hi || story.slug}`}>
               <div className="gothic-frame p-6 rounded-3xl border border-outline-variant/20 hover:border-primary transition-all">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-2">Part {story.seriesOrder || 1}</div>
                 <h3 className="text-2xl font-gothic text-on-surface mb-2">{getText(story.title)}</h3>

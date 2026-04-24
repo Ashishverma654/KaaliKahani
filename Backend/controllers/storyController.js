@@ -104,6 +104,14 @@ exports.getDraftById = async (req, res, next) => {
 
 exports.saveDraft = async (req, res, next) => {
   try {
+    const { title, content } = req.body;
+    if (!title || title.trim().length < 3) {
+      return formatResponse(res, 400, 'Draft requires a title (minimum 3 characters)');
+    }
+    if (!content || content.trim().length < 10) {
+      return formatResponse(res, 400, 'Draft requires some content (minimum 10 characters)');
+    }
+
     const draft = await storyService.saveDraft(req.user._id, req.body);
     return formatResponse(res, 201, 'Draft saved', draft);
   } catch (error) {
@@ -113,6 +121,14 @@ exports.saveDraft = async (req, res, next) => {
 
 exports.updateDraft = async (req, res, next) => {
   try {
+    const { title, content } = req.body;
+    if (title !== undefined && title.trim().length < 3) {
+      return formatResponse(res, 400, 'Draft title must be at least 3 characters');
+    }
+    if (content !== undefined && content.trim().length < 10) {
+      return formatResponse(res, 400, 'Draft content must be at least 10 characters');
+    }
+
     const draft = await storyService.updateDraft(req.user._id, req.params.id, req.body);
     return formatResponse(res, 200, 'Draft updated', draft);
   } catch (error) {

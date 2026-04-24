@@ -36,10 +36,9 @@ const CATEGORY_LABELS = {
   'general-horror': 'General Horror'
 };
 
-export default async function StoryDetail({ searchParams }) {
-  const params = await searchParams;
-  const slug = params.slug;
-  const lang = params.lang || 'en';
+export default async function StoryDetail({ params, searchParams }) {
+  const { slug } = await params;
+  const { lang = 'en' } = await searchParams;
 
   if (!slug) {
     return (
@@ -91,13 +90,13 @@ export default async function StoryDetail({ searchParams }) {
             )}
             <div className="flex items-center gap-2">
               <Link
-                href={`/detail?slug=${story.slug?.en || slug}&lang=en`}
+                href={`/detail/${story.slug?.en || slug}?lang=en`}
                 className={`px-3 py-1 text-[9px] uppercase tracking-widest font-bold rounded-full border ${lang === 'en' ? 'bg-primary text-white border-primary' : 'bg-surface/40 text-on-surface-variant border-outline-variant'}`}
               >
                 English
               </Link>
               <Link
-                href={`/detail?slug=${story.slug?.hi || story.slug?.en || slug}&lang=hi`}
+                href={`/detail/${story.slug?.hi || story.slug?.en || slug}?lang=hi`}
                 className={`px-3 py-1 text-[9px] uppercase tracking-widest font-bold rounded-full border ${lang === 'hi' ? 'bg-primary text-white border-primary' : 'bg-surface/40 text-on-surface-variant border-outline-variant'}`}
               >
                 Hindi
