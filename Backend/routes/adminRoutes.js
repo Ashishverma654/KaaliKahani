@@ -9,6 +9,7 @@ router.use(adminOnly);
 
 // Story Moderation Routes
 router.get('/stories', adminController.getAllStories);
+router.post('/stories', adminController.createStory);
 router.patch('/stories/:id/status', adminController.updateStoryStatus);
 
 // User Management Routes

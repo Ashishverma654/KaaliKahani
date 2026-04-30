@@ -5,6 +5,7 @@ const Settings = require('../models/Settings');
 const Like = require('../models/Like');
 const ReadingProgress = require('../models/ReadingProgress');
 const formatResponse = require('../utils/response');
+const generateSlug = require('../utils/slugify');
 
 /**
  * Fetch all stories for moderation
@@ -16,6 +17,46 @@ exports.getAllStories = async (req, res, next) => {
       .sort('-createdAt');
     
     return formatResponse(res, 200, 'All stories fetched for moderation', stories);
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
+ * Admin Story Creation
+ */
+exports.createStory = async (req, res, next) => {
+  try {
+    const { title, content, category, tags, coverImage, status, seriesId, seriesOrder, language = 'en' } = req.body;
+    
+    if (!title || !content) {
+      return formatResponse(res, 400, 'Title and content are required');
+    }
+
+    // Generate unique slug
+    let targetSlug = generateSlug(typeof title === 'object' ? (title.en || Object.values(title)[0]) : title);
+    const exists = await Story.findOne({ [`slug.${language}`]: targetSlug });
+    if (exists) {
+      targetSlug = `${targetSlug}-${Math.random().toString(36).substr(2, 5)}`;
+    }
+
+    const story = await Story.create({
+      title: typeof title === 'object' ? title : { [language]: title },
+      content: typeof content === 'object' ? content : { [language]: content },
+      originalContent: typeof content === 'object' ? content : { [language]: content },
+      slug: { [language]: targetSlug },
+      category: category || 'general-horror',
+      tags: tags || [],
+      coverImage,
+      status: status || 'draft',
+      author: req.user._id,
+      language: [language],
+      isPublished: status === 'published' || status === 'approved',
+      seriesId: seriesId || null,
+      seriesOrder: seriesOrder || 1
+    });
+
+    return formatResponse(res, 201, 'Story created successfully', story);
   } catch (error) {
     next(error);
   }

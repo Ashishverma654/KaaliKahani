@@ -25,6 +25,12 @@ const StorySchema = new mongoose.Schema({
   images: [{
     type: String
   }],
+  coverImage: {
+    type: String
+  },
+  tags: [{
+    type: String
+  }],
   category: {
     type: String,
     enum: ['real-horror', 'paranormal', 'haunted-places', 'urban-legends', 'general-horror'],

@@ -172,3 +172,23 @@ exports.analyzeStory = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.refineStory = async (req, res, next) => {
+  try {
+    const { content, prompt, lang } = req.body;
+    
+    if (!content || !prompt) {
+      return formatResponse(res, 400, 'Narrative content and instruction prompt are required');
+    }
+
+    const refinedContent = await geminiService.refineStory(content, prompt, lang || 'en');
+    
+    if (!refinedContent) {
+      return formatResponse(res, 503, 'AI service is currently unavailable');
+    }
+
+    return formatResponse(res, 200, 'Story refined successfully', { refinedContent });
+  } catch (error) {
+    next(error);
+  }
+};

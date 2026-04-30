@@ -11,7 +11,7 @@ class GeminiService {
     this.model = null;
     if (!this.disabled) {
       this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      this.model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     }
   }
 
@@ -80,6 +80,46 @@ class GeminiService {
     } catch (error) {
       console.error("Gemini Analysis Failure:", error.message);
       return null;
+    }
+  }
+
+  /**
+   * Refines or rewrites a story based on a specific user instructions (prompt).
+   */
+  async refineStory(content, userPrompt, lang = 'en') {
+    console.log("AI Refine Request Received..."); // DEBUG LOG
+    
+    if (this.disabled || !this.model) {
+      console.warn("AI Refine aborted: Service is disabled or model not initialized.");
+      return null;
+    }
+
+    const prompt = `
+      You are an elite horror editorial AI. 
+      Redesign the following story based on the instruction.
+      
+      STORY: "${content}"
+      INSTRUCTION: "${userPrompt}"
+      
+      Output ONLY the new story content.
+    `;
+
+    try {
+      console.log("Sending request to Gemini API..."); // DEBUG LOG
+      const result = await this.model.generateContent(prompt);
+      const response = await result.response;
+      
+      if (!response.candidates || response.candidates.length === 0) {
+        console.warn("Gemini returned no candidates (blocked content).");
+        return "The AI blocked this request due to safety policies.";
+      }
+
+      const text = response.text().trim();
+      console.log("Gemini response received successfully."); // DEBUG LOG
+      return text;
+    } catch (error) {
+      console.error("CRITICAL Gemini Error:", error.message); // THIS WILL SHOW US THE ACTUAL ERROR
+      return "AI Service Error: " + error.message;
     }
   }
 }

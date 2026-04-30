@@ -36,6 +36,7 @@ router.put('/draft/:id', protect, storyController.updateDraft);
 // Advanced Archival Routes (Image Uplink & AI Sense)
 router.post('/upload', protect, upload.single('image'), storyController.uploadImage);
 router.post('/analyze', protect, storyController.analyzeStory);
+router.post('/refine', protect, storyController.refineStory);
 
 router.post('/:id/like', protect, interactionLimiter, storyController.addLike);
 
