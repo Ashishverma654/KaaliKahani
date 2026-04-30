@@ -1,35 +1,27 @@
-const mongoose = require('mongoose');
 require('dotenv').config();
-
-const Story = require('./models/Story');
+const mongoose = require('mongoose');
 const User = require('./models/User');
-const Comment = require('./models/Comment');
 
-async function check() {
+const checkAdmins = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGO_URI);
     console.log('Connected to MongoDB');
-    
-    const totalStories = await Story.countDocuments();
-    console.log('totalStories:', totalStories);
-    
-    const pendingStories = await Story.countDocuments({ status: 'pending' });
-    console.log('pendingStories:', pendingStories);
-    
-    const totalUsers = await User.countDocuments();
-    console.log('totalUsers:', totalUsers);
-    
-    const activeUsers = await User.countDocuments({ isActive: true });
-    console.log('activeUsers:', activeUsers);
-    
-    const totalComments = await Comment.countDocuments();
-    console.log('totalComments:', totalComments);
-    
-  } catch (err) {
-    console.error('Error during counts:', err);
-  } finally {
-    await mongoose.disconnect();
-  }
-}
 
-check();
+    const admins = await User.find({ role: 'admin' });
+    if (admins.length === 0) {
+      console.log('No admin users found in the database.');
+    } else {
+      console.log(`Found ${admins.length} admin(s):`);
+      admins.forEach(admin => {
+        console.log(`- Name: ${admin.name}, Email: ${admin.email}, isActive: ${admin.isActive}`);
+      });
+    }
+    
+    process.exit(0);
+  } catch (error) {
+    console.error('Error:', error);
+    process.exit(1);
+  }
+};
+
+checkAdmins();

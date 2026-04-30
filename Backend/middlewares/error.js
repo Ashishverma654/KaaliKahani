@@ -26,7 +26,10 @@ const errorHandler = (err, req, res, next) => {
   }
 
   // Default Catch All
-  formatResponse(res, error.statusCode || 500, error.message || 'Server Error');
+  const statusCode = error.statusCode || 500;
+  const message = error.message || 'Server Error';
+
+  return formatResponse(res, statusCode, message);
 };
 
 module.exports = errorHandler;

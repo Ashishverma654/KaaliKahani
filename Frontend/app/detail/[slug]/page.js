@@ -108,6 +108,25 @@ export default async function StoryDetail({ params, searchParams }) {
             {getText(story.content, lang)}
           </div>
 
+          {/* User Uploaded Images Gallery */}
+          {(() => {
+            const bodyImages = story.images || [];
+            if (bodyImages.length === 0) return null;
+            return (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 my-12">
+                {bodyImages.map((img, idx) => (
+                  <div key={idx} className="relative aspect-video rounded-2xl overflow-hidden shadow-xl border border-outline-variant/10 group">
+                    <img 
+                      src={resolveImageUrl(img)} 
+                      alt={`Story visual ${idx + 1}`} 
+                      className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500" 
+                    />
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
+
           <StoryInteractions
             storyId={story._id}
             initialLikes={story.likesCount || 0}

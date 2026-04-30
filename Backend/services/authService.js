@@ -1,17 +1,18 @@
 const User = require('../models/User');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const ErrorResponse = require('../utils/errorResponse');
 
 // Generate JWT Access Token
 const signAccessToken = (id, tokenVersion) => {
-  return jwt.sign({ id, tokenVersion }, process.env.JWT_SECRET, {
+  return jwt.sign({ id: id.toString(), tokenVersion }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE || '1d'
   });
 };
 
 // Generate JWT Refresh Token
 const signRefreshToken = (id, tokenVersion) => {
-  return jwt.sign({ id, tokenVersion }, process.env.REFRESH_SECRET, {
+  return jwt.sign({ id: id.toString(), tokenVersion }, process.env.REFRESH_SECRET, {
     expiresIn: '7d'
   });
 };
@@ -48,21 +49,27 @@ exports.registerUser = async (userData) => {
 
 exports.loginUser = async (email, password) => {
   if (!email || !password) {
-    throw new Error('Please provide an email and password');
+    throw new ErrorResponse('Please provide an email and password', 400);
   }
 
-  const user = await User.findOne({ email }).select('+password');
+  const cleanEmail = email.trim().toLowerCase();
+  const user = await User.findOne({ email: cleanEmail }).select('+password');
+  
   if (!user) {
-    throw new Error('Invalid credentials');
+    console.log(`Login failed: User with email ${cleanEmail} not found`);
+    throw new ErrorResponse('Invalid credentials', 401);
   }
+
+  console.log(`User found: ${user.email}. Provided password length: ${password.length}. Stored hash length: ${user.password?.length}`);
 
   const isMatch = await bcrypt.compare(password, user.password);
   if (!isMatch) {
-    throw new Error('Invalid credentials');
+    console.log(`Login failed: Password mismatch for user ${cleanEmail}`);
+    throw new ErrorResponse('Invalid credentials', 401);
   }
   
   if (!user.isActive) {
-    throw new Error('Account has been deactivated. Contact support.');
+    throw new ErrorResponse('Account has been deactivated. Contact support.', 403);
   }
 
   const accessToken = signAccessToken(user._id, user.tokenVersion);
