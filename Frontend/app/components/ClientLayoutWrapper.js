@@ -43,7 +43,7 @@ export default function ClientLayoutWrapper({ children }) {
       </div>
 
       {!isAuthPage && (
-        <footer className="relative w-full bg-surface-container-low mt-20 pt-24 pb-12 overflow-hidden transition-colors duration-300">
+        <footer className="relative w-full bg-surface-container-low mt-8 pt-14 pb-6 overflow-hidden transition-colors duration-300">
 
           {/* Architectural Brand Watermark */}
           <div className="absolute bottom-0 left-1/2 -translate-x-1/2 select-none pointer-events-none opacity-[0.03] z-0 w-full text-center">
@@ -53,10 +53,10 @@ export default function ClientLayoutWrapper({ children }) {
           </div>
 
           <div className="relative z-10 max-w-[1440px] mx-auto px-12">
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-10">
 
               {/* Brand Colophon */}
-              <div className="lg:col-span-5 space-y-8">
+              <div className="lg:col-span-5 space-y-4">
                 <div>
                   <div className="text-3xl font-black font-display text-primary tracking-tight mb-4 uppercase">KaaliKahani.</div>
                   <p className="text-on-surface-variant font-sans text-sm leading-relaxed max-w-sm opacity-80 italic">
@@ -65,15 +65,15 @@ export default function ClientLayoutWrapper({ children }) {
                 </div>
 
                 {/* Archive Initiation (Newsletter) */}
-                <div className="space-y-4 max-w-sm">
+                <div className="space-y-2 max-w-sm">
                   <h4 className="text-[12px] font-black text-on-surface uppercase tracking-[0.4em]">Newsletter</h4>
                   <div className="relative group">
                     <input
                       type="email"
                       placeholder="email@example.com"
-                      className="w-full bg-surface-container-highest/20 border border-outline-variant/10 rounded-xl px-6 py-4 text-xs text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary/30 transition-all backdrop-blur-xl"
+                      className="w-full bg-surface-container-highest/20 border border-outline-variant/10 rounded-xl px-4 py-3 text-xs text-on-surface placeholder:text-on-surface-variant/40 focus:outline-none focus:border-primary/30 transition-all backdrop-blur-xl"
                     />
-                    <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-white text-[12px] font-black uppercase tracking-widest px-4 py-2.5 rounded-lg hover:bg-primary-hover transition-all shadow-lg active:scale-95">
+                    <button className="absolute right-1 top-1/2 -translate-y-1/2 bg-primary text-white text-[12px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg hover:bg-primary-hover transition-all shadow-lg active:scale-95">
                       Subscribe
                     </button>
                   </div>
@@ -82,10 +82,10 @@ export default function ClientLayoutWrapper({ children }) {
               </div>
 
               {/* Navigation Wings */}
-              <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-12">
-                <div className="space-y-6">
+              <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-8">
+                <div className="space-y-3">
                   <h4 className="text-[12px] font-black text-primary uppercase tracking-[0.4em]">Explore</h4>
-                  <ul className="space-y-4">
+                  <ul className="space-y-2">
                     {['Popular', 'Recent', 'Authors', 'Staff Picks'].map((link) => (
                       <li key={link}>
                         <Link href="/" className="text-on-surface-variant hover:text-primary transition-all text-xs font-semibold tracking-wide flex items-center group">
@@ -97,9 +97,9 @@ export default function ClientLayoutWrapper({ children }) {
                   </ul>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-3">
                   <h4 className="text-[12px] font-black text-primary uppercase tracking-[0.4em]">Editorial</h4>
-                  <ul className="space-y-4">
+                  <ul className="space-y-2">
                     {['About', 'Careers', 'Narratives', 'Contact'].map((link) => (
                       <li key={link}>
                         <Link href="/" className="text-on-surface-variant hover:text-primary transition-all text-xs font-semibold tracking-wide flex items-center group">
@@ -111,9 +111,9 @@ export default function ClientLayoutWrapper({ children }) {
                   </ul>
                 </div>
 
-                <div className="space-y-6">
+                <div className="space-y-3">
                   <h4 className="text-[12px] font-black text-primary uppercase tracking-[0.4em]">Legal</h4>
-                  <ul className="space-y-4">
+                  <ul className="space-y-2">
                     {['Privacy', 'Terms of Service', 'Legal Notice'].map((link) => (
                       <li key={link}>
                         <Link href="/" className="text-on-surface-variant hover:text-primary transition-all text-xs font-semibold tracking-wide flex items-center group">
@@ -137,7 +137,7 @@ export default function ClientLayoutWrapper({ children }) {
             </div>
 
             {/* Colophon Base */}
-            <div className="mt-24 pt-8 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div className="mt-8 pt-4 border-t border-outline-variant/10 flex flex-col md:flex-row justify-between items-center gap-4">
               <p className="text-on-surface-variant text-[12px] font-bold uppercase tracking-[0.4em] opacity-40">
                 © 2026 KaaliKahani. All rights reserved.
               </p>

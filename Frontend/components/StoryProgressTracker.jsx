@@ -56,7 +56,7 @@ const StoryProgressTracker = ({ storyId }) => {
   }, [storyId, isLoggedIn, isSettled]);
 
   return (
-    <div className="mt-6 text-[9px] font-black uppercase tracking-widest text-on-surface-variant">
+    <div className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">
       Reading progress saved: {lastProgress}%
     </div>
   );
