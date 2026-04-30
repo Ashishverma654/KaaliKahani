@@ -40,10 +40,16 @@ const getSlug = (value) => {
   return value.en || value.hi || '';
 };
 
+import { resolveImageUrl } from '@/utils/image';
+
 const getCoverImage = (story) => {
-  if (story?.coverImage) return story.coverImage;
-  if (Array.isArray(story?.images) && story.images.length > 0) return story.images[0];
-  return '';
+  const url = story?.coverImage 
+    ? resolveImageUrl(story.coverImage) 
+    : (Array.isArray(story?.images) && story.images.length > 0) 
+      ? resolveImageUrl(story.images[0]) 
+      : '';
+  // console.log('Resolved Home Image:', url); // Too many logs, keep it commented if needed
+  return url;
 };
 
 const CATEGORY_LABELS = {

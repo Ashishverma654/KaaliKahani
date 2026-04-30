@@ -5,37 +5,30 @@ const mongoose = require('mongoose');
  * A singleton schema for site-wide narrative control.
  */
 const SettingsSchema = new mongoose.Schema({
-  maintenanceMode: {
-    type: Boolean,
-    default: false
-  },
-  allowAIAnalysis: {
-    type: Boolean,
-    default: true
-  },
-  archivePublicAccess: {
-    type: Boolean,
-    default: true
-  },
-  curatorApprovalThreshold: {
-    type: Number,
-    default: 1 // Minimum approvals before publishing
-  },
-  siteTitle: {
+  siteName: {
     type: String,
     default: 'KaaliKahani'
+  },
+  tagline: {
+    type: String,
+    default: 'Ghost stories that haunt your soul'
   },
   featuredStoryId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Story',
     default: null
   },
-  archivalAlerts: [{
-    type: String, // Dynamic alerts displayed globally
-  }]
+  autoApproveStories: {
+    type: Boolean,
+    default: false
+  },
+  profanityFilter: {
+    type: Boolean,
+    default: true
+  }
 }, { timestamps: true });
 
-// Ensure only one settings document exists (Singleton Protocol map)
+// Ensure only one settings document exists (Singleton Protocol)
 SettingsSchema.statics.getSettings = async function() {
   let settings = await this.findOne();
   if (!settings) {

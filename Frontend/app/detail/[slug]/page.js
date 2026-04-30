@@ -22,10 +22,16 @@ const getText = (value, lang = 'en') => {
   return value[lang] || value.en || value.hi || '';
 };
 
+import { resolveImageUrl } from '@/utils/image';
+
 const getCoverImage = (story) => {
-  if (story?.coverImage) return story.coverImage;
-  if (Array.isArray(story?.images) && story.images.length > 0) return story.images[0];
-  return '';
+  const url = story?.coverImage 
+    ? resolveImageUrl(story.coverImage) 
+    : (Array.isArray(story?.images) && story.images.length > 0) 
+      ? resolveImageUrl(story.images[0]) 
+      : '';
+  console.log('Resolved Cover Image:', url);
+  return url;
 };
 
 const CATEGORY_LABELS = {
@@ -119,32 +125,9 @@ export default async function StoryDetail({ params, searchParams }) {
       </header>
 
       {/* Main Content Area */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_minmax(auto,720px)_1fr] gap-12 px-6 py-20">
-
-        {/* Left Sidebar: Engagement (Statically rendered for now) */}
-        <aside className="hidden lg:flex flex-col gap-8 sticky top-32 h-fit">
-          <div className="flex flex-col items-center gap-4">
-            <div className="group flex flex-col items-center gap-2">
-              <div className="w-14 h-14 rounded-full flex items-center justify-center bg-surface-container border border-outline-variant group-hover:bg-primary-container/20 group-hover:border-primary/40 transition-all cursor-pointer">
-                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">favorite</span>
-              </div>
-              <span className="text-xs font-bold text-on-surface-variant">{story.likesCount || 0}</span>
-            </div>
-            <div className="group flex flex-col items-center gap-2">
-              <div className="w-14 h-14 rounded-full flex items-center justify-center bg-surface-container border border-outline-variant group-hover:bg-tertiary-container/20 group-hover:border-tertiary/40 transition-all cursor-pointer">
-                <span className="material-symbols-outlined text-on-surface-variant group-hover:text-tertiary transition-colors">chat_bubble</span>
-              </div>
-              <span className="text-xs font-bold text-on-surface-variant">{comments.length || 0}</span>
-            </div>
-          </div>
-        </aside>
-
-        {/* Narrative Content */}
-        <div className="space-y-8 font-sans drop-shadow-md pb-24">
-          <p className="text-xl md:text-2xl font-light leading-relaxed text-on-surface/90 italic border-l-4 border-primary pl-8 py-2 mb-8">
-            {getText(story.content, lang)?.slice(0, 150)}...
-          </p>
-          <div className="text-lg leading-[1.8] text-on-surface-variant whitespace-pre-wrap">
+      <div className="max-w-[800px] mx-auto px-6 py-20">
+        <div className="space-y-12 font-sans drop-shadow-md pb-16">
+          <div className="text-xl md:text-2xl leading-[1.8] text-on-surface-variant whitespace-pre-wrap">
             {getText(story.content, lang)}
           </div>
 
@@ -156,16 +139,21 @@ export default async function StoryDetail({ params, searchParams }) {
           <StoryProgressTracker storyId={story._id} />
         </div>
 
-        {/* Right Sidebar: Promo */}
-        <aside className="hidden lg:flex flex-col gap-12 sticky top-32 h-fit">
-          <div className="w-full bg-surface-container-high rounded-xl flex flex-col items-center justify-center p-6 text-center border border-outline-variant group shadow-lg">
-            <span className="text-[10px] text-on-surface-variant font-bold uppercase tracking-widest mb-6">Join Us</span>
-            <h4 className="font-gothic font-bold text-lg text-white mb-2 uppercase">Interested in publishing?</h4>
-            <p className="text-xs text-on-surface-variant mb-6">Sign up today and share your stories with our community.</p>
-            <Link href="/login" className="w-full py-3 bg-white text-surface font-black text-xs rounded-full hover:bg-primary transition-colors text-center uppercase tracking-widest">Register</Link>
+        <footer className="mt-20 pt-16 border-t border-outline-variant/20">
+          <div className="w-full bg-surface-container-high rounded-[32px] p-8 md:p-12 text-center border border-outline-variant shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16" />
+            <span className="text-[10px] text-primary font-black uppercase tracking-[0.4em] mb-6 block">Join the Legacy</span>
+            <h4 className="font-gothic font-bold text-3xl text-white mb-4 uppercase">Interested in publishing?</h4>
+            <p className="text-sm text-on-surface-variant mb-10 max-w-md mx-auto leading-relaxed">
+              Sign up today and share your stories with our growing community of horror enthusiasts.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link href="/login" className="w-full sm:w-auto px-10 py-4 bg-white text-black font-black text-[10px] rounded-full hover:bg-primary hover:text-white transition-all uppercase tracking-widest shadow-xl">
+                Register Now
+              </Link>
+            </div>
           </div>
-        </aside>
-
+        </footer>
       </div>
     </article>
   );

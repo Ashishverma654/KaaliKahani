@@ -6,6 +6,7 @@ import ThemeToggle from '@/app/components/ThemeToggle';
 import HeaderCategoryDropdown from '@/app/components/HeaderCategoryDropdown';
 import { useRouter, usePathname } from 'next/navigation';
 import toast from 'react-hot-toast';
+import { resolveImageUrl } from '@/utils/image';
 
 const Navbar = () => {
   const { user, isLoggedIn, logout } = useAuth();
@@ -81,7 +82,7 @@ const Navbar = () => {
                     >
                       <div className="w-9 h-9 rounded-full ring-2 ring-outline-variant/30 ring-offset-2 ring-offset-surface transition-all group-hover:ring-primary/50 overflow-hidden bg-surface-container-high backdrop-blur-xl flex items-center justify-center">
                         {user?.avatar ? (
-                          <img src={user.avatar} alt={user.name} className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all" />
+                          <img src={resolveImageUrl(user.avatar)} alt={user.name} className="w-full h-full object-cover grayscale-[0.3] group-hover:grayscale-0 transition-all" />
                         ) : (
                           <span className="material-symbols-outlined text-lg text-on-surface-variant group-hover:text-primary transition-colors">account_circle</span>
                         )}

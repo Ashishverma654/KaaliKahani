@@ -7,25 +7,26 @@ const cookieParser = require('cookie-parser');
 
 const app = express();
 
-// Initialize Proxy Trust Registry (Required for Render/Deployment identification) map
+// Initialize Proxy Trust Registry
 app.set('trust proxy', 1);
+
+// CORS MUST be first to handle pre-flight OPTIONS requests
+app.use(cors({
+  origin: [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://localhost:3002',
+    'https://kaali-kahani-tpkx.vercel.app',
+    'https://kaali-kahani.vercel.app',
+    'https://kaali-kahani-admin.vercel.app',
+    'https://kaalikahani.onrender.com'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
+}));
 
 // Security and Parsing Middlewares
 app.use(helmet());
-app.use(cors({
-  origin: [
-    'http://localhost:3000', 
-    'http://localhost:3001', 
-    'http://localhost:3002',
-    'https://kaali-kahani-tpkx.vercel.app', 
-    'https://kaali-kahani.vercel.app',
-    'https://kaali-kahani-admin.vercel.app',
-    'https://kaalikahani.onrender.com',
-    process.env.FRONTEND_URL,
-    process.env.ADMIN_URL
-  ].filter(Boolean),
-  credentials: true
-}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

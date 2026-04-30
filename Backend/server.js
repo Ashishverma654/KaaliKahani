@@ -3,7 +3,28 @@ const app = require('./app');
 const connectDB = require('./config/db');
 
 // Execute Mongo Atlas Connection
-connectDB();
+connectDB().then(async () => {
+  // Auto-seed Super Admin if missing
+  const User = require('./models/User');
+  const bcrypt = require('bcrypt');
+  
+  const adminEmail = 'super9140admin@kaalikahani.com';
+  const existingAdmin = await User.findOne({ email: adminEmail });
+  
+  if (!existingAdmin) {
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash('Password@123', salt);
+    
+    await User.create({
+      name: 'Super Admin',
+      email: adminEmail,
+      password: hashedPassword,
+      role: 'admin',
+      isActive: true
+    });
+    console.log('🚀 Super Admin auto-seeded successfully!');
+  }
+});
 
 const PORT = process.env.PORT || 5000;
 

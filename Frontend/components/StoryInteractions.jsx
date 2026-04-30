@@ -16,6 +16,7 @@ const StoryInteractions = ({ storyId, initialLikes = 0, initialComments = [], is
   const canInteract = authLoggedIn || isLoggedIn;
 
   const handleLike = async () => {
+    console.log('Like attempt:', { storyId, canInteract, authLoggedIn, isLoggedIn });
     if (!canInteract) {
       toast.error('Please login to like a story.');
       return;
@@ -23,10 +24,13 @@ const StoryInteractions = ({ storyId, initialLikes = 0, initialComments = [], is
     if (isLiking) return;
     setIsLiking(true);
     try {
-      await storyService.likeStory(storyId);
+      console.log('Sending like request to backend...');
+      const res = await storyService.likeStory(storyId);
+      console.log('Like response:', res);
       setLikesCount((prev) => prev + 1);
       toast.success('Story liked');
     } catch (error) {
+      console.error('Like failed:', error);
       const msg = error.response?.data?.message || 'Unable to like story';
       toast.error(msg);
     } finally {
@@ -36,6 +40,7 @@ const StoryInteractions = ({ storyId, initialLikes = 0, initialComments = [], is
 
   const handleComment = async (e) => {
     e.preventDefault();
+    console.log('Comment attempt:', { storyId, canInteract, commentText });
     if (!canInteract) {
       toast.error('Please login to comment.');
       return;
@@ -43,11 +48,13 @@ const StoryInteractions = ({ storyId, initialLikes = 0, initialComments = [], is
     if (!commentText.trim()) return;
     setIsSubmitting(true);
     try {
+      console.log('Sending comment request to backend...');
       await storyService.addComment(storyId, commentText.trim());
       setCommentText('');
       toast.success('Comment submitted for review');
       // Comments are moderated now; do not inject into public list.
     } catch (error) {
+      console.error('Comment failed:', error);
       const msg = error.response?.data?.message || 'Unable to submit comment';
       toast.error(msg);
     } finally {
@@ -57,17 +64,23 @@ const StoryInteractions = ({ storyId, initialLikes = 0, initialComments = [], is
 
   return (
     <div className="mt-12 space-y-10">
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-6 border-y border-outline-variant/10 py-6">
         <button
           onClick={handleLike}
-          className="flex items-center gap-3 px-6 py-3 rounded-full bg-surface-container border border-outline-variant text-on-surface hover:bg-primary hover:text-white transition-all"
+          className="flex items-center gap-2 group transition-all"
           disabled={isLiking}
         >
-          <span className="material-symbols-outlined text-sm">favorite</span>
-          <span className="text-[10px] font-black uppercase tracking-widest">{likesCount} Likes</span>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container border border-outline-variant group-hover:bg-primary/10 group-hover:border-primary/40 transition-all">
+            <span className="material-symbols-outlined text-sm group-hover:text-primary">favorite</span>
+          </div>
+          <span className="text-[11px] font-black uppercase tracking-widest text-on-surface-variant group-hover:text-on-surface">{likesCount} Likes</span>
         </button>
-        <div className="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant">
-          {comments.length} Comments
+        
+        <div className="flex items-center gap-2 group cursor-default">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container border border-outline-variant">
+            <span className="material-symbols-outlined text-sm">chat_bubble</span>
+          </div>
+          <span className="text-[11px] font-black uppercase tracking-widest text-on-surface-variant">{comments.length} Comments</span>
         </div>
       </div>
 
