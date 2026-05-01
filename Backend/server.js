@@ -1,6 +1,12 @@
 require('dotenv').config();
 const app = require('./app');
 const connectDB = require('./config/db');
+const keepAlive = require('./utils/keepAlive');
+
+// Start Keep-Alive if running on Render
+if (process.env.RENDER_EXTERNAL_URL) {
+  keepAlive(process.env.RENDER_EXTERNAL_URL);
+}
 
 // Execute Mongo Atlas Connection
 connectDB().then(async () => {
