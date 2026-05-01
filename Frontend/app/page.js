@@ -136,12 +136,12 @@ export default async function HomePage({ searchParams }) {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="gothic-frame p-8 bg-surface-container-low/60 backdrop-blur-2xl rounded-3xl border border-outline-variant/10 shadow-2xl">
               <h3 className="text-xl font-black text-on-surface mb-6 tracking-wide border-b border-outline-variant/10 pb-4 uppercase text-[11px] tracking-[0.5em]">Trending Now</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+              <div className="grid grid-cols-1">
                 {trendingStories.length > 0 ? trendingStories.map((story, idx) => (
-                  <Link href={`/detail/${getSlug(story.slug)}`} key={story._id} className="group flex gap-4 border-b border-outline-variant/10 py-5 last:border-0 hover:bg-surface-container transition-colors -mx-4 px-4 rounded-xl">
-                    <span className="text-3xl font-gothic font-bold text-on-surface-variant/40 group-hover:text-primary transition-colors">{String(idx + 1).padStart(2, '0')}</span>
-                    <div className="mt-1">
-                      <h4 className="font-bold text-base text-on-surface leading-snug group-hover:text-primary transition-colors mb-1">{getText(story.title)}</h4>
+                  <Link href={`/detail/${getSlug(story.slug)}`} key={story._id} className="group flex items-center gap-6 border-b border-outline-variant/10 py-5 last:border-0 hover:bg-surface-container transition-colors -mx-4 px-4 rounded-xl">
+                    <span className="text-4xl font-gothic font-bold text-on-surface-variant/20 group-hover:text-primary transition-colors min-w-[40px] text-center">{String(idx + 1).padStart(2, '0')}</span>
+                    <div className="flex-1">
+                      <h4 className="font-bold text-base text-on-surface leading-tight group-hover:text-primary transition-colors mb-1">{getText(story.title)}</h4>
                       <span className="text-[10px] text-on-surface-variant tracking-[0.1em] uppercase font-bold">{story.views || 0} READS</span>
                     </div>
                   </Link>
