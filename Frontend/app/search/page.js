@@ -13,8 +13,10 @@ async function searchStories(query) {
       cache: 'no-store'
     });
     const data = await res.json();
-    return data.data || [];
+    // Ensure we return an array to prevent .map errors
+    return Array.isArray(data.data) ? data.data : [];
   } catch (error) {
+    console.error("Search fetch error:", error);
     return [];
   }
 }

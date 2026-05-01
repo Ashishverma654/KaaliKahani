@@ -127,7 +127,7 @@ export default async function HomePage({ searchParams }) {
                 <span className="bg-primary text-on-primary-container px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase rounded flex items-center shadow-sm">
                   {CATEGORY_LABELS[featuredStory.category] || featuredStory.category || "HORROR"}
                 </span>
-                <span className="text-white/70 text-xs font-bold tracking-widest uppercase drop-shadow-md">{featuredStory.readTime || 5} min read • {featuredStory.views || 0} reads</span>
+                <span className="text-white/70 text-xs font-bold tracking-widest uppercase drop-shadow-md">{featuredStory.views || 0} reads</span>
               </div>
               <h1 className="text-4xl md:text-6xl font-black text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] leading-none max-w-3xl mb-4">
                 {getText(featuredStory.title)}
@@ -197,7 +197,7 @@ export default async function HomePage({ searchParams }) {
                   <h3 className="text-2xl font-bold text-on-surface mb-2 leading-tight group-hover:text-primary transition-colors">{getText(story.title)}</h3>
                   <p className="text-xs text-on-surface-variant line-clamp-2 leading-relaxed mb-4">{getText(story.content)}</p>
                   <div className="mt-auto flex items-center justify-between text-[9px] text-on-surface-variant font-bold uppercase tracking-widest border-t border-outline-variant/10 pt-3 transition-colors">
-                     <span className="flex items-center gap-2">{story.readTime || 5} MIN • {story.views || 0} VIEWS</span>
+                     <span className="flex items-center gap-2">{story.views || 0} VIEWS</span>
                      <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[10px]">favorite</span> {story.likesCount || 0}</span>
                   </div>
                 </Link>

@@ -167,15 +167,21 @@ exports.getFeaturedStory = async () => {
 
 exports.searchStories = async (query, language = 'en') => {
   if (!query) return [];
+  
+  const searchRegex = new RegExp(query, 'i'); // Case-insensitive fuzzy search
+  
   const filter = {
     status: 'approved',
     isPublished: true,
     language: { $in: [language] },
-    $text: { $search: query }
+    $or: [
+      { [`title.${language}`]: searchRegex },
+      { [`content.${language}`]: searchRegex }
+    ]
   };
 
-  const stories = await Story.find(filter, { score: { $meta: 'textScore' } })
-    .sort({ score: { $meta: 'textScore' } })
+  const stories = await Story.find(filter)
+    .sort({ createdAt: -1 })
     .limit(20)
     .lean();
 
