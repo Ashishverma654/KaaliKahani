@@ -193,12 +193,12 @@ export default function UserProfile() {
                      </div>
 
                      <div className="flex flex-col items-center md:items-start text-center md:text-left">
-                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-2">Welcome User</p>
+                        <p className="text-[10px] font-black uppercase tracking-[0.4em] text-primary mb-2">Welcome</p>
                         <h1 className="text-4xl md:text-6xl font-black font-display tracking-tighter text-on-surface mb-2 uppercase drop-shadow-xl">{user?.name || 'Anonymous Author'}</h1>
                         <p className="text-xs md:text-sm font-medium text-on-surface-variant tracking-wider flex items-center gap-4">
                            <span className="flex items-center gap-2"><span className="material-symbols-outlined text-xs">alternate_email</span> {user?.email || 'unreachable@archive.org'}</span>
                            <span className="w-1 h-1 rounded-full bg-outline-variant opacity-40"></span>
-                           <span className="flex items-center gap-2 italic uppercase text-[10px] tracking-widest font-black">
+                           <span className="flex items-center gap-2 uppercase text-[10px] tracking-widest font-black">
                               Member since {user?.createdAt ? new Date(user.createdAt).getFullYear() : '2024'}
                            </span>
                         </p>
@@ -279,7 +279,7 @@ export default function UserProfile() {
                   <div className="p-8 rounded-3xl bg-primary-container/10 border border-primary/10 relative overflow-hidden group">
                      <div className="absolute top-0 right-0 w-24 h-24 bg-primary/20 blur-3xl rounded-full -translate-x-8 -translate-y-8 group-hover:bg-primary/30 transition-colors"></div>
                      <h4 className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mb-4">User Status</h4>
-                     <p className="text-xs text-on-surface font-medium leading-relaxed italic">"Your stories have reached {stories.reduce((acc, s) => acc + (s.views || 0), 0)} readers. Your collection continues to grow."</p>
+                     <p className="text-xs text-on-surface font-medium leading-relaxed">"Your stories have reached {stories.reduce((acc, s) => acc + (s.views || 0), 0)} readers. Your collection continues to grow."</p>
                   </div>
                </div>
 
@@ -346,7 +346,7 @@ export default function UserProfile() {
                            <div className="bg-surface-container-low rounded-[3rem] p-24 flex flex-col items-center justify-center text-center border-2 border-dashed border-outline-variant/10">
                               <span className="material-symbols-outlined text-6xl text-outline-variant/20 mb-8">ink_pen</span>
                               <h3 className="text-xl font-black font-display uppercase tracking-widest text-on-surface mb-4">No stories found</h3>
-                              <p className="text-on-surface-variant text-sm max-w-sm mb-12 italic">You haven't written any stories yet. Your contributions are welcome.</p>
+                              <p className="text-on-surface-variant text-sm max-w-sm mb-12">You haven't written any stories yet. Your contributions are welcome.</p>
                               <Link href="/submit" className="bg-primary hover:scale-105 transition-transform text-on-primary px-10 py-4 rounded-full font-black uppercase tracking-widest shadow-2xl">
                                  Begin Your First Story
                               </Link>
@@ -645,7 +645,7 @@ export default function UserProfile() {
                                  <span className="material-symbols-outlined text-primary text-xl mt-1">info</span>
                                  <div className="space-y-1">
                                     <p className="text-[10px] font-black uppercase tracking-widest text-on-surface">Password Reset Notice</p>
-                                    <p className="text-xs text-on-surface-variant font-medium leading-relaxed italic opacity-70">"Resetting your password will automatically terminate all other active sessions globally. You will need to re-authenticate on all devices."</p>
+                                    <p className="text-xs text-on-surface-variant font-medium leading-relaxed opacity-70">"Resetting your password will automatically terminate all other active sessions globally. You will need to re-authenticate on all devices."</p>
                                  </div>
                               </div>
                            </div>

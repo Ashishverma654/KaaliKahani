@@ -48,7 +48,7 @@ const ScrollToTop = () => {
         aria-label="Scroll to top"
       >
         {/* Progress SVG Ring */}
-        <svg className="absolute inset-0 w-full h-full -rotate-90">
+        <svg className="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 56 56">
           <circle
             cx="28"
             cy="28"
@@ -71,14 +71,16 @@ const ScrollToTop = () => {
               strokeLinecap: 'round',
               transition: 'stroke-dashoffset 0.1s ease-out'
             }}
-            className="text-primary drop-shadow-[0_0_8px_rgba(var(--primary-rgb),0.5)]"
+            className="text-primary"
           />
         </svg>
 
-        {/* Icon */}
-        <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors text-2xl relative z-10 font-bold">
-          expand_less
-        </span>
+        {/* Icon - Perfectly Centered */}
+        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <span className="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors text-2xl font-bold translate-y-[1px]">
+            keyboard_arrow_up
+          </span>
+        </div>
       </button>
     </div>
   );

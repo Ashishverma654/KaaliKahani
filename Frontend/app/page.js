@@ -48,7 +48,6 @@ const getCoverImage = (story) => {
     : (Array.isArray(story?.images) && story.images.length > 0) 
       ? resolveImageUrl(story.images[0]) 
       : '';
-  // console.log('Resolved Home Image:', url); // Too many logs, keep it commented if needed
   return url;
 };
 
@@ -72,7 +71,7 @@ export default async function HomePage({ searchParams }) {
   const trendingStories = [...stories]
     .filter((s) => s._id !== featuredStory?._id)
     .sort((a, b) => (b.views || 0) - (a.views || 0))
-    .slice(0, 3);
+    .slice(0, 4);
 
   const mostLiked = [...stories].sort((a, b) => (b.likesCount || 0) - (a.likesCount || 0))[0] || null;
   const mostRead = [...stories].sort((a, b) => (b.views || 0) - (a.views || 0))[0] || null;
@@ -123,7 +122,7 @@ export default async function HomePage({ searchParams }) {
                 </span>
                 <span className="text-white/70 text-xs font-bold tracking-widest uppercase drop-shadow-md">{featuredStory.readTime || 5} min read • {featuredStory.views || 0} reads</span>
               </div>
-              <h1 className="text-4xl md:text-6xl font-gothic text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] leading-none max-w-3xl mb-4">
+              <h1 className="text-4xl md:text-6xl font-black text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] leading-none max-w-3xl mb-4">
                 {getText(featuredStory.title)}
               </h1>
               <p className="text-white/80 max-w-xl text-sm md:text-base leading-relaxed mb-8 drop-shadow-md font-medium line-clamp-2">
@@ -177,18 +176,18 @@ export default async function HomePage({ searchParams }) {
           ))}
         </div>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-12 pb-24">
+        {/* Main Content Flow */}
+        <div className="flex flex-col gap-16 pb-24">
           <div>
-            <h2 className="text-4xl font-gothic text-on-surface mb-6 tracking-wide drop-shadow-sm transition-colors duration-300">Recent Stories</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <h2 className="text-4xl font-black text-on-surface mb-8 tracking-wide drop-shadow-sm transition-colors duration-300">Recent Stories</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {listStories.length > 0 ? listStories.map((story) => (
                 <Link key={story._id} href={`/detail/${getSlug(story.slug)}`} className="gothic-frame p-3 group bg-surface-container-low/60 backdrop-blur-3xl rounded-3xl border border-outline-variant/10 hover:bg-surface-container transition-all duration-300 shadow-xl overflow-hidden flex flex-col h-full">
                   <div className="relative aspect-[16/9] w-full overflow-hidden mb-4 border border-outline-variant shadow-sm rounded-2xl">
                     <img src={getCoverImage(story) || "https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=800&auto=format&fit=crop"} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 brightness-75 group-hover:brightness-100" alt={getText(story.title)}/>
                     <span className="absolute top-3 left-3 bg-surface-container-low/80 backdrop-blur text-on-surface border border-outline-variant/50 text-[8px] font-bold tracking-widest uppercase px-2 py-0.5 rounded shadow">{CATEGORY_LABELS[story.category] || story.category || "STORY"}</span>
                   </div>
-                  <h3 className="text-2xl font-gothic text-on-surface mb-2 leading-tight group-hover:text-primary transition-colors">{getText(story.title)}</h3>
+                  <h3 className="text-2xl font-bold text-on-surface mb-2 leading-tight group-hover:text-primary transition-colors">{getText(story.title)}</h3>
                   <p className="text-xs text-on-surface-variant line-clamp-2 leading-relaxed mb-4">{getText(story.content)}</p>
                   <div className="mt-auto flex items-center justify-between text-[9px] text-on-surface-variant font-bold uppercase tracking-widest border-t border-outline-variant/10 pt-3 transition-colors">
                      <span className="flex items-center gap-2">{story.readTime || 5} MIN • {story.views || 0} VIEWS</span>
@@ -196,23 +195,24 @@ export default async function HomePage({ searchParams }) {
                   </div>
                 </Link>
               )) : (
-                <div className="col-span-1 md:col-span-2 py-10 text-center text-on-surface-variant text-sm font-bold tracking-[0.2em] uppercase bg-surface-container-low/40 backdrop-blur-xl rounded-3xl border border-outline-variant/10">
+                <div className="col-span-full py-10 text-center text-on-surface-variant text-sm font-bold tracking-[0.2em] uppercase bg-surface-container-low/40 backdrop-blur-xl rounded-3xl border border-outline-variant/10">
                    No stories found
                 </div>
               )}
             </div>
           </div>
 
-          <aside className="flex flex-col gap-8">
-            <div className="gothic-frame p-6 pb-2 bg-surface-container-low/60 backdrop-blur-2xl rounded-3xl border border-outline-variant/10 shadow-2xl">
-              <h3 className="text-xl font-gothic text-on-surface mb-4 tracking-wide border-b border-outline-variant/10 pb-2 uppercase text-[10px] font-black tracking-[0.4em]">Trending Now</h3>
-              <div className="flex flex-col">
+          {/* Trending & Stats Row */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="gothic-frame p-8 bg-surface-container-low/60 backdrop-blur-2xl rounded-3xl border border-outline-variant/10 shadow-2xl">
+              <h3 className="text-xl font-black text-on-surface mb-6 tracking-wide border-b border-outline-variant/10 pb-4 uppercase text-[11px] tracking-[0.5em]">Trending Now</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
                 {trendingStories.length > 0 ? trendingStories.map((story, idx) => (
-                  <Link href={`/detail/${getSlug(story.slug)}`} key={story._id} className="group flex gap-4 border-b border-outline-variant/10 py-4 last:border-0 hover:bg-surface-container transition-colors -mx-6 px-6">
-                    <span className="text-2xl font-gothic font-bold text-on-surface-variant/40 group-hover:text-primary transition-colors">{String(idx + 1).padStart(2, '0')}</span>
+                  <Link href={`/detail/${getSlug(story.slug)}`} key={story._id} className="group flex gap-4 border-b border-outline-variant/10 py-5 last:border-0 hover:bg-surface-container transition-colors -mx-4 px-4 rounded-xl">
+                    <span className="text-3xl font-gothic font-bold text-on-surface-variant/40 group-hover:text-primary transition-colors">{String(idx + 1).padStart(2, '0')}</span>
                     <div className="mt-1">
-                      <h4 className="font-bold text-sm text-on-surface leading-snug group-hover:text-primary transition-colors mb-1">{getText(story.title)}</h4>
-                      <span className="text-[9px] text-on-surface-variant tracking-[0.1em] uppercase font-bold">{story.views || 0} READS</span>
+                      <h4 className="font-bold text-base text-on-surface leading-snug group-hover:text-primary transition-colors mb-1">{getText(story.title)}</h4>
+                      <span className="text-[10px] text-on-surface-variant tracking-[0.1em] uppercase font-bold">{story.views || 0} READS</span>
                     </div>
                   </Link>
                 )) : (
@@ -221,37 +221,43 @@ export default async function HomePage({ searchParams }) {
               </div>
             </div>
 
-            <div className="gothic-frame p-6 bg-surface-container-low/60 backdrop-blur-2xl rounded-3xl border border-outline-variant/10 shadow-2xl space-y-4">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.4em] text-on-surface-variant">Live Stats</h3>
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[9px] uppercase tracking-widest text-on-surface-variant">Most Liked</span>
-                  <span className="text-[9px] font-black text-on-surface">{mostLiked ? `${mostLiked.likesCount || 0}` : '—'}</span>
-                </div>
-                <div className="text-xs text-on-surface font-bold line-clamp-1">
-                  {mostLiked ? getText(mostLiked.title) : 'No stories yet'}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="gothic-frame p-8 bg-surface-container-low/60 backdrop-blur-2xl rounded-3xl border border-outline-variant/10 shadow-2xl space-y-6">
+                <h3 className="text-[11px] font-black uppercase tracking-[0.5em] text-on-surface-variant border-b border-outline-variant/10 pb-4">Live Stats</h3>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Most Liked</span>
+                      <span className="text-[10px] font-black text-primary">{mostLiked ? `${mostLiked.likesCount || 0}` : '—'}</span>
+                    </div>
+                    <div className="text-sm text-on-surface font-bold line-clamp-1 bg-surface-container/30 p-2 rounded-lg border border-outline-variant/5">
+                      {mostLiked ? getText(mostLiked.title) : 'No stories yet'}
+                    </div>
+                  </div>
+                  <div className="space-y-2 pt-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Most Read</span>
+                      <span className="text-[10px] font-black text-primary">{mostRead ? `${mostRead.views || 0}` : '—'}</span>
+                    </div>
+                    <div className="text-sm text-on-surface font-bold line-clamp-1 bg-surface-container/30 p-2 rounded-lg border border-outline-variant/5">
+                      {mostRead ? getText(mostRead.title) : 'No stories yet'}
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="space-y-3 pt-2 border-t border-outline-variant/10">
-                <div className="flex items-center justify-between">
-                  <span className="text-[9px] uppercase tracking-widest text-on-surface-variant">Most Read</span>
-                  <span className="text-[9px] font-black text-on-surface">{mostRead ? `${mostRead.views || 0}` : '—'}</span>
-                </div>
-                <div className="text-xs text-on-surface font-bold line-clamp-1">
-                  {mostRead ? getText(mostRead.title) : 'No stories yet'}
-                </div>
-              </div>
-              <div className="pt-2 border-t border-outline-variant/10">
-                <div className="flex items-center justify-between">
-                  <span className="text-[9px] uppercase tracking-widest text-on-surface-variant">Top Category</span>
-                  <span className="text-[9px] font-black text-on-surface">{CATEGORY_LABELS[topCategory] || topCategory}</span>
+              
+              <div className="flex flex-col gap-8">
+                <div className="gothic-frame p-8 bg-primary/5 backdrop-blur-xl rounded-3xl border border-primary/20 shadow-2xl flex flex-col justify-center h-full">
+                  <span className="text-[10px] uppercase tracking-widest text-primary font-black mb-2">Top Category</span>
+                  <span className="text-3xl font-gothic text-on-surface tracking-wider">{CATEGORY_LABELS[topCategory] || topCategory}</span>
                 </div>
               </div>
             </div>
-            <div className="aspect-square gothic-frame flex items-center justify-center bg-surface-container-low/40 backdrop-blur-xl rounded-3xl border border-outline-variant/10 border-dashed text-on-surface-variant text-[10px] font-bold tracking-[0.2em] shadow-2xl">
-               AD SPACE
-            </div>
-          </aside>
+          </div>
+
+          <div className="w-full h-32 gothic-frame flex items-center justify-center bg-surface-container-low/40 backdrop-blur-xl rounded-3xl border border-outline-variant/10 border-dashed text-on-surface-variant text-[10px] font-bold tracking-[0.2em] shadow-2xl">
+             AD SPACE
+          </div>
         </div>
       </div>
     </main>

@@ -57,8 +57,8 @@ exports.getStoryBySlug = async (req, res, next) => {
 
 exports.addLike = async (req, res, next) => {
   try {
-    const message = await storyService.toggleLike(req.user._id, req.params.id);
-    return formatResponse(res, 200, message.message);
+    const result = await storyService.toggleLike(req.user._id, req.params.id);
+    return formatResponse(res, 200, result.message, result);
   } catch (error) {
     next(error);
   }

@@ -22,7 +22,7 @@ const repairAdmin = async () => {
         isActive: true,
         name: 'Super Admin'
       },
-      { upsert: true, new: true }
+      { upsert: true, returnDocument: 'after' }
     );
 
     console.log(`✅ Admin account repaired/created: ${user.email}`);

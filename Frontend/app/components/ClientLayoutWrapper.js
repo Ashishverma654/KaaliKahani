@@ -58,8 +58,8 @@ export default function ClientLayoutWrapper({ children }) {
               {/* Brand Colophon */}
               <div className="lg:col-span-5 space-y-4">
                 <div>
-                  <div className="text-3xl font-black font-display text-primary tracking-tight mb-4 uppercase">KaaliKahani.</div>
-                  <p className="text-on-surface-variant font-sans text-sm leading-relaxed max-w-sm opacity-80 italic">
+                  <div className="text-3xl font-gothic text-primary tracking-wider mb-4">KaaliKahani</div>
+                  <p className="text-on-surface-variant font-sans text-sm leading-relaxed max-w-sm opacity-80 font-bold">
                     "The digital Platform for stories. Creating the best in storytelling and beyond."
                   </p>
                 </div>

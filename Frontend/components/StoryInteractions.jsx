@@ -8,6 +8,7 @@ import Link from 'next/link';
 const StoryInteractions = ({ storyId, initialLikes = 0, initialComments = [], initialCommentsCount = 0, isLoggedIn = false, children }) => {
   const { isLoggedIn: authLoggedIn } = useAuth();
   const [likesCount, setLikesCount] = useState(initialLikes);
+  const [hasLiked, setHasLiked] = useState(false);
   const [comments, setComments] = useState(initialComments);
   const [commentText, setCommentText] = useState('');
   const [isLiking, setIsLiking] = useState(false);
@@ -25,13 +26,21 @@ const StoryInteractions = ({ storyId, initialLikes = 0, initialComments = [], in
     setIsLiking(true);
     try {
       console.log('Sending like request to backend...');
-      const res = await storyService.likeStory(storyId);
-      console.log('Like response:', res);
-      setLikesCount((prev) => prev + 1);
-      toast.success('Story liked');
+      const data = await storyService.likeStory(storyId);
+      console.log('Like response:', data);
+      
+      if (data.action === 'liked') {
+        setLikesCount((prev) => prev + 1);
+        setHasLiked(true);
+        toast.success('Story liked');
+      } else {
+        setLikesCount((prev) => Math.max(0, prev - 1));
+        setHasLiked(false);
+        toast.success('Like removed');
+      }
     } catch (error) {
       console.error('Like failed:', error);
-      const msg = error.response?.data?.message || 'Unable to like story';
+      const msg = error.response?.data?.message || 'Unable to update like';
       toast.error(msg);
     } finally {
       setIsLiking(false);
@@ -70,16 +79,19 @@ const StoryInteractions = ({ storyId, initialLikes = 0, initialComments = [], in
           className="flex items-center gap-2 group transition-all"
           disabled={isLiking}
         >
-          <div className="w-6 h-6 rounded-full flex items-center justify-center bg-surface-container border border-outline-variant group-hover:bg-primary/10 group-hover:border-primary/40 transition-all">
-            <span className="material-symbols-outlined text-xs group-hover:text-primary">favorite</span>
-          </div>
-          <span className="text-[11px] font-black uppercase tracking-widest text-on-surface-variant group-hover:text-on-surface">{likesCount} Likes</span>
+          <span 
+            className={`material-symbols-outlined text-sm transition-all duration-300 ${hasLiked ? 'text-red-600 scale-110' : 'group-hover:text-primary'}`}
+            style={hasLiked ? { fontVariationSettings: "'FILL' 1" } : {}}
+          >
+            favorite
+          </span>
+          <span className={`text-[11px] font-black uppercase tracking-widest transition-colors ${hasLiked ? 'text-on-surface' : 'text-on-surface-variant group-hover:text-on-surface'}`}>
+            {likesCount} Likes
+          </span>
         </button>
 
         <div className="flex items-center gap-2 group cursor-default">
-          <div className="w-6 h-6 rounded-full flex items-center justify-center bg-surface-container border border-outline-variant">
-            <span className="material-symbols-outlined text-xs">chat_bubble</span>
-          </div>
+          <span className="material-symbols-outlined text-sm">chat_bubble</span>
           <span className="text-[11px] font-black uppercase tracking-widest text-on-surface-variant">
             {Math.max(comments.length, initialCommentsCount || 0)} Comments
           </span>

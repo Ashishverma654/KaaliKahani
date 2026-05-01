@@ -322,35 +322,38 @@ exports.getAnalytics = async (req, res, next) => {
   try {
     const { range = '14' } = req.query;
     const days = parseInt(range);
-    const traffic = [];
-    const engagement = [];
-    
+    const promises = [];
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const start = new Date(date.setHours(0, 0, 0, 0));
       const end = new Date(date.setHours(23, 59, 59, 999));
 
-      // Traffic proxy
-      const views = await ReadingProgress.countDocuments({ updatedAt: { $gte: start, $lte: end } });
-      const uniqueVisitors = await ReadingProgress.distinct('userId', { updatedAt: { $gte: start, $lte: end } });
-
-      traffic.push({ 
-        date: start.toISOString(),
-        views, 
-        uniqueVisitors: uniqueVisitors.length 
-      });
-
-      // Engagement proxy
-      const likes = await Like.countDocuments({ createdAt: { $gte: start, $lte: end } });
-      const comments = await Comment.countDocuments({ createdAt: { $gte: start, $lte: end } });
-
-      engagement.push({
-        date: start.toISOString(),
-        likes,
-        comments
-      });
+      promises.push(
+        Promise.all([
+          ReadingProgress.countDocuments({ updatedAt: { $gte: start, $lte: end } }),
+          ReadingProgress.distinct('userId', { updatedAt: { $gte: start, $lte: end } }),
+          Like.countDocuments({ createdAt: { $gte: start, $lte: end } }),
+          Comment.countDocuments({ createdAt: { $gte: start, $lte: end } })
+        ]).then(([views, uniqueVisitors, likes, comments]) => {
+          return { start, views, uniqueVisitors: uniqueVisitors.length, likes, comments };
+        })
+      );
     }
+
+    const results = await Promise.all(promises);
+
+    const traffic = results.map(r => ({
+      date: r.start.toISOString(),
+      views: r.views,
+      uniqueVisitors: r.uniqueVisitors
+    }));
+
+    const engagement = results.map(r => ({
+      date: r.start.toISOString(),
+      likes: r.likes,
+      comments: r.comments
+    }));
 
     return formatResponse(res, 200, 'Time-series analytics generated', { traffic, engagement });
   } catch (error) {
@@ -387,7 +390,7 @@ exports.getSettings = async (req, res, next) => {
 
 exports.updateSettings = async (req, res, next) => {
   try {
-    const settings = await Settings.findOneAndUpdate({}, req.body, { new: true, upsert: true });
+    const settings = await Settings.findOneAndUpdate({}, req.body, { returnDocument: 'after', upsert: true });
     return formatResponse(res, 200, 'Global settings updated successfully', settings);
   } catch (error) {
     next(error);

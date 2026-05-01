@@ -243,10 +243,9 @@ function SubmitStoryContent() {
 
   return (
     <ProtectedRoute>
-      <main className="max-w-4xl mx-auto px-6 pt-16 pb-24">
+      <main className="max-w-4xl mx-auto px-6 pt-8 pb-24">
         {/* Header Section */}
-        <header className="mb-16 text-center">
-          <span className="text-secondary font-display font-bold tracking-widest text-xs uppercase mb-4 block">Editorial Desk</span>
+        <header className="mb-8 text-center">
           <h1 className="text-5xl md:text-6xl font-black font-display tracking-tighter text-on-surface mb-6">Craft Your Narrative</h1>
           <p className="text-on-surface-variant text-lg max-w-xl mx-auto leading-relaxed">
             Share your unique perspective with the community. Every great story begins with a single word.
@@ -371,13 +370,13 @@ function SubmitStoryContent() {
 
           {/* Rich Text Editor Placeholder */}
           <section className="bg-surface-container-low rounded-2xl overflow-hidden border border-outline-variant relative">
-            <div className="px-6 h-12 border-b border-outline-variant flex items-center justify-between gap-4 bg-[#0e0e0e]">
+            <div className="px-6 h-12 border-b border-outline-variant flex items-center justify-between gap-4 bg-black">
               <div className="flex items-center gap-4">
-                <button type="button" className="material-symbols-outlined text-on-surface-variant hover:text-primary text-sm">format_bold</button>
-                <button type="button" className="material-symbols-outlined text-on-surface-variant hover:text-primary text-sm">format_italic</button>
-                <button type="button" className="material-symbols-outlined text-on-surface-variant hover:text-primary text-sm">format_quote</button>
-                <div className="h-6 w-[1px] bg-outline-variant mx-2"></div>
-                <button type="button" className="material-symbols-outlined text-on-surface-variant hover:text-primary text-sm">link</button>
+                <button type="button" className="material-symbols-outlined text-white/60 hover:text-primary text-sm transition-colors">format_bold</button>
+                <button type="button" className="material-symbols-outlined text-white/60 hover:text-primary text-sm transition-colors">format_italic</button>
+                <button type="button" className="material-symbols-outlined text-white/60 hover:text-primary text-sm transition-colors">format_quote</button>
+                <div className="h-6 w-[1px] bg-white/10 mx-2"></div>
+                <button type="button" className="material-symbols-outlined text-white/60 hover:text-primary text-sm transition-colors">link</button>
               </div>
               
               <button 
@@ -385,10 +384,10 @@ function SubmitStoryContent() {
                 onClick={handleAIAnalyze}
                 className={`relative flex items-center gap-2 group transition-all px-4 py-1 rounded-lg ${isAnalyzing ? 'animate-pulse' : ''}`}
               >
-                <span className={`material-symbols-outlined text-sm ${isAnalyzing ? 'text-primary animate-spin' : 'text-on-surface-variant group-hover:text-primary'}`}>
+                <span className={`material-symbols-outlined text-sm ${isAnalyzing ? 'text-primary animate-spin' : 'text-white/60 group-hover:text-primary'}`}>
                   {isAnalyzing ? 'sync' : 'auto_fix'}
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-on-surface-variant group-hover:text-white">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 group-hover:text-white transition-colors">
                   {isAnalyzing ? 'Analyzing Story...' : 'AI Analysis'}
                 </span>
                 <div className="absolute inset-0 bg-primary/5 rounded-lg filter blur-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
@@ -463,7 +462,7 @@ function SubmitStoryContent() {
                <button 
                  type="submit" 
                  disabled={loading}
-                 className="flex-1 md:flex-none px-12 py-3 rounded-full bg-primary-container text-on-primary-container font-display font-bold shadow-lg shadow-primary-container/20 transition-all hover:scale-105 active:scale-95 h-12 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+                 className="flex-1 md:flex-none px-12 py-3 rounded-full border border-outline-variant text-on-surface font-display font-bold transition-all hover:bg-primary hover:text-black h-12 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
                >
                  {loading ? 'Submitting...' : 'Submit Story'}
                </button>

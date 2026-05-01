@@ -111,7 +111,7 @@ exports.getStoryBySlug = async (slug, language = 'en') => {
   const story = await Story.findOneAndUpdate(
     query, 
     { $inc: { views: 1 } }, // Increment view explicitly atomically
-    { new: true }
+    { returnDocument: 'after' }
   ).populate('author', 'name avatar').populate('seriesId', 'title description').lean();
 
   if (!story) {
@@ -241,19 +241,19 @@ exports.toggleLike = async (userId, storyId) => {
   const story = await Story.findById(storyId);
   if (!story) throw new Error('Story not found');
 
-  // Strict constraint check
   const existingLike = await Like.findOne({ userId, storyId });
-  if (existingLike) {
-    throw new Error('You have already liked this story');
-  }
-
-  // Bind Like schema connection
-  await Like.create({ userId, storyId });
-
-  // Atomic aggregate bump
-  await Story.findByIdAndUpdate(storyId, { $inc: { likesCount: 1 } });
   
-  return { message: 'Story liked successfully' };
+  if (existingLike) {
+    // Unlike logic
+    await Like.deleteOne({ _id: existingLike._id });
+    await Story.findByIdAndUpdate(storyId, { $inc: { likesCount: -1 } });
+    return { message: 'Story unliked successfully', action: 'unliked' };
+  } else {
+    // Like logic
+    await Like.create({ userId, storyId });
+    await Story.findByIdAndUpdate(storyId, { $inc: { likesCount: 1 } });
+    return { message: 'Story liked successfully', action: 'liked' };
+  }
 };
 
 exports.addComment = async (userId, storyId, content) => {

@@ -85,4 +85,5 @@ body {
   border: 1px solid var(--outline-variant);
   opacity: 0.5;
   pointer-events: none;
+  border-radius: inherit;
 }

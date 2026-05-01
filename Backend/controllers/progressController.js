@@ -22,7 +22,7 @@ exports.updateProgress = async (req, res, next) => {
     const updated = await ReadingProgress.findOneAndUpdate(
       { userId: req.user._id, storyId: req.params.id },
       { progress: safeProgress, lastUpdatedAt: new Date() },
-      { new: true, upsert: true }
+      { returnDocument: 'after', upsert: true }
     );
 
     return formatResponse(res, 200, 'Progress updated', updated);

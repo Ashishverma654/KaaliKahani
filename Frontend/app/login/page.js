@@ -21,7 +21,7 @@ function AuthenticationContent() {
   React.useEffect(() => {
     if (isSettled && isLoggedIn) {
       const from = searchParams.get('from') || '/';
-      
+
       const timer = setTimeout(() => {
         if (from === pathname) return;
         router.replace(from);
@@ -57,19 +57,19 @@ function AuthenticationContent() {
     }
 
     setLoading(true);
-    
+
     try {
       const from = searchParams.get('from');
       const endpoint = isLogin ? '/auth/login' : '/auth/register';
-      
-      const res = await login({ 
-        email: formData.email, 
+
+      const res = await login({
+        email: formData.email,
         password: formData.password,
         name: formData.name, // For registration if needed map map map
         dob: formData.dob,    // For registration if needed map map map
         endpoint
       });
-      
+
       toast.success(isLogin ? `Welcome back, ${res.user.name}` : 'Account created successfully!');
     } catch (err) {
       if (err.response?.data?.data?.errors) {
@@ -85,88 +85,88 @@ function AuthenticationContent() {
 
   return (
     <main className="min-h-screen flex items-center justify-center p-6 selection:bg-primary/20 transition-all duration-700 relative overflow-hidden bg-black">
-      
+
       {/* Cinematic Background Image Layer */}
       <div className="absolute inset-0 z-0 overflow-hidden">
-        <img 
+        <img
           key={isLogin ? 'login-bg' : 'register-bg'}
-          src={isLogin ? "/assets/loginPage.jpg" : "/assets/registerationPage.jpg"} 
+          src={isLogin ? "/assets/loginPage.jpg" : "/assets/registerationPage.jpg"}
           alt="Auth Background"
           className="w-full h-full object-cover opacity-40 transition-opacity duration-1000"
         />
         {/* Cinematic Vignette */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-black/80"></div>
       </div>
-      
+
       {/* Centered Portal Container */}
       <div className={`w-full ${isLogin ? 'max-w-md' : 'max-w-[850px]'} relative z-10 animate-in fade-in zoom-in-95 duration-1000 transition-all duration-500`}>
-        
+
         {/* Minimalist Brand Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-1">
           <h1 className="text-4xl md:text-5xl font-black font-display tracking-tight text-white uppercase leading-none drop-shadow-2xl mb-4">
             {isLogin ? 'Welcome Back.' : 'Create an Account.'}
           </h1>
-          <p className="text-on-surface-variant text-[10px] font-bold uppercase tracking-[0.4em] opacity-60">
+          <p className="text-white text-[10px] font-bold uppercase tracking-[0.4em] opacity-60">
             {isLogin ? 'Please log in to continue' : 'Please sign up to continue'}
           </p>
         </div>
 
         {/* The Authentication Gate */}
-        <div className="bg-black/5 backdrop-blur-3xl p-8 md:p-12 rounded-[2.5rem] border border-white/5 shadow-2xl space-y-8">
-          
+        <div className="bg-black/5 backdrop-blur-3xl p-4 md:p-7 rounded-[2.5rem] border border-white/5 shadow-2xl space-y-4">
+
           {error && (
-            <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-bold uppercase tracking-widest text-center animate-shake backdrop-blur-md">
-               {error}
+            <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 text-[9px] font-bold uppercase tracking-widest text-center animate-shake backdrop-blur-md">
+              {error}
             </div>
           )}
 
-          <form className="space-y-8" onSubmit={handleSubmit}>
-            <div className={`grid grid-cols-1 ${!isLogin ? 'md:grid-cols-2' : ''} gap-x-8 gap-y-6`}>
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className={`grid grid-cols-1 ${!isLogin ? 'md:grid-cols-2' : ''} gap-x-8 gap-y-2`}>
               {!isLogin && (
                 <>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1 opacity-60">Full Name</label>
-                    <input 
-                      type="text" 
+                  <div className="space-y-0.5">
+                    <label className="text-xs font-bold text-white uppercase tracking-widest ml-1 opacity-60">Full Name</label>
+                    <input
+                      type="text"
                       placeholder="e.g. Ashish Verma"
                       required
-                      className="w-full bg-[#f0f3ff]/5 border border-white/5 rounded-2xl px-6 py-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-red-500/40 transition-all backdrop-blur-xl shadow-inner font-bold"
+                      className="w-full bg-[#f0f3ff]/5 border border-white/5 rounded-2xl px-6 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-red-500/40 transition-all backdrop-blur-xl shadow-inner font-bold"
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1 opacity-60">Date of Birth</label>
-                    <input 
-                      type="date" 
+                  <div className="space-y-0.5">
+                    <label className="text-xs font-bold text-white uppercase tracking-widest ml-1 opacity-60">Date of Birth</label>
+                    <input
+                      type="date"
                       required
-                      className="w-full bg-[#f0f3ff]/5 border border-white/5 rounded-2xl px-6 py-4 text-sm text-white focus:outline-none focus:border-red-500/40 transition-all backdrop-blur-xl shadow-inner font-bold [color-scheme:dark]"
+                      className="w-full bg-[#f0f3ff]/5 border border-white/5 rounded-2xl px-6 py-2.5 text-sm text-white focus:outline-none focus:border-red-500/40 transition-all backdrop-blur-xl shadow-inner font-bold [color-scheme:dark]"
                       value={formData.dob}
                       onChange={(e) => setFormData({ ...formData, dob: e.target.value })}
                     />
                   </div>
                 </>
               )}
-              
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1 opacity-60">Email Address</label>
-                <input 
-                  type="email" 
+
+              <div className="space-y-0.5">
+                <label className="text-xs font-bold text-white uppercase tracking-widest ml-1 opacity-60">Email Address</label>
+                <input
+                  type="email"
                   placeholder="user@example.com"
                   required
-                  className="w-full bg-[#f0f3ff]/5 border border-white/5 rounded-2xl px-6 py-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-red-500/40 transition-all backdrop-blur-xl shadow-inner font-bold"
+                  className="w-full bg-[#f0f3ff]/5 border border-white/5 rounded-2xl px-6 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-red-500/40 transition-all backdrop-blur-xl shadow-inner font-bold"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1 opacity-60">Password</label>
-                <input 
-                  type="password" 
+              <div className="space-y-0.5">
+                <label className="text-xs font-bold text-white uppercase tracking-widest ml-1 opacity-60">Password</label>
+                <input
+                  type="password"
                   placeholder="••••••••••••"
                   required
-                  className="w-full bg-[#f0f3ff]/5 border border-white/5 rounded-2xl px-6 py-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-red-500/40 transition-all backdrop-blur-xl shadow-inner font-bold"
+                  className="w-full bg-[#f0f3ff]/5 border border-white/5 rounded-2xl px-6 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-red-500/40 transition-all backdrop-blur-xl shadow-inner font-bold"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
@@ -174,39 +174,40 @@ function AuthenticationContent() {
 
               {!isLogin && (
                 <>
-                  <div className="space-y-2">
-                    <label className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest ml-1 opacity-60">Confirm Password</label>
-                    <input 
-                      type="password" 
+                  <div className="space-y-0.5">
+                    <label className="text-xs font-bold text-white uppercase tracking-widest ml-1 opacity-60">Confirm Password</label>
+                    <input
+                      type="password"
                       placeholder="••••••••••••"
                       required
-                      className="w-full bg-[#f0f3ff]/5 border border-white/5 rounded-2xl px-6 py-4 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-red-500/40 transition-all backdrop-blur-xl shadow-inner font-bold border-dashed border-white/10"
+                      className="w-full bg-[#f0f3ff]/5 border border-white/5 rounded-2xl px-6 py-2.5 text-sm text-white placeholder:text-white/20 focus:outline-none focus:border-red-500/40 transition-all backdrop-blur-xl shadow-inner font-bold border-dashed border-white/10"
                       value={formData.confirmPassword}
                       onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                     />
                   </div>
-                  <div className="flex flex-col justify-end pb-4">
-                    <Link href="/" className="inline-flex items-center gap-2 text-on-surface-variant hover:text-white font-bold uppercase text-[9px] tracking-[0.3em] transition-all group opacity-40 hover:opacity-100">
+                  <div className="flex flex-col justify-end pb-2">
+                    <Link href="/" className="inline-flex items-center gap-2 text-white hover:text-white font-bold uppercase text-xs tracking-[0.3em] transition-all group opacity-40 hover:opacity-100">
                       <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
                       Return to Home
                     </Link>
                   </div>
+                
                 </>
               )}
             </div>
 
-            <div className="pt-4 space-y-6">
-              <button 
-                type="submit" 
+            <div className="pt-1 space-y-4">
+              <button
+                type="submit"
                 disabled={loading}
-                className="w-full bg-[#a31d1d] text-white font-black text-[10px] uppercase tracking-[0.4em] py-5 rounded-2xl shadow-2xl hover:bg-[#8b1818] transition-all disabled:opacity-50 active:scale-[0.98]"
+                className="w-full bg-[#a31d1d] text-white font-black text-xs uppercase tracking-[0.4em] py-3 rounded-2xl shadow-2xl hover:bg-[#8b1818] transition-all disabled:opacity-50 active:scale-[0.98]"
               >
                 {loading ? 'Please wait...' : (isLogin ? 'Login' : 'Sign Up')}
               </button>
 
               {isLogin && (
                 <div className="flex justify-center">
-                  <Link href="/" className="inline-flex items-center gap-2 text-on-surface-variant hover:text-white font-bold uppercase text-[9px] tracking-[0.3em] transition-all group opacity-40 hover:opacity-100">
+                  <Link href="/" className="inline-flex items-center gap-2 text-white hover:text-white font-bold uppercase text-xs tracking-[0.3em] transition-all group opacity-40 hover:opacity-100">
                     <span className="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
                     Return to Home
                   </Link>
@@ -215,15 +216,15 @@ function AuthenticationContent() {
             </div>
           </form>
 
-          <div className="pt-6 text-center border-t border-white/5">
-            <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest opacity-60">
+          <div className="pt-4 text-center border-t border-white/5">
+            <p className="text-xs font-bold text-white uppercase tracking-widest opacity-60">
               {isLogin ? "Don't have an account? " : "Already have an account? "}
-              <button 
+              <button
                 onClick={() => {
                   setIsLogin(!isLogin);
                   setError(null);
                   setFormData({ name: '', email: '', password: '', confirmPassword: '', dob: '' });
-                }} 
+                }}
                 className="text-[#a31d1d] font-bold hover:text-white transition-colors underline underline-offset-4"
               >
                 {isLogin ? 'Register now.' : 'Login now.'}
@@ -241,7 +242,7 @@ export default function AuthenticatonPortal() {
     <Suspense fallback={
       <div className="min-h-screen bg-black flex flex-col items-center justify-center space-y-8 animate-pulse">
         <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        <p className="text-[10px] font-black tracking-[0.5em] uppercase text-on-surface-variant/40">Loading...</p>
+        <p className="text-[10px] font-black tracking-[0.5em] uppercase text-white/40">Loading...</p>
       </div>
     }>
       <AuthenticationContent />

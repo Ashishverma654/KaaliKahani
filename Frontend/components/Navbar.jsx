@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense } from 'react';
+import React, { Suspense, useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/hooks/useAuth';
 import ThemeToggle from '@/app/components/ThemeToggle';
@@ -12,10 +12,25 @@ const Navbar = () => {
   const { user, isLoggedIn, logout } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
-  const isAuthPage = pathname === '/login';
-  const [searchQuery, setSearchQuery] = React.useState('');
+  const isAuthPage = pathname === '/login' || pathname === '/register';
+  const [searchQuery, setSearchQuery] = useState('');
 
-  const [showUserMenu, setShowUserMenu] = React.useState(false);
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const userMenuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+    if (showUserMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showUserMenu]);
 
   const handleLogout = async () => {
     try {
@@ -34,7 +49,7 @@ const Navbar = () => {
           <Link href="/" className="text-3xl font-gothic text-primary tracking-wider drop-shadow-sm">
             KaaliKahani
           </Link>
-          <div className="hidden md:flex items-center gap-6 font-sans text-sm font-bold tracking-widest uppercase">
+          <div className="hidden md:flex items-center gap-6 font-sans text-xs font-black tracking-widest uppercase">
             <Suspense fallback={<div className="text-[10px] font-bold tracking-widest uppercase opacity-50">Loading...</div>}>
               <HeaderCategoryDropdown />
             </Suspense>
@@ -43,21 +58,23 @@ const Navbar = () => {
         
         {/* Search Bar & Actions */}
         <div className="flex items-center gap-4">
-          <div className="hidden lg:flex items-center bg-surface-container px-4 py-1.5 rounded-full border border-outline-variant w-56 transition-colors duration-300">
-            <span className="material-symbols-outlined text-on-surface-variant text-sm mr-2 flex items-center justify-center">search</span>
-            <input 
-              className="bg-transparent border-none focus:outline-none text-xs w-full placeholder:text-on-surface-variant flex items-center h-full outline-none text-on-surface" 
-              placeholder="Search stories..." 
-              type="text" 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter' && searchQuery.trim()) {
-                  router.push(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
-                }
-              }}
-            />
-          </div>
+          {!isAuthPage && (
+            <div className="hidden lg:flex items-center bg-surface-container px-4 py-1.5 rounded-full border border-outline-variant w-56 transition-colors duration-300">
+              <span className="material-symbols-outlined text-on-surface-variant text-sm mr-2 flex items-center justify-center">search</span>
+              <input 
+                className="bg-transparent border-none focus:outline-none text-xs w-full placeholder:text-on-surface-variant flex items-center h-full outline-none text-on-surface" 
+                placeholder="Search stories..." 
+                type="text" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && searchQuery.trim()) {
+                    router.push(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
+                  }
+                }}
+              />
+            </div>
+          )}
 
             <div className="flex items-center gap-4">
               <ThemeToggle />
@@ -67,14 +84,14 @@ const Navbar = () => {
 
                     <Link 
                       href="/submit" 
-                      className="bg-surface-container text-on-surface-variant border border-outline-variant/30 px-4 py-1.5 rounded-full font-black text-[9px] uppercase tracking-[0.2em] hover:bg-primary hover:text-white transition-all flex items-center h-8"
+                      className="bg-surface-container text-on-surface-variant border border-outline-variant/30 px-4 py-1.5 rounded-full font-black text-xs uppercase tracking-[0.2em] hover:bg-primary hover:text-white transition-all flex items-center h-8"
                     >
                       New Story
                     </Link>
                   </div>
                   
                   {/* User Profile Dropdown */}
-                  <div className="relative pl-4 border-l border-white/10">
+                  <div className="relative pl-4 border-l border-white/10" ref={userMenuRef}>
                     <button 
                       onClick={() => setShowUserMenu(!showUserMenu)}
                       className="group relative flex items-center"
@@ -95,14 +112,14 @@ const Navbar = () => {
                     {showUserMenu && (
                       <div className="absolute top-12 right-0 w-48 bg-surface-container-high backdrop-blur-3xl border border-outline-variant/30 rounded-2xl shadow-2xl py-3 animate-in fade-in slide-in-from-top-2 duration-300 z-50 overflow-hidden">
                         <div className="px-5 py-2 border-b border-outline-variant/10 mb-2">
-                          <p className="text-[8px] font-black text-primary uppercase tracking-[0.3em]">Logged In As</p>
-                          <p className="text-[10px] text-on-surface font-bold truncate max-w-full">{user?.name}</p>
+                          <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Logged In As</p>
+                          <p className="text-xs text-on-surface font-bold truncate max-w-full">{user?.name}</p>
                         </div>
                         
                         <Link 
                           href="/profile" 
                           onClick={() => setShowUserMenu(false)}
-                          className="flex items-center gap-3 px-5 py-3 text-[9px] font-black uppercase tracking-[0.2em] text-on-surface-variant hover:text-primary hover:bg-primary/5 transition-all group"
+                          className="flex items-center gap-3 px-5 py-3 text-[11px] font-black uppercase tracking-[0.2em] text-on-surface-variant hover:text-primary hover:bg-primary/5 transition-all group"
                         >
                           <span className="material-symbols-outlined text-sm group-hover:text-primary transition-colors">person</span>
                           Profile
@@ -113,7 +130,7 @@ const Navbar = () => {
                             handleLogout();
                             setShowUserMenu(false);
                           }}
-                          className="w-full flex items-center gap-3 px-5 py-3 text-[9px] font-black uppercase tracking-[0.2em] text-red-500 hover:bg-red-500/10 transition-all border-t border-outline-variant/10 group"
+                          className="w-full flex items-center gap-3 px-5 py-3 text-[11px] font-black uppercase tracking-[0.2em] text-red-500 hover:bg-red-500/10 transition-all border-t border-outline-variant/10 group"
                         >
                           <span className="material-symbols-outlined text-sm group-hover:animate-pulse">logout</span>
                           Logout
@@ -125,7 +142,7 @@ const Navbar = () => {
               ) : (
                 <Link 
                   href="/login" 
-                  className="bg-surface-container text-on-surface border border-outline-variant/30 px-6 py-2 rounded-full font-black text-[9px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all shadow-2xl backdrop-blur-xl flex items-center h-9"
+                  className="bg-surface-container text-on-surface border border-outline-variant/30 px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all shadow-2xl backdrop-blur-xl flex items-center h-8"
                 >
                   Login / Sign Up
                 </Link>
