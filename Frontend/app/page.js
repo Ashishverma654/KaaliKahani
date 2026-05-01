@@ -228,35 +228,32 @@ export default async function HomePage({ searchParams }) {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="gothic-frame p-8 bg-surface-container-low/60 backdrop-blur-2xl rounded-3xl border border-outline-variant/10 shadow-2xl space-y-6">
+            <div className="flex flex-col">
+              <div className="gothic-frame p-8 bg-surface-container-low/60 backdrop-blur-2xl rounded-3xl border border-outline-variant/10 shadow-2xl space-y-6 h-full">
                 <h3 className="text-[11px] font-black uppercase tracking-[0.5em] text-on-surface-variant border-b border-outline-variant/10 pb-4">Live Stats</h3>
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Most Liked</span>
-                      <span className="text-[10px] font-black text-primary">{mostLiked ? `${mostLiked.likesCount || 0}` : '—'}</span>
-                    </div>
-                    <div className="text-sm text-on-surface font-bold line-clamp-1 bg-surface-container/30 p-2 rounded-lg border border-outline-variant/5">
-                      {mostLiked ? getText(mostLiked.title) : 'No stories yet'}
-                    </div>
-                  </div>
-                  <div className="space-y-2 pt-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Most Read</span>
-                      <span className="text-[10px] font-black text-primary">{mostRead ? `${mostRead.views || 0}` : '—'}</span>
-                    </div>
-                    <div className="text-sm text-on-surface font-bold line-clamp-1 bg-surface-container/30 p-2 rounded-lg border border-outline-variant/5">
-                      {mostRead ? getText(mostRead.title) : 'No stories yet'}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Most Liked</span>
+                        <span className="text-[10px] font-black text-primary">{mostLiked ? `${mostLiked.likesCount || 0}` : '—'}</span>
+                      </div>
+                      <div className="text-sm text-on-surface font-bold bg-surface-container/30 p-2 rounded-lg border border-outline-variant/5 leading-snug">
+                        {mostLiked ? getText(mostLiked.title) : 'No stories yet'}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
-              
-              <div className="flex flex-col gap-8">
-                <div className="gothic-frame p-8 bg-primary/5 backdrop-blur-xl rounded-3xl border border-primary/20 shadow-2xl flex flex-col justify-center h-full">
-                  <span className="text-[10px] uppercase tracking-widest text-primary font-black mb-2">Top Category</span>
-                  <span className="text-3xl font-gothic text-on-surface tracking-wider">{CATEGORY_LABELS[topCategory] || topCategory}</span>
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold">Most Read</span>
+                        <span className="text-[10px] font-black text-primary">{mostRead ? `${mostRead.views || 0}` : '—'}</span>
+                      </div>
+                      <div className="text-sm text-on-surface font-bold bg-surface-container/30 p-2 rounded-lg border border-outline-variant/5 leading-snug">
+                        {mostRead ? getText(mostRead.title) : 'No stories yet'}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
