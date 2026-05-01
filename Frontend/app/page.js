@@ -107,14 +107,21 @@ export default async function HomePage({ searchParams }) {
       <div className="max-w-[1300px] mx-auto px-4 sm:px-6 w-full">
         {/* Hero Section */}
         {featuredStory ? (
-          <div className="mt-8 relative w-full h-[60vh] min-h-[500px] rounded-[32px] overflow-hidden border border-outline-variant shadow-2xl shadow-black/80 group">
+          <div className="mt-8 relative w-full h-[70vh] min-h-[500px] rounded-[32px] overflow-hidden border border-outline-variant shadow-2xl shadow-black/80 group bg-black">
+            {/* Blurred Background Layer */}
+            <img 
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover opacity-30 blur-2xl scale-110"
+              src={getCoverImage(featuredStory) || "https://images.unsplash.com/photo-1505322022379-7c3353ee6291?q=80&w=2000&auto=format&fit=crop"}
+            />
+            {/* Main Visible Image */}
             <img 
               alt={featuredStory.title}
-              className="absolute inset-0 w-full h-full object-cover transition-transform duration-[20s] group-hover:scale-110 opacity-80" 
-              src={getCoverImage(featuredStory) || "https://images.unsplash.com/photo-1505322022379-7c3353ee6291?q=80&w=2000&auto=format&fit=crop&grayscale"} 
-              style={{ filter: "contrast(1.2) brightness(0.7) sepia(0.3) hue-rotate(-50deg) saturate(2)" }} 
+              className="relative w-full h-full object-contain transition-transform duration-700 group-hover:scale-[1.02]" 
+              src={getCoverImage(featuredStory) || "https://images.unsplash.com/photo-1505322022379-7c3353ee6291?q=80&w=2000&auto=format&fit=crop"} 
+              style={{ filter: "contrast(1.1) brightness(0.9)" }} 
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
             <div className="absolute bottom-0 left-0 w-full p-8 md:p-14">
               <div className="flex items-center gap-3 mb-4">
                 <span className="bg-primary text-on-primary-container px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase rounded flex items-center shadow-sm">
