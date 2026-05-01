@@ -55,11 +55,7 @@ const StoryProgressTracker = ({ storyId }) => {
     };
   }, [storyId, isLoggedIn, isSettled]);
 
-  return (
-    <div className="text-[9px] font-black uppercase tracking-widest text-on-surface-variant">
-      Reading progress saved: {lastProgress}%
-    </div>
-  );
+  return null;
 };
 
 export default StoryProgressTracker;

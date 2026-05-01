@@ -231,6 +231,39 @@ exports.deleteComment = async (req, res, next) => {
   }
 };
 
+exports.updateCommentStatus = async (req, res, next) => {
+  try {
+    const { status } = req.body;
+    if (!['pending', 'approved', 'rejected'].includes(status)) {
+      return formatResponse(res, 400, 'Invalid status update request');
+    }
+
+    const comment = await Comment.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true }
+    );
+
+    if (!comment) return formatResponse(res, 404, 'Comment not found');
+
+    return formatResponse(res, 200, `Comment status updated to ${status}`, comment);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.migrateComments = async (req, res, next) => {
+  try {
+    const result = await Comment.updateMany(
+      { status: { $exists: false } },
+      { $set: { status: 'approved' } }
+    );
+    return formatResponse(res, 200, `Migrated ${result.modifiedCount} comments to approved status.`);
+  } catch (error) {
+    next(error);
+  }
+};
+
 /**
  * Advanced Analytics
  */

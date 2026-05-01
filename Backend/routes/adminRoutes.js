@@ -21,6 +21,8 @@ router.delete('/users/:id', adminController.deleteUser);
 
 // Comments Management Routes
 router.get('/comments', adminController.getAllComments);
+router.post('/comments/migrate', adminController.migrateComments);
+router.patch('/comments/:id/status', adminController.updateCommentStatus);
 router.patch('/comments/:id/flag', adminController.toggleCommentFlag);
 router.delete('/comments/:id', adminController.deleteComment);
 

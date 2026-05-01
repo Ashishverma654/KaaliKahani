@@ -18,6 +18,11 @@ const CommentSchema = new mongoose.Schema({
   isFlagged: {
     type: Boolean,
     default: false
+  },
+  status: {
+    type: String,
+    enum: ['pending', 'approved', 'rejected'],
+    default: 'pending'
   }
 }, { timestamps: true });
 

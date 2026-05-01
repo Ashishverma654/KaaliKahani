@@ -68,42 +68,52 @@ export default async function StoryDetail({ params, searchParams }) {
   }
 
   return (
-    <article>
-      {/* Immersive Progress Bar */}
-      <div className="fixed top-20 left-0 w-full h-[2px] z-[60]">
-        <div className="h-full bg-gradient-to-r from-primary via-secondary to-tertiary w-[35%]"></div>
+    <article className="relative">
+      {/* Cinematic Background Image Layer (Synchronized with Homepage) */}
+      <div className="fixed inset-0 z-[-20] overflow-hidden bg-surface">
+        <img 
+          src="/assets/homePage.jpg" 
+          alt="Atmospheric Background"
+          className="w-full h-full object-cover opacity-10 dark:opacity-40 transition-opacity duration-1000 grayscale-[0.9] dark:grayscale-[0.5] contrast-[1.1] scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-surface via-surface/40 to-surface opacity-100"></div>
       </div>
 
+      {/* Decorative Ambience Blobs (Synchronized with Homepage) */}
+      <div className="fixed top-0 left-[20%] w-[600px] h-[600px] bg-primary/10 rounded-full blur-[120px] pointer-events-none -z-10 opacity-30 animate-pulse" />
+      <div className="fixed bottom-0 right-[10%] w-[800px] h-[600px] bg-primary/20 rounded-full blur-[150px] pointer-events-none -z-10 opacity-20" />
+
+
       {/* Hero Section */}
-      <header className="relative w-full pt-16 pb-4 overflow-hidden flex items-start shadow-xl">
+      <header className="relative w-full overflow-hidden flex items-start shadow-2xl flex-col">
         <img
           alt={getText(story.title)}
           className="absolute inset-0 w-full h-full object-cover"
           src={getCoverImage(story) || "https://images.unsplash.com/photo-1542106311-bfad4bd2e351?q=80&w=2000&auto=format&fit=crop"}
-          style={{ filter: "brightness(0.5) contrast(1.1) grayscale(30%)" }}
+          style={{ filter: "brightness(0.25) contrast(1.2)" }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-surface/90 via-surface/40 to-transparent"></div>
-        <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent"></div>
-
-        <div className="relative w-full px-6 md:px-12 lg:px-20 z-10 flex flex-col gap-3" style={{ fontFamily: "'Times New Roman', Times, serif" }}>
-          <h1 className="text-4xl md:text-4xl font-bold leading-tight text-white drop-shadow-xl truncate">
+        <div className="absolute inset-0 bg-gradient-to-r from-surface via-surface/20 to-transparent opacity-80"></div>
+        <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-surface/30"></div>
+ 
+        <div className="relative w-full px-6 md:px-12 lg:px-24 z-10 flex flex-col gap-1 pb-6 pt-6" style={{ fontFamily: "'Martel', 'Noto Serif Devanagari', 'Times New Roman', Times, serif" }}>
+          <h1 className="text-4xl md:text-6xl font-black leading-[1.15] text-white drop-shadow-[0_10px_30px_rgba(0,0,0,0.9)] max-w-5xl">
             {getText(story.title, lang)}
           </h1>
-          <div className="flex items-center gap-3 text-white/80 font-medium tracking-wide">
-            <span className="text-sm md:text-base tracking-widest uppercase font-bold text-white drop-shadow-md">
+          <div className="flex items-center gap-4 text-white/90 font-medium tracking-[0.3em] uppercase">
+            <span className="text-sm md:text-base font-black text-white drop-shadow-lg">
               {story.author?.name || "KaaliKahani Writer"}
             </span>
-            <span className="w-1.5 h-1.5 rounded-full bg-primary drop-shadow-md"></span>
-            <span className="text-xs md:text-sm tracking-widest uppercase font-bold drop-shadow-md">
-              {story.readTime || 5} min read
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_15px_rgba(158,27,27,0.9)]"></span>
+            <span className="text-xs md:text-sm font-black drop-shadow-lg">
+              {story.readTime || 5} min read • {story.views || 0} reads • {story.likesCount || 0} likes • {story.commentsCount || comments.length || 0} comments
             </span>
           </div>
         </div>
       </header>
-
+ 
       {/* Main Content Area */}
-      <div className="w-full px-6 md:px-12 lg:px-20 pt-8 pb-8">
-        <div className="space-y-12 font-sans drop-shadow-md pb-8">
+      <div className="w-full px-6 md:px-12 lg:px-24 pt-0 pb-8">
+        <div className="space-y-8 font-sans drop-shadow-md pb-8">
           <div className="text-xl md:text-2xl leading-[1.8] text-on-surface-variant whitespace-pre-wrap text-justify">
             {getText(story.content, lang)}
           </div>
@@ -131,6 +141,7 @@ export default async function StoryDetail({ params, searchParams }) {
             storyId={story._id}
             initialLikes={story.likesCount || 0}
             initialComments={comments}
+            initialCommentsCount={story.commentsCount || 0}
           >
             <StoryProgressTracker storyId={story._id} />
           </StoryInteractions>
@@ -140,7 +151,7 @@ export default async function StoryDetail({ params, searchParams }) {
           <div className="w-full bg-surface-container-high rounded-2xl p-6 md:p-8 text-center border border-outline-variant shadow-xl relative overflow-hidden group" style={{ fontFamily: "'Times New Roman', Times, serif" }}>
             <div className="absolute top-0 right-0 w-22 h-22 bg-primary/5 rounded-full blur-3xl -mr-1 -mt-18" />
             <span className="text-sm text-primary font-black uppercase tracking-[0.3em] mb-2 block">Join the Legacy</span>
-            <h4 className="font-bold text-5xl md:text-4xl text-white mb-2 uppercase">Interested in publishing?</h4>
+            <h4 className="font-bold text-5xl text-white mb-2 uppercase">Interested in publishing?</h4>
             <p className="text-base md:text-lg text-on-surface-variant mb-5 max-w-md mx-auto leading-relaxed">
               Sign up today and share your stories with our growing community of horror enthusiasts.
             </p>

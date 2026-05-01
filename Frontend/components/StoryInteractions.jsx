@@ -5,7 +5,7 @@ import storyService from '@/services/storyService';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
-const StoryInteractions = ({ storyId, initialLikes = 0, initialComments = [], isLoggedIn = false, children }) => {
+const StoryInteractions = ({ storyId, initialLikes = 0, initialComments = [], initialCommentsCount = 0, isLoggedIn = false, children }) => {
   const { isLoggedIn: authLoggedIn } = useAuth();
   const [likesCount, setLikesCount] = useState(initialLikes);
   const [comments, setComments] = useState(initialComments);
@@ -80,14 +80,16 @@ const StoryInteractions = ({ storyId, initialLikes = 0, initialComments = [], is
           <div className="w-6 h-6 rounded-full flex items-center justify-center bg-surface-container border border-outline-variant">
             <span className="material-symbols-outlined text-xs">chat_bubble</span>
           </div>
-          <span className="text-[11px] font-black uppercase tracking-widest text-on-surface-variant">{comments.length} Comments</span>
+          <span className="text-[11px] font-black uppercase tracking-widest text-on-surface-variant">
+            {Math.max(comments.length, initialCommentsCount || 0)} Comments
+          </span>
         </div>
       </div>
 
-      <div className="space-y-3">
-        <h3 className="text-sm font-black uppercase tracking-widest text-on-surface">Community Echo</h3>
+      <div className="space-y-3 pl-2">
+        <h3 className="text-sm font-black uppercase tracking-widest text-on-surface">Comments</h3>
         {comments.length === 0 ? (
-          <div className="text-xs text-on-surface-variant uppercase tracking-widest">No approved comments yet.</div>
+          <div className="text-xs text-on-surface-variant uppercase tracking-widest">No comments.</div>
         ) : (
           <div className="space-y-4">
             {comments.map((c) => (
@@ -106,14 +108,14 @@ const StoryInteractions = ({ storyId, initialLikes = 0, initialComments = [], is
           </div>
         )}
       </div>
-
-      <form onSubmit={handleComment} className="space-y-2">
+ 
+      <form onSubmit={handleComment} className="space-y-2 pl-2">
         <h4 className="text-[10px] font-black uppercase tracking-widest text-on-surface-variant">Add Comment</h4>
         <textarea
           value={commentText}
           onChange={(e) => setCommentText(e.target.value)}
           className="w-full min-h-[80px] bg-surface-container-low border border-outline-variant rounded-xl p-3 text-on-surface text-xs focus:outline-none focus:border-primary"
-          placeholder="Share your thoughts… (comments are reviewed before publishing)"
+          placeholder="Share your thoughts…"
         />
         <div className="flex items-center justify-between gap-4 mt-2">
           <div className="flex items-center gap-4">
