@@ -433,25 +433,29 @@ exports.getStats = async (req, res, next) => {
     ]);
 
     // Generate chart data based on range
-    const chartData = [];
+    const promises = [];
     for (let i = days - 1; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const startOfDay = new Date(date.setHours(0, 0, 0, 0));
       const endOfDay = new Date(date.setHours(23, 59, 59, 999));
       
-      const count = await ReadingProgress.countDocuments({
-        updatedAt: { $gte: startOfDay, $lte: endOfDay }
-      });
-      
-      chartData.push({
-        date: startOfDay.toISOString(),
-        name: days > 7 
-          ? date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
-          : date.toLocaleDateString('en-US', { weekday: 'short', month: 'short' }),
-        count
-      });
+      promises.push(
+        ReadingProgress.countDocuments({
+          updatedAt: { $gte: startOfDay, $lte: endOfDay }
+        }).then(count => {
+          return {
+            date: startOfDay.toISOString(),
+            name: days > 7 
+              ? date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+              : date.toLocaleDateString('en-US', { weekday: 'short', month: 'short' }),
+            count
+          };
+        })
+      );
     }
+
+    const chartData = await Promise.all(promises);
 
     return formatResponse(res, 200, 'Dashboard analytics synchronized', {
       totalStories,
