@@ -192,3 +192,29 @@ exports.refineStory = async (req, res, next) => {
     next(error);
   }
 };
+exports.addBookmark = async (req, res, next) => {
+  try {
+    const result = await storyService.toggleBookmark(req.user._id, req.params.id);
+    return formatResponse(res, 200, result.message, result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.getMyBookmarks = async (req, res, next) => {
+  try {
+    const stories = await storyService.getMyBookmarks(req.user._id);
+    return formatResponse(res, 200, 'Bookmarks fetched', stories);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.checkBookmark = async (req, res, next) => {
+  try {
+    const isBookmarked = await storyService.isStoryBookmarked(req.user._id, req.params.id);
+    return formatResponse(res, 200, 'Status fetched', { isBookmarked });
+  } catch (error) {
+    next(error);
+  }
+};

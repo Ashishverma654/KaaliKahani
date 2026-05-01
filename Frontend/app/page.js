@@ -1,6 +1,8 @@
 import React, { Suspense } from 'react';
 import Link from 'next/link';
-import api from '@/utils/api';
+import HeroCard from '@/components/HeroCard';
+import StoryCard from '@/components/StoryCard';
+import { getText, getSlug, getCoverImage, CATEGORY_LABELS } from '@/utils/story';
 
 // This is a Server Component by default in Next.js App Router
 async function getStories(category) {
@@ -27,37 +29,6 @@ async function getFeaturedStory() {
     return null;
   }
 }
-
-const getText = (value) => {
-  if (!value) return '';
-  if (typeof value === 'string') return value;
-  return value.en || value.hi || '';
-};
-
-const getSlug = (value) => {
-  if (!value) return '';
-  if (typeof value === 'string') return value;
-  return value.en || value.hi || '';
-};
-
-import { resolveImageUrl } from '@/utils/image';
-
-const getCoverImage = (story) => {
-  const url = story?.coverImage 
-    ? resolveImageUrl(story.coverImage) 
-    : (Array.isArray(story?.images) && story.images.length > 0) 
-      ? resolveImageUrl(story.images[0]) 
-      : '';
-  return url;
-};
-
-const CATEGORY_LABELS = {
-  'real-horror': 'Real Horror',
-  'paranormal': 'Paranormal',
-  'haunted-places': 'Haunted Places',
-  'urban-legends': 'Urban Legends',
-  'general-horror': 'General Horror'
-};
 
 export default async function HomePage({ searchParams }) {
   const params = await searchParams;
@@ -107,46 +78,9 @@ export default async function HomePage({ searchParams }) {
       <div className="max-w-[1300px] mx-auto px-4 sm:px-6 w-full">
         {/* Hero Section */}
         {featuredStory ? (
-          <div className="mt-8 relative w-full h-[70vh] min-h-[500px] rounded-[32px] overflow-hidden border border-outline-variant shadow-2xl shadow-black/80 group bg-black">
-            {/* Blurred Background Layer */}
-            <img 
-              alt=""
-              className="absolute inset-0 w-full h-full object-cover opacity-30 blur-2xl scale-110"
-              src={getCoverImage(featuredStory) || "https://images.unsplash.com/photo-1505322022379-7c3353ee6291?q=80&w=2000&auto=format&fit=crop"}
-            />
-            {/* Main Visible Image */}
-            <img 
-              alt={featuredStory.title}
-              className="relative w-full h-full object-contain transition-transform duration-700 group-hover:scale-[1.02]" 
-              src={getCoverImage(featuredStory) || "https://images.unsplash.com/photo-1505322022379-7c3353ee6291?q=80&w=2000&auto=format&fit=crop"} 
-              style={{ filter: "contrast(1.1) brightness(0.9)" }} 
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80"></div>
-            <div className="absolute bottom-0 left-0 w-full p-8 md:p-14">
-              <div className="flex items-center gap-3 mb-4">
-                <span className="bg-primary text-on-primary-container px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase rounded flex items-center shadow-sm">
-                  {CATEGORY_LABELS[featuredStory.category] || featuredStory.category || "HORROR"}
-                </span>
-                <span className="text-white/70 text-xs font-bold tracking-widest uppercase drop-shadow-md">{featuredStory.views || 0} reads</span>
-              </div>
-              <h1 className="text-4xl md:text-6xl font-black text-white drop-shadow-[0_4px_12px_rgba(0,0,0,0.8)] leading-none max-w-3xl mb-4">
-                {getText(featuredStory.title)}
-              </h1>
-              <p className="text-white/80 max-w-xl text-sm md:text-base leading-relaxed mb-8 drop-shadow-md font-medium line-clamp-2">
-                {getText(featuredStory.content)}
-              </p>
-              <div className="flex items-center gap-3">
-                <Link href={`/detail/${getSlug(featuredStory.slug)}`} className="bg-primary border border-outline-variant text-on-primary-container px-8 py-3 rounded-lg font-bold text-xs uppercase tracking-widest hover:brightness-110 transition-all shadow-lg">
-                  Read Story
-                </Link>
-                <button className="w-11 h-11 bg-surface-container-low/80 backdrop-blur-md text-on-surface border border-outline-variant rounded-lg flex items-center justify-center hover:bg-surface-container transition-colors shadow">
-                  <span className="material-symbols-outlined text-sm">bookmark</span>
-                </button>
-              </div>
-            </div>
-          </div>
+          <HeroCard story={featuredStory} />
         ) : (
-          <div className="mt-8 relative w-full h-[60vh] min-h-[500px] rounded-[32px] overflow-hidden border border-outline-variant shadow-2xl flex items-center justify-center bg-surface-container">
+          <div className="mt-8 relative w-full h-[70vh] min-h-[500px] rounded-[32px] overflow-hidden border border-outline-variant shadow-2xl flex items-center justify-center bg-surface-container">
              <span className="text-on-surface-variant text-xs font-bold tracking-widest uppercase">No verified stories published yet.</span>
           </div>
         )}
@@ -189,18 +123,7 @@ export default async function HomePage({ searchParams }) {
             <h2 className="text-4xl font-black text-on-surface mb-8 tracking-wide drop-shadow-sm transition-colors duration-300">Recent Stories</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {listStories.length > 0 ? listStories.map((story) => (
-                <Link key={story._id} href={`/detail/${getSlug(story.slug)}`} className="gothic-frame p-3 group bg-surface-container-low/60 backdrop-blur-3xl rounded-3xl border border-outline-variant/10 hover:bg-surface-container transition-all duration-300 shadow-xl overflow-hidden flex flex-col h-full">
-                  <div className="relative aspect-[16/9] w-full overflow-hidden mb-4 border border-outline-variant shadow-sm rounded-2xl">
-                    <img src={getCoverImage(story) || "https://images.unsplash.com/photo-1518005020951-eccb494ad742?q=80&w=800&auto=format&fit=crop"} className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 brightness-75 group-hover:brightness-100" alt={getText(story.title)}/>
-                    <span className="absolute top-3 left-3 bg-surface-container-low/80 backdrop-blur text-on-surface border border-outline-variant/50 text-[8px] font-bold tracking-widest uppercase px-2 py-0.5 rounded shadow">{CATEGORY_LABELS[story.category] || story.category || "STORY"}</span>
-                  </div>
-                  <h3 className="text-2xl font-bold text-on-surface mb-2 leading-tight group-hover:text-primary transition-colors">{getText(story.title)}</h3>
-                  <p className="text-xs text-on-surface-variant line-clamp-2 leading-relaxed mb-4">{getText(story.content)}</p>
-                  <div className="mt-auto flex items-center justify-between text-[9px] text-on-surface-variant font-bold uppercase tracking-widest border-t border-outline-variant/10 pt-3 transition-colors">
-                     <span className="flex items-center gap-2">{story.views || 0} VIEWS</span>
-                     <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[10px]">favorite</span> {story.likesCount || 0}</span>
-                  </div>
-                </Link>
+                <StoryCard key={story._id} story={story} />
               )) : (
                 <div className="col-span-full py-10 text-center text-on-surface-variant text-sm font-bold tracking-[0.2em] uppercase bg-surface-container-low/40 backdrop-blur-xl rounded-3xl border border-outline-variant/10">
                    No stories found

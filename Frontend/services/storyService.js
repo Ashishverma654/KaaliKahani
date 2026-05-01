@@ -11,6 +11,11 @@ const storyService = {
     return response.data.data;
   },
 
+  getMyBookmarks: async () => {
+    const response = await api.get('/stories/bookmarks');
+    return response.data.data;
+  },
+
   getMyDrafts: async () => {
     try {
       const response = await api.get('/stories/drafts');
@@ -57,6 +62,16 @@ const storyService = {
 
   likeStory: async (id) => {
     const response = await api.post(`/stories/${id}/like`);
+    return response.data.data;
+  },
+  
+  bookmarkStory: async (id) => {
+    const response = await api.post(`/stories/${id}/bookmark`);
+    return response.data.data;
+  },
+
+  checkBookmarkStatus: async (id) => {
+    const response = await api.get(`/stories/${id}/bookmark`);
     return response.data.data;
   },
 

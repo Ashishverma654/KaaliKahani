@@ -13,6 +13,7 @@ router.get('/search', storyController.searchStories);
 router.get('/', storyController.getStories);
 router.get('/me', protect, storyController.getMyStories);
 router.get('/drafts', protect, storyController.getMyDrafts);
+router.get('/bookmarks', protect, storyController.getMyBookmarks);
 router.get('/draft/:id', protect, storyController.getDraftById);
 router.get('/:slug', storyController.getStoryBySlug);
 
@@ -39,6 +40,8 @@ router.post('/analyze', protect, storyController.analyzeStory);
 router.post('/refine', protect, storyController.refineStory);
 
 router.post('/:id/like', protect, interactionLimiter, storyController.addLike);
+router.post('/:id/bookmark', protect, interactionLimiter, storyController.addBookmark);
+router.get('/:id/bookmark', protect, storyController.checkBookmark);
 
 router.post(
   '/:id/comment',

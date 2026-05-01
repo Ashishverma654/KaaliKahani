@@ -1,6 +1,7 @@
 const Story = require('../models/Story');
 const Like = require('../models/Like');
 const Comment = require('../models/Comment');
+const Bookmark = require('../models/Bookmark');
 const generateSlug = require('../utils/slugify');
 const calculateReadTime = require('../utils/readTime');
 const geminiService = require('./geminiService');
@@ -284,4 +285,33 @@ exports.getMyStories = async (userId) => {
     .lean();
     
   return stories;
+};
+
+exports.toggleBookmark = async (userId, storyId) => {
+  const story = await Story.findById(storyId);
+  if (!story) throw new Error('Story not found');
+
+  const existingBookmark = await Bookmark.findOne({ userId, storyId });
+  
+  if (existingBookmark) {
+    await Bookmark.deleteOne({ _id: existingBookmark._id });
+    return { message: 'Story removed from bookmarks', action: 'removed' };
+  } else {
+    await Bookmark.create({ userId, storyId });
+    return { message: 'Story saved to bookmarks', action: 'saved' };
+  }
+};
+
+exports.getMyBookmarks = async (userId) => {
+  const bookmarks = await Bookmark.find({ userId }).populate({
+    path: 'storyId',
+    populate: { path: 'author', select: 'name avatar' }
+  }).lean();
+  
+  return bookmarks.map(b => b.storyId).filter(s => s !== null);
+};
+
+exports.isStoryBookmarked = async (userId, storyId) => {
+  const exists = await Bookmark.exists({ userId, storyId });
+  return !!exists;
 };

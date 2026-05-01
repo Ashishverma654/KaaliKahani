@@ -13,6 +13,7 @@ export default function UserProfile() {
    const router = useRouter();
    const [stories, setStories] = useState([]);
    const [drafts, setDrafts] = useState([]);
+   const [bookmarks, setBookmarks] = useState([]);
    const [loading, setLoading] = useState(true);
    const [authChecked, setAuthChecked] = useState(false);
    const [activeTab, setActiveTab] = useState('stories'); // 'stories' | 'profile' | 'security'
@@ -62,6 +63,8 @@ export default function UserProfile() {
             setStories(data || []);
             const draftData = await storyService.getMyDrafts();
             setDrafts(draftData || []);
+            const bookmarkData = await storyService.getMyBookmarks();
+            setBookmarks(bookmarkData || []);
          } catch (error) {
             console.error('Failed to fetch stories:', error);
          } finally {
@@ -243,6 +246,14 @@ export default function UserProfile() {
                            Profile Details
                         </button>
                         <button
+                           onClick={() => setActiveTab('bookmarks')}
+                           className={`flex items-center gap-4 px-5 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all ${activeTab === 'bookmarks' ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' : 'text-on-surface-variant hover:bg-surface-container'
+                              }`}
+                        >
+                           <span className="material-symbols-outlined text-sm">bookmark</span>
+                           My Bookmarks
+                        </button>
+                        <button
                            onClick={() => setActiveTab('security')}
                            className={`flex items-center gap-4 px-5 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all ${activeTab === 'security' ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' : 'text-on-surface-variant hover:bg-surface-container'
                               }`}
@@ -401,6 +412,46 @@ export default function UserProfile() {
                            )}
                         </div>
                      </>
+                  )}
+
+                  {activeTab === 'bookmarks' && (
+                     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <div className="flex items-center justify-between border-b border-outline-variant/10 pb-6">
+                           <div>
+                              <h2 className="text-2xl font-black font-display uppercase tracking-widest text-on-surface mb-1">My Bookmarks</h2>
+                              <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.4em] opacity-60">Your collection of saved stories</p>
+                           </div>
+                        </div>
+
+                        {bookmarks.length > 0 ? (
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                              {bookmarks.map((story) => (
+                                 <Link key={story._id} href={`/detail/${story.slug?.en || story.slug}`} className="gothic-frame p-4 group bg-surface-container-low/60 backdrop-blur-3xl rounded-3xl border border-outline-variant/10 hover:bg-surface-container transition-all duration-300 shadow-xl overflow-hidden flex flex-col h-full">
+                                    <h3 className="text-xl font-bold text-on-surface mb-2 leading-tight group-hover:text-primary transition-colors">{typeof story.title === 'string' ? story.title : story.title?.en}</h3>
+                                    <div className="mt-auto flex items-center justify-between text-[9px] text-on-surface-variant font-bold uppercase tracking-widest border-t border-outline-variant/10 pt-3">
+                                       <span className="flex items-center gap-2">{story.views || 0} VIEWS</span>
+                                       <button 
+                                         onClick={async (e) => {
+                                           e.preventDefault();
+                                           e.stopPropagation();
+                                           await storyService.bookmarkStory(story._id);
+                                           setBookmarks(prev => prev.filter(b => b._id !== story._id));
+                                           toast.success('Removed from bookmarks');
+                                         }}
+                                         className="text-primary hover:text-red-500 transition-colors"
+                                       >
+                                         Remove
+                                       </button>
+                                    </div>
+                                 </Link>
+                              ))}
+                           </div>
+                        ) : (
+                           <div className="bg-surface-container-low rounded-[3rem] p-16 text-center text-on-surface-variant text-sm font-bold tracking-[0.2em] uppercase border border-outline-variant/10">
+                              No bookmarks yet
+                           </div>
+                        )}
+                     </div>
                   )}
 
                   {activeTab === 'profile' && (
