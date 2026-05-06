@@ -246,9 +246,9 @@ function SubmitStoryContent() {
       <main className="max-w-4xl mx-auto px-6 pt-8 pb-24">
         {/* Header Section */}
         <header className="mb-8 text-center">
-          <h1 className="text-5xl md:text-6xl font-black font-display tracking-tighter text-on-surface mb-6">Craft Your Narrative</h1>
+          <h1 className="text-5xl md:text-6xl font-black font-display tracking-tighter text-on-surface mb-6">Narrate Your Experience</h1>
           <p className="text-on-surface-variant text-lg max-w-xl mx-auto leading-relaxed">
-            Share your unique perspective with the community. Every great story begins with a single word.
+            Share your unique experience with the world. Every great story begins with a single word.
           </p>
         </header>
 

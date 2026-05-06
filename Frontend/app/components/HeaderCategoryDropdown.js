@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function HeaderCategoryDropdown() {
+export default function HeaderCategoryDropdown({ mobile, closeMenu }) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
   const router = useRouter();
@@ -24,18 +24,45 @@ export default function HeaderCategoryDropdown() {
         setIsOpen(false);
       }
     };
-    document.addEventListener('mousedown', handleClickOutside);
+    if (!mobile) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [mobile]);
 
   const handleCategorySelect = (category) => {
     setIsOpen(false);
+    if (closeMenu) closeMenu();
     if (category === 'All') {
       router.push('/');
     } else {
       router.push(`/?category=${encodeURIComponent(category)}`);
     }
   };
+
+  if (mobile) {
+    return (
+      <div className="flex flex-col gap-2 w-full">
+        <button 
+          onClick={() => handleCategorySelect('All')}
+          className="w-full text-left py-2 text-on-surface hover:text-primary transition-colors text-xs"
+        >
+          Categories: All Stories
+        </button>
+        {categories.map((cat) => (
+          <button 
+            key={cat.value}
+            onClick={() => handleCategorySelect(cat.value)}
+            className={`w-full text-left py-2 pl-4 text-xs transition-colors ${
+              currentCategory === cat.value ? 'text-primary' : 'text-on-surface-variant hover:text-on-surface'
+            }`}
+          >
+            - {cat.label}
+          </button>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="relative" ref={dropdownRef}>

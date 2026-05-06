@@ -5,7 +5,7 @@ import StoryProgressTracker from '@/components/StoryProgressTracker';
 
 async function getStory(slug, lang) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/stories/${slug}?lang=${lang || 'en'}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000/api'}/stories/${slug}?lang=${lang || 'en'}`, {
       cache: 'no-store'
     });
     const data = await res.json();
@@ -92,7 +92,7 @@ export default async function StoryDetail({ params, searchParams }) {
               {CATEGORY_LABELS[story.category] || story.category || "STORY"}
             </span>
           </div>
-          <h1 className="text-4xl md:text-6xl font-black leading-tight text-on-surface max-w-5xl">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black leading-tight text-on-surface max-w-5xl">
             {getText(story.title, lang)}
           </h1>
           <div className="flex items-center gap-4 text-on-surface-variant font-bold tracking-[0.2em] uppercase mt-2">
@@ -110,7 +110,7 @@ export default async function StoryDetail({ params, searchParams }) {
       {/* Main Content Area */}
       <div className="w-full px-6 md:px-12 lg:px-24 pt-0 pb-8">
         <div className="space-y-8 font-sans drop-shadow-md pb-8">
-          <div className="text-xl md:text-2xl leading-[1.8] text-on-surface-variant whitespace-pre-wrap text-justify">
+          <div className="text-lg md:text-xl lg:text-2xl leading-[1.8] text-on-surface-variant whitespace-pre-wrap text-justify">
             {getText(story.content, lang)}
           </div>
 

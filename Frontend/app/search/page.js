@@ -9,7 +9,7 @@ const getText = (value) => {
 
 async function searchStories(query) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/stories/search?query=${encodeURIComponent(query)}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000/api'}/stories/search?query=${encodeURIComponent(query)}`, {
       cache: 'no-store'
     });
     const data = await res.json();

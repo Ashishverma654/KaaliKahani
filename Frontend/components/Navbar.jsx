@@ -16,7 +16,13 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
   const userMenuRef = useRef(null);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setShowMobileMenu(false);
+  }, [pathname]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -44,9 +50,17 @@ const Navbar = () => {
 
   return (
     <nav className={`fixed top-0 w-full z-50 transition-all duration-700 ${isAuthPage ? 'bg-transparent border-transparent' : 'bg-surface/90 backdrop-blur-md border-b border-outline-variant'}`}>
-      <div className="flex justify-between items-center px-6 md:px-12 h-16 max-w-[1440px] mx-auto">
-        <div className="flex items-center gap-8 md:gap-12">
-          <Link href="/" className="text-3xl font-gothic text-primary tracking-wider drop-shadow-sm">
+      <div className="flex justify-between items-center px-4 md:px-12 h-16 max-w-[1440px] mx-auto">
+        <div className="flex items-center gap-2 md:gap-12">
+          {/* Mobile Menu Toggle */}
+          <button 
+            className="md:hidden text-on-surface hover:text-primary transition-colors flex items-center justify-center w-10 h-10 -ml-2"
+            onClick={() => setShowMobileMenu(!showMobileMenu)}
+          >
+            <span className="material-symbols-outlined text-2xl">{showMobileMenu ? 'close' : 'menu'}</span>
+          </button>
+
+          <Link href="/" className="text-xl sm:text-2xl md:text-3xl font-gothic text-primary tracking-normal sm:tracking-wider drop-shadow-sm">
             KaaliKahani
           </Link>
           <div className="hidden md:flex items-center gap-6 font-sans text-xs font-black tracking-widest uppercase">
@@ -76,7 +90,7 @@ const Navbar = () => {
             </div>
           )}
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 md:gap-4">
               <ThemeToggle />
               {isLoggedIn ? (
                 <div className="flex items-center gap-5">
@@ -142,14 +156,61 @@ const Navbar = () => {
               ) : (
                 <Link 
                   href="/login" 
-                  className="bg-surface-container text-on-surface border border-outline-variant/30 px-4 py-1.5 rounded-full font-black text-[10px] uppercase tracking-[0.3em] hover:bg-primary hover:text-white transition-all shadow-2xl backdrop-blur-xl flex items-center h-8"
+                  className="bg-surface-container text-on-surface border border-outline-variant/30 px-4 md:px-5 py-1.5 rounded-full font-black text-[10px] uppercase tracking-[0.2em] md:tracking-[0.3em] hover:bg-primary hover:text-white transition-all shadow-2xl backdrop-blur-xl flex items-center justify-center h-8 whitespace-nowrap"
                 >
-                  Login / Sign Up
+                  <span className="md:hidden">Login</span>
+                  <span className="hidden md:block">Login / Sign Up</span>
                 </Link>
               )}
             </div>
         </div>
       </div>
+
+      {/* Mobile Menu Drawer */}
+      {showMobileMenu && (
+        <div className="md:hidden absolute top-16 left-0 w-full bg-surface/95 backdrop-blur-xl border-b border-outline-variant shadow-2xl animate-in slide-in-from-top-2 duration-300">
+          <div className="p-6 flex flex-col gap-6">
+            {!isAuthPage && (
+              <div className="flex items-center bg-surface-container px-4 py-3 rounded-2xl border border-outline-variant transition-colors duration-300">
+                <span className="material-symbols-outlined text-on-surface-variant text-lg mr-3">search</span>
+                <input 
+                  className="bg-transparent border-none focus:outline-none text-sm w-full placeholder:text-on-surface-variant flex items-center h-full outline-none text-on-surface" 
+                  placeholder="Search stories..." 
+                  type="text" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && searchQuery.trim()) {
+                      setShowMobileMenu(false);
+                      router.push(`/search?query=${encodeURIComponent(searchQuery.trim())}`);
+                    }
+                  }}
+                />
+              </div>
+            )}
+            
+            <div className="flex flex-col gap-4 font-sans text-xs font-black tracking-widest uppercase border-t border-outline-variant/30 pt-6">
+               <Link href="/" className="text-on-surface hover:text-primary transition-colors py-2" onClick={() => setShowMobileMenu(false)}>Home</Link>
+               <Suspense fallback={<div className="text-[10px] opacity-50 py-2">Loading...</div>}>
+                 <HeaderCategoryDropdown mobile={true} closeMenu={() => setShowMobileMenu(false)} />
+               </Suspense>
+            </div>
+            
+            {isLoggedIn && (
+              <div className="border-t border-outline-variant/30 pt-6 mt-2">
+                <Link 
+                  href="/submit" 
+                  onClick={() => setShowMobileMenu(false)}
+                  className="w-full bg-primary text-on-primary-container px-4 py-3 rounded-xl font-black text-xs uppercase tracking-[0.2em] hover:bg-primary/90 transition-all flex items-center justify-center gap-2 shadow-lg"
+                >
+                  <span className="material-symbols-outlined text-sm">edit_document</span>
+                  Write New Story
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

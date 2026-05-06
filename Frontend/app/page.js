@@ -7,7 +7,7 @@ import { getText, getSlug, getCoverImage, CATEGORY_LABELS } from '@/utils/story'
 // This is a Server Component by default in Next.js App Router
 async function getStories(category) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/stories${category ? `?category=${encodeURIComponent(category)}` : ''}`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000/api'}/stories${category ? `?category=${encodeURIComponent(category)}` : ''}`, {
       cache: 'no-store' // Ensure we get fresh stories on every request
     });
     const data = await res.json();
@@ -20,7 +20,7 @@ async function getStories(category) {
 
 async function getFeaturedStory() {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/stories/featured`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000/api'}/stories/featured`, {
       cache: 'no-store'
     });
     const data = await res.json();
@@ -134,7 +134,7 @@ export default async function HomePage({ searchParams }) {
 
           {/* Trending & Stats Row */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="gothic-frame p-8 bg-surface-container-low/60 backdrop-blur-2xl rounded-3xl border border-outline-variant/10 shadow-2xl">
+            <div className="gothic-frame p-6 md:p-8 bg-surface-container-low/60 backdrop-blur-2xl rounded-3xl border border-outline-variant/10 shadow-2xl">
               <h3 className="text-xl font-black text-on-surface mb-6 tracking-wide border-b border-outline-variant/10 pb-4 uppercase text-[11px] tracking-[0.5em]">Trending Now</h3>
               <div className="grid grid-cols-1">
                 {trendingStories.length > 0 ? trendingStories.map((story, idx) => (
@@ -152,7 +152,7 @@ export default async function HomePage({ searchParams }) {
             </div>
 
             <div className="flex flex-col">
-              <div className="gothic-frame p-8 bg-surface-container-low/60 backdrop-blur-2xl rounded-3xl border border-outline-variant/10 shadow-2xl space-y-6 h-full">
+              <div className="gothic-frame p-6 md:p-8 bg-surface-container-low/60 backdrop-blur-2xl rounded-3xl border border-outline-variant/10 shadow-2xl space-y-6 h-full">
                 <h3 className="text-[11px] font-black uppercase tracking-[0.5em] text-on-surface-variant border-b border-outline-variant/10 pb-4">Live Stats</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-4">

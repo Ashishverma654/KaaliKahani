@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-let baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
-if (baseUrl && !baseUrl.endsWith('/api') && baseUrl !== 'http://localhost:5000') {
+let baseUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000/api';
+if (baseUrl && !baseUrl.endsWith('/api') && baseUrl !== 'http://127.0.0.1:5000') {
   baseUrl = baseUrl.replace(/\/$/, '') + '/api';
 }
 
