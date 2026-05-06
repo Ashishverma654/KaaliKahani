@@ -1,87 +1,120 @@
 # KaaliKahani - Professional Multilingual Narrative Platform
 
-KaaliKahani is an industrial-grade storytelling platform designed for high-end narratives. It features a sophisticated "Editorial Noir" aesthetic, bilingual support (English/Hindi), and a decoupled architecture that separates the Public Platform from the Administrative Backend.
+KaaliKahani is an industrial-grade, full-stack storytelling platform designed for high-end narratives. It features a sophisticated "Editorial Noir" aesthetic, bilingual support (English/Hindi), and a decoupled architecture that separates the Public Platform from the Administrative Backend.
 
 ---
 
-## 🏛 System Architecture (For AI & Developers)
+## ✨ Key Features
+
+- **📖 "Editorial Noir" Aesthetic**: A fully responsive, premium user interface built with TailwindCSS, featuring glassmorphism, dynamic grids, and dark/light modes.
+- **🤖 AI Writing Assistant**: Integrated with the Gemini API to help authors refine, expand, and structure their story drafts directly within the submission flow.
+- **🖼️ Seamless Image Hosting**: Native integration with Cloudinary for lightning-fast cover image and inline story image uploads.
+- **🔖 Persistent Bookmarking System**: Logged-in users can save stories to their "Reading List," complete with visual feedback and backend persistence.
+- **🔍 Regex Fuzzy Search**: A powerful, typo-tolerant search engine capable of finding stories across multiple languages and categories instantly.
+- **📊 Real-time Reading Progress**: Advanced reading trackers and live views/likes counters to boost community engagement.
+- **🌐 Bilingual Support**: Full support for both English and Hindi narratives with integrated translation pathways.
+
+---
+
+## 🛠 Tech Stack
+
+- **Frontend**: Next.js (App Router), React, TailwindCSS, Axios
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB (Mongoose ORM)
+- **Authentication**: JWT (JSON Web Tokens) with dual Access/Refresh token architecture
+- **Cloud Storage**: Cloudinary
+- **AI Integration**: Google Gemini AI
+
+---
+
+## 🏛 System Architecture
 
 This project follows a **Decoupled Admin Pattern**. The repository contains the Public Frontend and the Shared Backend.
 
-- **Public Frontend**: strictly for authors (submission) and readers (consumption).
-- **Shared Backend**: A unified Node.js/Express API that serves both the Public Site and the **Standalone Admin Dashboard** (hosted in a separate repository).
-- **Administrative Layer**: All administrative actions are located under the `/api/admin` namespace and are protected by `adminOnly` middleware.
+- **Public Frontend**: Designed strictly for authors (submission) and readers (consumption).
+- **Shared Backend**: A unified Node.js/Express API that serves both the Public Site and the Standalone Admin Dashboard.
+- **Administrative Layer**: All administrative actions are heavily secured under the `/api/admin` namespace and protected by strict Role-Based Access Control (RBAC).
 
 ---
 
-## 🔐 Security & Access Control
+## 🚀 Getting Started
 
-The system uses **JWT-based authentication** (Dual-token: Access + Refresh). 
-- **Admin Verification**: The backend verifies `user.role === 'admin'`.
-- **RBAC**: Any request to `/api/admin/*` must include a valid Admin JWT.
-- **Session Safety**: Administrative actions like "Self-Deactivation" are blocked at the controller level for safety.
+Follow these steps to run the KaaliKahani platform on your local machine.
+
+### Prerequisites
+- Node.js (v18 or higher recommended)
+- MongoDB Database (Local or Atlas)
+- Cloudinary Account
+- Google Gemini API Key
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/yourusername/KaaliKahani.git
+cd KaaliKahani
+```
+
+### 2. Backend Setup
+Navigate to the backend directory and install dependencies:
+```bash
+cd Backend
+npm install
+```
+
+Create a `.env` file in the `/Backend` directory with the following variables:
+```env
+PORT=5000
+NODE_ENV=development
+FRONTEND_URL=http://localhost:3000
+
+# MongoDB Connection
+MONGO_URI=your_mongodb_connection_string
+
+# JWT Secrets (Generate secure random strings)
+JWT_SECRET=your_jwt_secret
+REFRESH_SECRET=your_refresh_secret
+JWT_EXPIRE=1d
+
+# Cloudinary Setup
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+
+# Gemini API Integration
+GEMINI_API_KEY=your_gemini_api_key
+```
+
+Start the backend development server:
+```bash
+npm run dev
+```
+
+### 3. Frontend Setup
+Open a new terminal, navigate to the frontend directory, and install dependencies:
+```bash
+cd Frontend
+npm install
+```
+
+Create a `.env.local` file in the `/Frontend` directory:
+```env
+NEXT_PUBLIC_API_URL=http://127.0.0.1:5000/api
+```
+
+Start the frontend development server:
+```bash
+npm run dev
+```
+
+The website will be live at `http://localhost:3000`.
 
 ---
 
-## 📡 Administrative API Specification (Dashboard Sync)
+## 🔐 Security Information
 
-The following endpoints are optimized for the **KaaliKahani-Admin** project:
-
-### 1. Analytics & Overview
-- **`GET /api/admin/stats`**
-    - **Purpose**: Populates dashboard cards and charts.
-    - **Response**: 
-      - `totalStories`: Integer
-      - `pendingStories`: Integer
-      - `activeUsers`: Integer
-      - `totalComments`: Integer
-      - `chartData`: Array of last 7 days (e.g., `{ name: 'Mon', count: 5 }`).
-
-### 2. Story Moderation Queue
-- **`GET /api/admin/stories`**
-    - **Purpose**: Lists all narratives for review.
-    - **Data**: Populates `author` field with `name`, `email`, and `avatar`. Sorted by Newest.
-- **`PATCH /api/admin/stories/:id/status`**
-    - **Purpose**: Approve or Reject a story.
-    - **Payload**: `{ "status": "approved" | "rejected" | "pending" }`.
-    - **Sync Logic**: Setting a story to `approved` automatically sets `isPublished: true` and updates `approvedAt`.
-
-### 3. User Management
-- **`GET /api/admin/users`**
-    - **Purpose**: Full registry of platform users.
-- **`PATCH /api/admin/users/:id/toggle-status`**
-    - **Purpose**: Ban or Unban a user.
-    - **Sync Logic**: Toggles the `isActive` boolean. Users with `isActive: false` are blocked from logging into either platform.
+- **Environment Variables**: Sensitive data is strictly ignored via `.gitignore` and must be provided via local environment variables.
+- **Cross-Origin Resource Sharing (CORS)**: The API restricts requests to whitelisted frontend domains.
+- **Route Protection**: Next.js route handlers and Express middleware ensure unauthorized users cannot access restricted submission or administrative dashboards.
 
 ---
 
-## 🔄 Data Synchronization Protocol
-
-When building the Admin Panel, ensure the following logic is maintained:
-
-| Entity | State | Effect on Public Platform |
-| :--- | :--- | :--- |
-| **Story** | `pending` | Hidden from public. Appears only in Author's Profile. |
-| **Story** | `approved` | Visible on Home Page and Category lists. `isPublished` becomes `true`. |
-| **Story** | `rejected` | Hidden from public. Marked as rejected in Author's Profile. |
-| **User** | `role: admin` | Grants access to the Admin Dashboard API. |
-| **User** | `isActive: false` | User is immediately logged out and cannot re-authenticate. |
-
----
-
-## 🛠 Integration Checklist for Admin-AI
-If you are the AI building the **KaaliKahani-Admin** project, use this list to verify your sync:
-- [ ] **Auth Check**: Do I call `/api/auth/me` and verify `role === 'admin'` before showing the dashboard?
-- [ ] **Status Mapping**: Do my "Approve" buttons send the exact string `"approved"` to `/api/admin/stories/:id/status`?
-- [ ] **Analytics Sync**: Does my Dashboard chart correctly map the `chartData` array from `/api/admin/stats`?
-- [ ] **Error Handling**: Do I show the `message` returned by the backend's `formatResponse` utility on 403/401 errors?
-
----
-
-## 🚀 Deployment & Environment
-- **Backend**: `npm run dev` in `/Backend`.
-- **Frontend**: `npm run dev` in `/Frontend`.
-- **Environment**: Ensure `MONGO_URI` and `JWT_SECRET` are shared between the Backend and any environment connecting to it.
-
----
-*Version 2.2.0 - Decoupled Admin Integration Edition*
+*Version 2.3.0 - The Complete Experience Update*
