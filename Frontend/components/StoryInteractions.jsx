@@ -1,18 +1,30 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import storyService from '@/services/storyService';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 
 const StoryInteractions = ({ storyId, initialLikes = 0, initialComments = [], initialCommentsCount = 0, isLoggedIn = false, children }) => {
-  const { isLoggedIn: authLoggedIn } = useAuth();
+  const { isLoggedIn: authLoggedIn, isSettled } = useAuth();
   const [likesCount, setLikesCount] = useState(initialLikes);
   const [hasLiked, setHasLiked] = useState(false);
   const [comments, setComments] = useState(initialComments);
   const [commentText, setCommentText] = useState('');
   const [isLiking, setIsLiking] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  useEffect(() => {
+    const fetchLikeStatus = async () => {
+      if ((authLoggedIn || isLoggedIn) && storyId) {
+        try {
+          const data = await storyService.checkLikeStatus(storyId);
+          setHasLiked(data.isLiked);
+        } catch (error) {}
+      }
+    };
+    if (isSettled) fetchLikeStatus();
+  }, [authLoggedIn, isLoggedIn, isSettled, storyId]);
 
   const canInteract = authLoggedIn || isLoggedIn;
 

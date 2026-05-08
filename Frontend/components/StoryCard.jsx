@@ -10,6 +10,7 @@ import { toast } from 'react-hot-toast';
 export default function StoryCard({ story }) {
   const { isLoggedIn, isSettled } = useAuth();
   const [isSaved, setIsSaved] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -18,6 +19,10 @@ export default function StoryCard({ story }) {
         try {
           const data = await storyService.checkBookmarkStatus(story._id);
           setIsSaved(data.isBookmarked);
+        } catch (error) {}
+        try {
+          const likeData = await storyService.checkLikeStatus(story._id);
+          setIsLiked(likeData.isLiked);
         } catch (error) {}
       }
     };
@@ -80,7 +85,15 @@ export default function StoryCard({ story }) {
       
       <div className="mt-auto flex items-center justify-between text-[9px] text-on-surface-variant font-bold uppercase tracking-widest border-t border-outline-variant/10 pt-3 transition-colors">
          <span className="flex items-center gap-2">{story.views || 0} VIEWS</span>
-         <span className="flex items-center gap-1"><span className="material-symbols-outlined text-[10px]">favorite</span> {story.likesCount || 0}</span>
+         <span className="flex items-center gap-1">
+           <span 
+             className={`material-symbols-outlined text-[10px] ${isLiked ? 'text-red-600' : ''}`}
+             style={isLiked ? { fontVariationSettings: "'FILL' 1" } : {}}
+           >
+             favorite
+           </span> 
+           {story.likesCount || 0}
+         </span>
       </div>
     </Link>
   );

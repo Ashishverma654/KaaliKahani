@@ -315,3 +315,8 @@ exports.isStoryBookmarked = async (userId, storyId) => {
   const exists = await Bookmark.exists({ userId, storyId });
   return !!exists;
 };
+
+exports.isStoryLiked = async (userId, storyId) => {
+  const exists = await Like.exists({ userId, storyId });
+  return !!exists;
+};

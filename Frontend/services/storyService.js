@@ -75,6 +75,11 @@ const storyService = {
     return response.data.data;
   },
 
+  checkLikeStatus: async (id) => {
+    const response = await api.get(`/stories/${id}/like`);
+    return response.data.data;
+  },
+
   addComment: async (id, content) => {
     const response = await api.post(`/stories/${id}/comment`, { content });
     return response.data.data;

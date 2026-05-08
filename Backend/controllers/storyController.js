@@ -218,3 +218,12 @@ exports.checkBookmark = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.checkLike = async (req, res, next) => {
+  try {
+    const isLiked = await storyService.isStoryLiked(req.user._id, req.params.id);
+    return formatResponse(res, 200, 'Like status fetched', { isLiked });
+  } catch (error) {
+    next(error);
+  }
+};

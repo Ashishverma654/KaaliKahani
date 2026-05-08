@@ -40,6 +40,7 @@ router.post('/analyze', protect, storyController.analyzeStory);
 router.post('/refine', protect, storyController.refineStory);
 
 router.post('/:id/like', protect, interactionLimiter, storyController.addLike);
+router.get('/:id/like', protect, storyController.checkLike);
 router.post('/:id/bookmark', protect, interactionLimiter, storyController.addBookmark);
 router.get('/:id/bookmark', protect, storyController.checkBookmark);
 
