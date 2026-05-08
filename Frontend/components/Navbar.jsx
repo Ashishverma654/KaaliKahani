@@ -63,11 +63,7 @@ const Navbar = () => {
           <Link href="/" className="text-xl sm:text-2xl md:text-3xl font-gothic text-primary tracking-normal sm:tracking-wider drop-shadow-sm">
             KaaliKahani
           </Link>
-          <div className="hidden md:flex items-center gap-6 font-sans text-xs font-black tracking-widest uppercase">
-            <Suspense fallback={<div className="text-[10px] font-bold tracking-widest uppercase opacity-50">Loading...</div>}>
-              <HeaderCategoryDropdown />
-            </Suspense>
-          </div>
+          {/* Removed Category Dropdown as per user request */}
         </div>
         
         {/* Search Bar & Actions */}
@@ -191,9 +187,7 @@ const Navbar = () => {
             
             <div className="flex flex-col gap-4 font-sans text-xs font-black tracking-widest uppercase border-t border-outline-variant/30 pt-6">
                <Link href="/" className="text-on-surface hover:text-primary transition-colors py-2" onClick={() => setShowMobileMenu(false)}>Home</Link>
-               <Suspense fallback={<div className="text-[10px] opacity-50 py-2">Loading...</div>}>
-                 <HeaderCategoryDropdown mobile={true} closeMenu={() => setShowMobileMenu(false)} />
-               </Suspense>
+               {/* Mobile Categories Removed */}
             </div>
             
             {isLoggedIn && (

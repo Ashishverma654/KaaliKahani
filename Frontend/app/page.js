@@ -85,37 +85,7 @@ export default async function HomePage({ searchParams }) {
           </div>
         )}
 
-        {/* Categories Tabs */}
-        <div className="flex items-center gap-3 overflow-x-auto py-10 scrollbar-hide">
-          <Link 
-            href="/"
-            className={`px-6 py-2.5 text-[9px] font-black tracking-[0.3em] uppercase rounded-full border transition-all shadow-lg ${
-              !category 
-                ? 'bg-primary text-white border-primary/30' 
-                : 'bg-surface-container text-on-surface border-outline-variant/50 hover:border-primary/40 hover:text-primary'
-            }`}
-          >
-            All Stories
-          </Link>
-          {[
-            { label: 'Real Horror', value: 'real-horror' },
-            { label: 'Paranormal', value: 'paranormal' },
-            { label: 'Haunted Places', value: 'haunted-places' },
-            { label: 'Urban Legends', value: 'urban-legends' }
-          ].map((cat) => (
-            <Link 
-              key={cat.value}
-              href={`/?category=${encodeURIComponent(cat.value)}`}
-              className={`px-6 py-2.5 text-[9px] font-black tracking-[0.3em] uppercase rounded-full border whitespace-nowrap transition-all shadow-lg ${
-                category === cat.value 
-                  ? 'bg-primary text-white border-primary/30' 
-                  : 'bg-surface-container text-on-surface border-outline-variant/50 hover:border-primary/40 hover:text-primary'
-              }`}
-            >
-              {cat.label}
-            </Link>
-          ))}
-        </div>
+        {/* Removed Categories Tabs as per user request */}
 
         {/* Main Content Flow */}
         <div className="flex flex-col gap-16 pb-24">

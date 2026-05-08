@@ -61,9 +61,7 @@ export default function StoryCard({ story }) {
           className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 brightness-75 group-hover:brightness-100" 
           alt={getText(story.title)}
         />
-        <span className="absolute top-3 left-3 bg-surface-container-low/80 backdrop-blur text-on-surface border border-outline-variant/50 text-[8px] font-bold tracking-widest uppercase px-2 py-0.5 rounded shadow">
-          {CATEGORY_LABELS[story.category] || story.category || "STORY"}
-        </span>
+        {/* Category Badge Removed */}
         
         {isLoggedIn && (
           <button 

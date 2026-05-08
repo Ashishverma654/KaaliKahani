@@ -74,9 +74,6 @@ export default function HeroCard({ story }) {
       
       <div className="absolute bottom-0 left-0 w-full p-6 md:p-14">
         <div className="flex items-center gap-3 mb-4">
-          <span className="bg-primary text-on-primary-container px-2 py-0.5 text-[10px] font-bold tracking-widest uppercase rounded flex items-center shadow-sm">
-            {CATEGORY_LABELS[story.category] || story.category || "HORROR"}
-          </span>
           <span className="text-white/70 text-xs font-bold tracking-widest uppercase drop-shadow-md">{story.views || 0} reads</span>
         </div>
         
