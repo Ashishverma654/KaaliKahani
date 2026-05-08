@@ -40,6 +40,8 @@ exports.createStory = async (req, res, next) => {
       targetSlug = `${targetSlug}-${Math.random().toString(36).substr(2, 5)}`;
     }
 
+    const finalStatus = status === 'published' ? 'approved' : (status || 'draft');
+
     const story = await Story.create({
       title: typeof title === 'object' ? title : { [language]: title },
       content: typeof content === 'object' ? content : { [language]: content },
@@ -48,10 +50,10 @@ exports.createStory = async (req, res, next) => {
       category: category || 'general-horror',
       tags: tags || [],
       coverImage,
-      status: status || 'draft',
+      status: finalStatus,
       author: req.user._id,
       language: [language],
-      isPublished: status === 'published' || status === 'approved',
+      isPublished: finalStatus === 'approved',
       seriesId: seriesId || null,
       seriesOrder: seriesOrder || 1
     });
