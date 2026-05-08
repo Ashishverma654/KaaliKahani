@@ -86,6 +86,8 @@ export default async function HomePage({ searchParams }) {
         )}
 
         {/* Removed Categories Tabs as per user request */}
+        <div className="h-8 md:h-12" /> 
+
 
         {/* Main Content Flow */}
         <div className="flex flex-col gap-16 pb-24">
