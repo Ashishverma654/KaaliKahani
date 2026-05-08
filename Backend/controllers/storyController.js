@@ -227,3 +227,12 @@ exports.checkLike = async (req, res, next) => {
     next(error);
   }
 };
+
+exports.getMyLikedStories = async (req, res, next) => {
+  try {
+    const stories = await storyService.getMyLikedStories(req.user._id);
+    return formatResponse(res, 200, 'Liked stories fetched', stories);
+  } catch (error) {
+    next(error);
+  }
+};

@@ -14,6 +14,7 @@ export default function UserProfile() {
    const [stories, setStories] = useState([]);
    const [drafts, setDrafts] = useState([]);
    const [bookmarks, setBookmarks] = useState([]);
+   const [likedStories, setLikedStories] = useState([]);
    const [loading, setLoading] = useState(true);
    const [authChecked, setAuthChecked] = useState(false);
    const [activeTab, setActiveTab] = useState('stories'); // 'stories' | 'profile' | 'security'
@@ -65,6 +66,8 @@ export default function UserProfile() {
             setDrafts(draftData || []);
             const bookmarkData = await storyService.getMyBookmarks();
             setBookmarks(bookmarkData || []);
+            const likedData = await storyService.getMyLikedStories();
+            setLikedStories(likedData || []);
          } catch (error) {
             console.error('Failed to fetch stories:', error);
          } finally {
@@ -175,7 +178,7 @@ export default function UserProfile() {
       <ProtectedRoute>
          <main className="min-h-screen bg-surface selection:bg-primary/20 transition-all duration-700">
             {/* Cinematic Hero Section */}
-            <div className="relative h-[45vh] w-full overflow-hidden">
+            <div className="relative h-[38vh] w-full overflow-hidden">
                {/* Deep Tonal Gradient Background */}
                <div className="absolute inset-0 bg-gradient-to-b from-primary-container/20 to-surface"></div>
                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_#131313_100%)] opacity-80"></div>
@@ -252,6 +255,14 @@ export default function UserProfile() {
                         >
                            <span className="material-symbols-outlined text-sm">bookmark</span>
                            My Bookmarks
+                        </button>
+                        <button
+                           onClick={() => setActiveTab('liked')}
+                           className={`flex items-center gap-4 px-5 py-4 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] transition-all ${activeTab === 'liked' ? 'bg-primary text-on-primary shadow-lg shadow-primary/20' : 'text-on-surface-variant hover:bg-surface-container'
+                              }`}
+                        >
+                           <span className="material-symbols-outlined text-sm">favorite</span>
+                           Liked Stories
                         </button>
                         <button
                            onClick={() => setActiveTab('security')}
@@ -416,32 +427,62 @@ export default function UserProfile() {
 
                   {activeTab === 'bookmarks' && (
                      <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                        <div className="flex items-center justify-between border-b border-outline-variant/10 pb-6">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-outline-variant/10 pb-8 gap-4">
                            <div>
-                              <h2 className="text-2xl font-black font-display uppercase tracking-widest text-on-surface mb-1">My Bookmarks</h2>
-                              <p className="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.4em] opacity-60">Your collection of saved stories</p>
+                              <p className="text-primary text-[10px] font-black uppercase tracking-[0.5em] mb-3">Saved Archive</p>
+                              <h2 className="text-4xl md:text-5xl font-black font-display uppercase tracking-tighter text-on-surface">My Bookmarks</h2>
+                           </div>
+                           <div className="bg-surface-container-high/50 px-5 py-2 rounded-2xl border border-outline-variant/10 backdrop-blur-md">
+                              <p className="text-[9px] font-black text-on-surface-variant uppercase tracking-widest flex items-center gap-2">
+                                 <span className="w-1.5 h-1.5 rounded-full bg-primary"></span>
+                                 {bookmarks.length} {bookmarks.length === 1 ? 'Story' : 'Stories'} Saved
+                              </p>
                            </div>
                         </div>
 
                         {bookmarks.length > 0 ? (
                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                               {bookmarks.map((story) => (
-                                 <Link key={story._id} href={`/detail/${story.slug?.en || story.slug}`} className="gothic-frame p-4 group bg-surface-container-low/60 backdrop-blur-3xl rounded-3xl border border-outline-variant/10 hover:bg-surface-container transition-all duration-300 shadow-xl overflow-hidden flex flex-col h-full">
-                                    <h3 className="text-xl font-bold text-on-surface mb-2 leading-tight group-hover:text-primary transition-colors">{typeof story.title === 'string' ? story.title : story.title?.en}</h3>
-                                    <div className="mt-auto flex items-center justify-between text-[9px] text-on-surface-variant font-bold uppercase tracking-widest border-t border-outline-variant/10 pt-3">
-                                       <span className="flex items-center gap-2">{story.views || 0} VIEWS</span>
-                                       <button 
-                                         onClick={async (e) => {
-                                           e.preventDefault();
-                                           e.stopPropagation();
-                                           await storyService.bookmarkStory(story._id);
-                                           setBookmarks(prev => prev.filter(b => b._id !== story._id));
-                                           toast.success('Removed from bookmarks');
-                                         }}
-                                         className="text-primary hover:text-red-500 transition-colors"
-                                       >
-                                         Remove
-                                       </button>
+                                 <Link 
+                                    key={story._id} 
+                                    href={`/detail/${story.slug?.en || story.slug}`} 
+                                    className="group relative overflow-hidden bg-surface-container-low/40 backdrop-blur-3xl rounded-[2rem] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 shadow-2xl flex flex-col h-full"
+                                 >
+                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                                    
+                                    <div className="p-8 relative z-10 flex flex-col h-full">
+                                       <div className="flex justify-between items-start mb-4">
+                                          <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                                             {story.category || 'General'}
+                                          </span>
+                                          <button 
+                                            onClick={async (e) => {
+                                              e.preventDefault();
+                                              e.stopPropagation();
+                                              await storyService.bookmarkStory(story._id);
+                                              setBookmarks(prev => prev.filter(b => b._id !== story._id));
+                                              toast.success('Removed from bookmarks');
+                                            }}
+                                            className="w-10 h-10 rounded-full bg-surface-container-high/50 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all group/btn shadow-inner"
+                                            title="Remove Bookmark"
+                                          >
+                                            <span className="material-symbols-outlined text-sm group-hover/btn:scale-110 transition-transform">bookmark_remove</span>
+                                          </button>
+                                       </div>
+
+                                       <h3 className="text-xl md:text-2xl font-black font-display text-on-surface mb-3 leading-tight group-hover:text-primary transition-colors duration-300">
+                                          {typeof story.title === 'string' ? story.title : story.title?.en}
+                                       </h3>
+
+                                       <div className="mt-auto pt-6 border-t border-outline-variant/10 flex items-center justify-between">
+                                          <div className="flex items-center gap-4">
+                                             <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-on-surface-variant">
+                                                <span className="material-symbols-outlined text-[14px]">visibility</span>
+                                                {story.views || 0} VIEWS
+                                             </span>
+                                          </div>
+                                          <span className="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">arrow_forward</span>
+                                       </div>
                                     </div>
                                  </Link>
                               ))}
@@ -449,6 +490,87 @@ export default function UserProfile() {
                         ) : (
                            <div className="bg-surface-container-low rounded-[3rem] p-16 text-center text-on-surface-variant text-sm font-bold tracking-[0.2em] uppercase border border-outline-variant/10">
                               No bookmarks yet
+                           </div>
+                        )}
+                     </div>
+                  )}
+
+                  {activeTab === 'liked' && (
+                     <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                        <div className="flex flex-col md:flex-row md:items-end justify-between border-b border-outline-variant/10 pb-8 gap-4">
+                           <div>
+                              <p className="text-primary text-[10px] font-black uppercase tracking-[0.5em] mb-3">Your Gallery</p>
+                              <h2 className="text-4xl md:text-5xl font-black font-display uppercase tracking-tighter text-on-surface">Liked Stories</h2>
+                           </div>
+                           <div className="bg-surface-container-high/50 px-5 py-2 rounded-2xl border border-outline-variant/10 backdrop-blur-md">
+                              <p className="text-[9px] font-black text-on-surface-variant uppercase tracking-widest flex items-center gap-2">
+                                 <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+                                 {likedStories.length} {likedStories.length === 1 ? 'Story' : 'Stories'} Appreciated
+                              </p>
+                           </div>
+                        </div>
+
+                        {likedStories.length > 0 ? (
+                           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                              {likedStories.map((story) => (
+                                 <Link 
+                                    key={story._id} 
+                                    href={`/detail/${story.slug?.en || story.slug}`} 
+                                    className="group relative overflow-hidden bg-surface-container-low/40 backdrop-blur-3xl rounded-[2rem] border border-outline-variant/10 hover:border-primary/30 transition-all duration-500 shadow-2xl flex flex-col h-full"
+                                 >
+                                    {/* Subtle Gradient Overlay */}
+                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+                                    
+                                    <div className="p-8 relative z-10 flex flex-col h-full">
+                                       <div className="flex justify-between items-start mb-4">
+                                          <span className="text-[8px] font-black uppercase tracking-[0.3em] text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                                             {story.category || 'General'}
+                                          </span>
+                                          <button 
+                                            onClick={async (e) => {
+                                              e.preventDefault();
+                                              e.stopPropagation();
+                                              await storyService.likeStory(story._id);
+                                              setLikedStories(prev => prev.filter(l => l._id !== story._id));
+                                              toast.success('Removed from liked stories');
+                                            }}
+                                            className="w-10 h-10 rounded-full bg-red-500/10 flex items-center justify-center text-red-500 hover:bg-red-500 hover:text-white transition-all group/btn shadow-inner border border-red-500/20"
+                                            title="Unlike"
+                                          >
+                                            <span className="material-symbols-outlined text-sm group-hover/btn:scale-110 transition-transform" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                                          </button>
+                                       </div>
+
+                                       <h3 className="text-xl md:text-2xl font-black font-display text-on-surface mb-3 leading-tight group-hover:text-primary transition-colors duration-300">
+                                          {typeof story.title === 'string' ? story.title : story.title?.en}
+                                       </h3>
+
+                                       <p className="text-[10px] font-bold text-on-surface-variant/60 uppercase tracking-widest mb-6 flex items-center gap-2">
+                                          <span className="material-symbols-outlined text-xs">person</span>
+                                          {story.author?.name || 'Unknown Author'}
+                                       </p>
+
+                                       <div className="mt-auto pt-6 border-t border-outline-variant/10 flex items-center justify-between">
+                                          <div className="flex items-center gap-4">
+                                             <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-on-surface-variant">
+                                                <span className="material-symbols-outlined text-[14px] text-red-500" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                                                {story.likesCount || 0} {story.likesCount === 1 ? 'LIKE' : 'LIKES'}
+                                             </span>
+                                             <span className="w-1 h-1 rounded-full bg-outline-variant opacity-30"></span>
+                                             <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-on-surface-variant">
+                                                <span className="material-symbols-outlined text-[14px]">visibility</span>
+                                                {story.views || 0}
+                                             </span>
+                                          </div>
+                                          <span className="material-symbols-outlined text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300">arrow_forward</span>
+                                       </div>
+                                    </div>
+                                 </Link>
+                              ))}
+                           </div>
+                        ) : (
+                           <div className="bg-surface-container-low rounded-[3rem] p-16 text-center text-on-surface-variant text-sm font-bold tracking-[0.2em] uppercase border border-outline-variant/10">
+                              No liked stories yet
                            </div>
                         )}
                      </div>

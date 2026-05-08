@@ -320,3 +320,12 @@ exports.isStoryLiked = async (userId, storyId) => {
   const exists = await Like.exists({ userId, storyId });
   return !!exists;
 };
+
+exports.getMyLikedStories = async (userId) => {
+  const likes = await Like.find({ userId }).populate({
+    path: 'storyId',
+    populate: { path: 'author', select: 'name avatar' }
+  }).lean();
+  
+  return likes.map(l => l.storyId).filter(s => s !== null);
+};

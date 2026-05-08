@@ -278,7 +278,7 @@ function SubmitStoryContent() {
 
           {/* Media Upload Section map */}
           <section>
-            <label className="text-on-surface-variant font-display font-bold text-sm tracking-widest uppercase mb-6 block">02. Visual Atmosphere</label>
+            <label className="text-on-surface-variant font-display font-bold text-sm tracking-widest uppercase mb-6 block">02. Add Image</label>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[300px]">
                {renderUploadBlock(0, true)}
                <div className="hidden md:flex flex-col gap-4">
@@ -290,7 +290,7 @@ function SubmitStoryContent() {
 
           {/* Series Section */}
           <section>
-            <label className="text-on-surface-variant font-display font-bold text-sm tracking-widest uppercase mb-6 block">02B. Series (Optional)</label>
+            <label className="text-on-surface-variant font-display font-bold text-sm tracking-widest uppercase mb-6 block">03. Series (Optional)</label>
             <div className="space-y-4">
               <select
                 value={seriesId}
@@ -343,7 +343,7 @@ function SubmitStoryContent() {
 
           {/* Category Chips */}
           <section>
-            <label className="text-on-surface-variant font-display font-bold text-sm tracking-widest uppercase mb-6 block">03. Contextual Filing</label>
+            <label className="text-on-surface-variant font-display font-bold text-sm tracking-widest uppercase mb-6 block">04. Choose a Category</label>
             <div className="flex flex-wrap gap-3">
               {[
                 { label: 'Real Horror', value: 'real-horror' },
@@ -369,7 +369,9 @@ function SubmitStoryContent() {
           </section>
 
           {/* Rich Text Editor Placeholder */}
-          <section className="bg-surface-container-low rounded-2xl overflow-hidden border border-outline-variant relative">
+          <section className="space-y-6">
+            <label className="text-on-surface-variant font-display font-bold text-sm tracking-widest uppercase block">05. The Narrative</label>
+            <div className="bg-surface-container-low rounded-2xl overflow-hidden border border-outline-variant relative">
             <div className="px-6 h-12 border-b border-outline-variant flex items-center justify-between gap-4 bg-black">
               <div className="flex items-center gap-4">
                 <button type="button" className="material-symbols-outlined text-white/60 hover:text-primary text-sm transition-colors">format_bold</button>
@@ -379,19 +381,21 @@ function SubmitStoryContent() {
                 <button type="button" className="material-symbols-outlined text-white/60 hover:text-primary text-sm transition-colors">link</button>
               </div>
               
-              <button 
-                type="button" 
-                onClick={handleAIAnalyze}
-                className={`relative flex items-center gap-2 group transition-all px-4 py-1 rounded-lg ${isAnalyzing ? 'animate-pulse' : ''}`}
-              >
-                <span className={`material-symbols-outlined text-sm ${isAnalyzing ? 'text-primary animate-spin' : 'text-white/60 group-hover:text-primary'}`}>
-                  {isAnalyzing ? 'sync' : 'auto_fix'}
-                </span>
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 group-hover:text-white transition-colors">
-                  {isAnalyzing ? 'Analyzing Story...' : 'AI Analysis'}
-                </span>
-                <div className="absolute inset-0 bg-primary/5 rounded-lg filter blur-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
-              </button>
+              {user?.role === 'admin' && (
+                <button 
+                  type="button" 
+                  onClick={handleAIAnalyze}
+                  className={`relative flex items-center gap-2 group transition-all px-4 py-1 rounded-lg ${isAnalyzing ? 'animate-pulse' : ''}`}
+                >
+                  <span className={`material-symbols-outlined text-sm ${isAnalyzing ? 'text-primary animate-spin' : 'text-white/60 group-hover:text-primary'}`}>
+                    {isAnalyzing ? 'sync' : 'auto_fix'}
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-white/60 group-hover:text-white transition-colors">
+                    {isAnalyzing ? 'Analyzing Story...' : 'AI Analysis'}
+                  </span>
+                  <div className="absolute inset-0 bg-primary/5 rounded-lg filter blur-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none"></div>
+                </button>
+              )}
             </div>
             <textarea 
               className="w-full bg-transparent border-0 focus:outline-none p-8 text-on-surface text-lg leading-relaxed placeholder:text-surface-bright resize-none min-h-[300px]" 
@@ -401,6 +405,7 @@ function SubmitStoryContent() {
               onChange={(e) => setFormData({...formData, content: e.target.value})}
               required
             ></textarea>
+            </div>
           </section>
 
           {/* AI Suggestions Panel */}

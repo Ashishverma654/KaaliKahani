@@ -14,6 +14,7 @@ router.get('/', storyController.getStories);
 router.get('/me', protect, storyController.getMyStories);
 router.get('/drafts', protect, storyController.getMyDrafts);
 router.get('/bookmarks', protect, storyController.getMyBookmarks);
+router.get('/liked', protect, storyController.getMyLikedStories);
 router.get('/draft/:id', protect, storyController.getDraftById);
 router.get('/:slug', storyController.getStoryBySlug);
 

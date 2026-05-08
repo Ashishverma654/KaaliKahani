@@ -15,6 +15,11 @@ const storyService = {
     const response = await api.get('/stories/bookmarks');
     return response.data.data;
   },
+  
+  getMyLikedStories: async () => {
+    const response = await api.get('/stories/liked');
+    return response.data.data;
+  },
 
   getMyDrafts: async () => {
     try {
