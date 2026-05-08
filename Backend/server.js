@@ -3,10 +3,9 @@ const app = require('./app');
 const connectDB = require('./config/db');
 const keepAlive = require('./utils/keepAlive');
 
-// Start Keep-Alive if running on Render
-if (process.env.RENDER_EXTERNAL_URL) {
-  keepAlive(process.env.RENDER_EXTERNAL_URL);
-}
+// Start Keep-Alive to prevent Render free tier from sleeping
+const pingUrl = process.env.RENDER_EXTERNAL_URL || 'https://kaalikahani.onrender.com';
+keepAlive(pingUrl);
 
 // Execute Mongo Atlas Connection
 connectDB().then(async () => {
