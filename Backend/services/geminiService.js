@@ -11,9 +11,48 @@ class GeminiService {
     this.model = null;
     if (!this.disabled) {
       this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      this.model = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
-      this.fallbackModel = this.genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      this.model = this.genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+      this.fallbackModel = this.genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     }
+  }
+
+  /**
+   * Private helper to execute Gemini requests with retry and fallback logic
+   */
+  async _callWithRetry(prompt) {
+    const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+    let lastError;
+    let result;
+
+    // Try primary model with 2 retries on 503
+    for (let i = 0; i < 2; i++) {
+      try {
+        result = await this.model.generateContent(prompt);
+        lastError = null;
+        break;
+      } catch (err) {
+        lastError = err;
+        if (err.message.includes('503')) {
+          console.warn(`Primary model 503 error, retrying in 2s... (Attempt ${i + 1}/2)`);
+          await sleep(2000);
+        } else {
+          break;
+        }
+      }
+    }
+
+    // Fallback if primary failed definitively
+    if (lastError) {
+      console.warn(`Primary model failed definitively (${lastError.message}), trying fallback model...`);
+      if (!this.fallbackModel) throw lastError;
+      result = await this.fallbackModel.generateContent(prompt);
+    }
+
+    const response = await result.response;
+    if (!response.candidates || response.candidates.length === 0) {
+      throw new Error("Gemini returned no candidates (blocked content).");
+    }
+    return response.text().trim();
   }
 
   /**
@@ -67,16 +106,7 @@ class GeminiService {
     `;
 
     try {
-      let result;
-      try {
-        result = await this.model.generateContent(prompt);
-      } catch (primaryErr) {
-        console.warn(`Primary model failed (${primaryErr.message}), falling back to Pro model...`);
-        if (!this.fallbackModel) throw primaryErr;
-        result = await this.fallbackModel.generateContent(prompt);
-      }
-      const response = await result.response;
-      const text = response.text();
+      const text = await this._callWithRetry(prompt);
       
       // Extract JSON if AI surrounds it with markdown blocks
       const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -87,7 +117,7 @@ class GeminiService {
       return JSON.parse(text);
     } catch (error) {
       console.error("Gemini Analysis Failure:", error.message);
-      return null;
+      throw error;
     }
   }
 
@@ -104,38 +134,19 @@ class GeminiService {
 
     const prompt = `
       You are an elite horror editorial AI. 
-      Redesign the following story based on the instruction.
+      Your task is to rewrite the story provided below following the user's instruction.
       
       STORY: "${content}"
       INSTRUCTION: "${userPrompt}"
       
-      Output ONLY the new story content.
+      CRITICAL: Output ONLY the raw story text. Do not include any introductory text, labels, or conversational filler.
     `;
 
     try {
-      console.log("Sending request to Gemini API..."); // DEBUG LOG
-      let result;
-      try {
-        result = await this.model.generateContent(prompt);
-      } catch (primaryErr) {
-        console.warn(`Primary model failed (${primaryErr.message}), falling back to Pro model...`);
-        if (!this.fallbackModel) throw primaryErr;
-        result = await this.fallbackModel.generateContent(prompt);
-      }
-      
-      const response = await result.response;
-      
-      if (!response.candidates || response.candidates.length === 0) {
-        console.warn("Gemini returned no candidates (blocked content).");
-        return "The AI blocked this request due to safety policies.";
-      }
-
-      const text = response.text().trim();
-      console.log("Gemini response received successfully."); // DEBUG LOG
-      return text;
+      return await this._callWithRetry(prompt);
     } catch (error) {
-      console.error("CRITICAL Gemini Error:", error.message); // THIS WILL SHOW US THE ACTUAL ERROR
-      return "AI Service Error: " + error.message;
+      console.error("CRITICAL Gemini Error:", error.message);
+      throw error;
     }
   }
 }
