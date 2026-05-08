@@ -11,7 +11,8 @@ class GeminiService {
     this.model = null;
     if (!this.disabled) {
       this.genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-      this.model = this.genAI.getGenerativeModel({ model: "gemini-flash-latest" });
+      this.model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      this.fallbackModel = this.genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
     }
   }
 
@@ -66,7 +67,14 @@ class GeminiService {
     `;
 
     try {
-      const result = await this.model.generateContent(prompt);
+      let result;
+      try {
+        result = await this.model.generateContent(prompt);
+      } catch (primaryErr) {
+        console.warn(`Primary model failed (${primaryErr.message}), falling back to Pro model...`);
+        if (!this.fallbackModel) throw primaryErr;
+        result = await this.fallbackModel.generateContent(prompt);
+      }
       const response = await result.response;
       const text = response.text();
       
@@ -106,7 +114,15 @@ class GeminiService {
 
     try {
       console.log("Sending request to Gemini API..."); // DEBUG LOG
-      const result = await this.model.generateContent(prompt);
+      let result;
+      try {
+        result = await this.model.generateContent(prompt);
+      } catch (primaryErr) {
+        console.warn(`Primary model failed (${primaryErr.message}), falling back to Pro model...`);
+        if (!this.fallbackModel) throw primaryErr;
+        result = await this.fallbackModel.generateContent(prompt);
+      }
+      
       const response = await result.response;
       
       if (!response.candidates || response.candidates.length === 0) {
