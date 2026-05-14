@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
+const seriesController = require('../controllers/seriesController');
 const { protect, adminOnly } = require('../middlewares/auth');
 
 // Apply protection to all archival admin vectors map map
@@ -39,5 +40,10 @@ router.patch('/settings', adminController.updateSettings);
 
 // Global Search
 router.get('/search', adminController.globalSearch);
+
+// Series Management Routes
+router.get('/series', seriesController.getAllSeries);
+router.put('/series/:id', seriesController.updateSeries);
+router.delete('/series/:id', seriesController.deleteSeries);
 
 module.exports = router;

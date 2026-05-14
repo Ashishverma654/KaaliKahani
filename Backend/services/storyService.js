@@ -1,4 +1,5 @@
 const Story = require('../models/Story');
+const Series = require('../models/Series');
 const Like = require('../models/Like');
 const Comment = require('../models/Comment');
 const Bookmark = require('../models/Bookmark');
@@ -6,9 +7,11 @@ const generateSlug = require('../utils/slugify');
 const calculateReadTime = require('../utils/readTime');
 const geminiService = require('./geminiService');
 
-exports.submitStory = async (authorId, payload) => {
-  // Extract pure language (Defaulting map)
-  const lang = payload.language || 'en';
+exports.submitStory = async (authorId, payload, storyId = null) => {
+  // Extract pure language (Defaulting to 'en')
+  let lang = payload.language || 'en';
+  if (Array.isArray(lang)) lang = lang[0] || 'en';
+  if (typeof lang !== 'string') lang = 'en';
   const titleText = payload.title;
   const contentText = payload.content;
 
@@ -30,20 +33,58 @@ exports.submitStory = async (authorId, payload) => {
 
   const readTime = calculateReadTime(contentObj);
 
-  const newStory = await Story.create({
-    title: titleObj,
-    content: contentObj,
-    originalContent: contentObj, // immutable backup log as requested
-    slug: slugObj,
-    language: [lang],
-    images: payload.images || [],
-    seriesId: payload.seriesId || null,
-    seriesOrder: payload.seriesOrder || 1,
-    category: payload.category || 'general-horror',
-    author: authorId,
-    readTime,
-    isPublished: false
-  });
+  // SERIES CATEGORY ENFORCEMENT: If story belongs to a series, lock category to series category
+  let resolvedCategory = payload.category || 'general-horror';
+  if (payload.seriesId) {
+    const series = await Series.findById(payload.seriesId).select('category').lean();
+    if (series && series.category) {
+      resolvedCategory = series.category;
+    }
+  }
+
+  let story;
+  if (storyId) {
+    // Transition existing draft to submission
+    story = await Story.findOneAndUpdate(
+      { _id: storyId, author: authorId },
+      {
+        title: titleObj,
+        content: contentObj,
+        slug: slugObj,
+        language: [lang],
+        languages: [lang],
+        images: payload.images || [],
+        coverImage: payload.coverImage || (payload.images?.length > 0 ? payload.images[0] : null),
+        seriesId: payload.seriesId || null,
+        seriesOrder: payload.seriesOrder || 1,
+        category: resolvedCategory,
+        readTime,
+        status: 'pending',
+        isPublished: false
+      },
+      { new: true }
+    );
+    if (!story) throw new Error('Story/Draft not found or unauthorized');
+  } else {
+    // Create new submission from scratch
+    story = await Story.create({
+      title: titleObj,
+      content: contentObj,
+      originalContent: contentObj, // immutable backup log as requested
+      slug: slugObj,
+      language: [lang],
+      languages: [lang],
+      images: payload.images || [],
+      coverImage: payload.coverImage || (payload.images?.length > 0 ? payload.images[0] : null),
+      seriesId: payload.seriesId || null,
+      seriesOrder: payload.seriesOrder || 1,
+      category: resolvedCategory,
+      author: authorId,
+      readTime,
+      status: 'pending',
+      isPublished: false
+    });
+  }
 
   // Intelligence Pipeline Execution (Non-blocking)
   const aiAnalysis = async () => {
@@ -60,33 +101,36 @@ exports.submitStory = async (authorId, payload) => {
           }
         };
 
-        // Also suggest a category if the user hasn't specified one yet
-        if (!newStory.category || newStory.category === 'general-horror') {
+        if (!story.category || story.category === 'general-horror') {
           updateData.category = aiResults.suggestedCategory;
         }
 
-        await Story.findByIdAndUpdate(newStory._id, updateData);
-        console.log(`Gemini Intelligence Finalized for Story: ${newStory._id}`);
+        await Story.findByIdAndUpdate(story._id, updateData);
+        console.log(`Gemini Intelligence Finalized for Story: ${story._id}`);
       }
     } catch (error) {
-      console.warn(`Gemini Pipeline Fail for ${newStory._id}: ${error.message}`);
+      console.warn(`Gemini Pipeline Fail for ${story._id}: ${error.message}`);
     }
   };
 
   // Trigger the pipeline but do not block the user response
   aiAnalysis();
 
-  return newStory;
+  return story;
 };
 
 exports.getPublicStories = async (queryLanguage = 'en', page = 1, limit = 10, category = null) => {
   const skip = (page - 1) * limit;
 
   // Enforce Status rules explicitly and target specific language matching
+  // Support both 'language' and 'languages' field names for cross-DB compatibility
   const filter = { 
     status: 'approved',
     isPublished: true,
-    language: { $in: [queryLanguage] }
+    $or: [
+      { language: { $in: [queryLanguage] } },
+      { languages: { $in: [queryLanguage] } }
+    ]
   };
 
   if (category) {
@@ -105,13 +149,33 @@ exports.getPublicStories = async (queryLanguage = 'en', page = 1, limit = 10, ca
   return { stories, total, page, pages: Math.ceil(total / limit) };
 };
 
-exports.getStoryBySlug = async (slug, language = 'en') => {
+exports.getStoryBySlug = async (slug, language = 'en', userId = null) => {
   // Query by nested language-specific slug mapping
-  const query = { [`slug.${language}`]: slug, status: 'approved', isPublished: true };
-  
+  let query = { [`slug.${language}`]: slug, status: 'approved', isPublished: true };
+
+  if (userId) {
+     const storyCheck = await Story.findOne({ [`slug.${language}`]: slug }).select('author status isPublished');
+     if (storyCheck && (storyCheck.author.toString() === userId.toString() || storyCheck.status === 'approved')) {
+        query = { [`slug.${language}`]: slug };
+     }
+  }
+
+  let updateData = { $inc: { views: 1 } };
+  if (userId) {
+     const alreadyViewed = await Story.findOne({ ...query, viewers: userId }).select('_id');
+     if (!alreadyViewed) {
+        updateData = { 
+           $inc: { views: 1 },
+           $addToSet: { viewers: userId }
+        };
+     } else {
+        updateData = {}; // No increment if already viewed
+     }
+  }
+
   const story = await Story.findOneAndUpdate(
     query, 
-    { $inc: { views: 1 } }, // Increment view explicitly atomically
+    updateData,
     { returnDocument: 'after' }
   ).populate('author', 'name avatar').populate('seriesId', 'title description').lean();
 
@@ -171,13 +235,19 @@ exports.searchStories = async (query, language = 'en') => {
   
   const searchRegex = new RegExp(query, 'i'); // Case-insensitive fuzzy search
   
+  // Use $and to combine language check ($or) with text search ($or)
   const filter = {
     status: 'approved',
     isPublished: true,
-    language: { $in: [language] },
-    $or: [
-      { [`title.${language}`]: searchRegex },
-      { [`content.${language}`]: searchRegex }
+    $and: [
+      { $or: [
+        { language: { $in: [language] } },
+        { languages: { $in: [language] } }
+      ]},
+      { $or: [
+        { [`title.${language}`]: searchRegex },
+        { [`content.${language}`]: searchRegex }
+      ]}
     ]
   };
 
@@ -190,22 +260,36 @@ exports.searchStories = async (query, language = 'en') => {
 };
 
 exports.saveDraft = async (authorId, payload) => {
-  const lang = payload.language || 'en';
+  let lang = payload.language || 'en';
+  if (Array.isArray(lang)) lang = lang[0] || 'en';
+  if (typeof lang !== 'string') lang = 'en';
+
   const titleText = payload.title || '';
   const contentText = payload.content || '';
 
   const titleObj = { [lang]: titleText };
   const contentObj = { [lang]: contentText };
 
+  // SERIES CATEGORY ENFORCEMENT
+  let resolvedCategory = payload.category || 'general-horror';
+  if (payload.seriesId) {
+    const series = await Series.findById(payload.seriesId).select('category').lean();
+    if (series && series.category) {
+      resolvedCategory = series.category;
+    }
+  }
+
   const draft = await Story.create({
     title: titleObj,
     content: contentObj,
     originalContent: contentObj,
     language: [lang],
+    languages: [lang],
     images: payload.images || [],
+    coverImage: payload.coverImage || (payload.images?.length > 0 ? payload.images[0] : null),
     seriesId: payload.seriesId || null,
     seriesOrder: payload.seriesOrder || 1,
-    category: payload.category || 'general-horror',
+    category: resolvedCategory,
     author: authorId,
     readTime: calculateReadTime(contentObj),
     status: 'draft',
@@ -223,8 +307,21 @@ exports.updateDraft = async (authorId, draftId, payload) => {
   if (payload.title !== undefined) draft.title = { ...draft.title, [lang]: payload.title };
   if (payload.content !== undefined) draft.content = { ...draft.content, [lang]: payload.content };
   if (payload.images) draft.images = payload.images;
+  if (payload.coverImage) draft.coverImage = payload.coverImage;
+  else if (payload.images?.length > 0) draft.coverImage = payload.images[0];
   if (payload.category) draft.category = payload.category;
-  if (payload.seriesId !== undefined) draft.seriesId = payload.seriesId || null;
+  if (payload.seriesId !== undefined) {
+    draft.seriesId = payload.seriesId || null;
+  }
+  
+  // SERIES CATEGORY ENFORCEMENT
+  if (draft.seriesId) {
+    const series = await Series.findById(draft.seriesId).select('category').lean();
+    if (series && series.category) {
+      draft.category = series.category;
+    }
+  }
+
   if (payload.seriesOrder !== undefined) draft.seriesOrder = payload.seriesOrder || 1;
   draft.readTime = calculateReadTime(draft.content);
 
@@ -241,6 +338,27 @@ exports.getMyDrafts = async (authorId) => {
 exports.getDraftById = async (authorId, draftId) => {
   const draft = await Story.findOne({ _id: draftId, author: authorId, status: 'draft' }).lean();
   return draft;
+};
+
+exports.deleteStory = async (userId, storyId, isAdmin = false) => {
+  const filter = { _id: storyId };
+  if (!isAdmin) {
+    filter.author = userId;
+    // Optional: Only allow users to delete drafts or pending stories? 
+    // For now, let's allow them to delete their own stories.
+  }
+
+  const story = await Story.findOneAndDelete(filter);
+  if (!story) throw new Error('Story not found or unauthorized');
+
+  // Cleanup associated records if necessary (Like, Comment, etc.)
+  await Promise.all([
+    Like.deleteMany({ storyId }),
+    Comment.deleteMany({ storyId }),
+    Bookmark.deleteMany({ storyId })
+  ]);
+
+  return story;
 };
 
 exports.toggleLike = async (userId, storyId) => {
@@ -328,4 +446,25 @@ exports.getMyLikedStories = async (userId) => {
   }).lean();
   
   return likes.map(l => l.storyId).filter(s => s !== null);
+};
+
+exports.deleteStory = async (userId, storyId, isAdmin = false) => {
+  const story = await Story.findById(storyId);
+  if (!story) throw new Error('Story not found');
+
+  // Authorization check: Only author or admin can delete
+  if (story.author.toString() !== userId.toString() && !isAdmin) {
+    throw new Error('Not authorized to delete this story');
+  }
+
+  await Story.findByIdAndDelete(storyId);
+  
+  // Cleanup related data (likes, bookmarks, comments)
+  await Promise.all([
+    Like.deleteMany({ storyId }),
+    Bookmark.deleteMany({ storyId }),
+    Comment.deleteMany({ storyId })
+  ]);
+
+  return true;
 };

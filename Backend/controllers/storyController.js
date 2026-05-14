@@ -1,10 +1,11 @@
 const storyService = require('../services/storyService');
 const geminiService = require('../services/geminiService');
 const formatResponse = require('../utils/response');
+const jwt = require('jsonwebtoken');
 
 exports.submitStory = async (req, res, next) => {
   try {
-    const story = await storyService.submitStory(req.user._id, req.body);
+    const story = await storyService.submitStory(req.user._id, req.body, req.body.storyId);
     return formatResponse(res, 201, 'Story submitted for review successfully', story);
   } catch (error) {
     next(error);
@@ -48,7 +49,26 @@ exports.searchStories = async (req, res, next) => {
 exports.getStoryBySlug = async (req, res, next) => {
   try {
     const lang = req.query.lang || 'en';
-    const data = await storyService.getStoryBySlug(req.params.slug, lang);
+    
+    let userId = null;
+    let token = null;
+
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    } else if (req.cookies && req.cookies.accessToken) {
+      token = req.cookies.accessToken;
+    }
+
+    if (token) {
+      try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        userId = decoded.id;
+      } catch (err) {
+        // Ignore invalid token for public route
+      }
+    }
+
+    const data = await storyService.getStoryBySlug(req.params.slug, lang, userId);
     return formatResponse(res, 200, 'Story loaded successfully', data);
   } catch (error) {
     next(error);
@@ -144,8 +164,12 @@ exports.uploadImage = async (req, res, next) => {
     if (!req.file) {
       return formatResponse(res, 400, 'No file provided');
     }
+    
+    // Support multiple possible property names for the URL
+    const imageUrl = req.file.path || req.file.secure_url || req.file.url;
+    
     return formatResponse(res, 200, 'Image uploaded successfully', {
-      imageUrl: req.file.path
+      imageUrl: imageUrl
     });
   } catch (error) {
     next(error);
@@ -232,6 +256,15 @@ exports.getMyLikedStories = async (req, res, next) => {
   try {
     const stories = await storyService.getMyLikedStories(req.user._id);
     return formatResponse(res, 200, 'Liked stories fetched', stories);
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.deleteStory = async (req, res, next) => {
+  try {
+    await storyService.deleteStory(req.user._id, req.params.id, req.user.role === 'admin');
+    return formatResponse(res, 200, 'Story deleted successfully');
   } catch (error) {
     next(error);
   }

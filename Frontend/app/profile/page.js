@@ -147,6 +147,24 @@ export default function UserProfile() {
       }
    };
 
+   const handleDeleteStory = async (storyId) => {
+      if (!window.confirm('Are you sure you want to delete this story? This action cannot be undone.')) {
+         return;
+      }
+
+      try {
+         await storyService.deleteStory(storyId);
+         toast.success('Story deleted successfully');
+         // Refresh lists
+         setStories(stories.filter(s => s._id !== storyId));
+         setDrafts(drafts.filter(d => d._id !== storyId));
+         setBookmarks(bookmarks.filter(b => b._id !== storyId));
+         setLikedStories(likedStories.filter(l => l._id !== storyId));
+      } catch (error) {
+         toast.error(error.message || 'Deletion failed');
+      }
+   };
+
    const handlePasswordChange = async (e) => {
       e.preventDefault();
       if (passwordData.newPassword !== passwordData.confirmPassword) {
@@ -407,12 +425,20 @@ export default function UserProfile() {
                                              <span className="flex items-center gap-1.5"><span className="material-symbols-outlined text-[12px]">calendar_today</span> {draft.updatedAt ? new Date(draft.updatedAt).toLocaleDateString() : 'N/A'}</span>
                                           </div>
                                        </div>
-                                       <Link
-                                          href={`/submit?draftId=${draft._id}`}
-                                          className="px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all bg-surface-container-high text-on-surface hover:bg-primary hover:text-on-primary"
-                                       >
-                                          Continue Draft
-                                       </Link>
+                                       <div className="flex items-center gap-3 w-full md:w-auto">
+                                          <button
+                                             onClick={() => handleDeleteStory(draft._id)}
+                                             className="flex-1 md:flex-none px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all bg-primary/10 text-primary hover:bg-primary hover:text-white border border-primary/20"
+                                          >
+                                             Delete
+                                          </button>
+                                          <Link
+                                             href={`/submit?draftId=${draft._id}`}
+                                             className="flex-1 md:flex-none px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all bg-surface-container-high text-on-surface hover:bg-primary hover:text-on-primary text-center"
+                                          >
+                                             Continue Draft
+                                          </Link>
+                                       </div>
                                     </div>
                                  ))}
                               </div>

@@ -134,6 +134,17 @@ const Navbar = () => {
                           <span className="material-symbols-outlined text-sm group-hover:text-primary transition-colors">person</span>
                           Profile
                         </Link>
+
+                        {user?.role === 'admin' && (
+                          <Link 
+                            href="/admin" 
+                            onClick={() => setShowUserMenu(false)}
+                            className="flex items-center gap-3 px-5 py-3 text-[11px] font-black uppercase tracking-[0.2em] text-primary hover:bg-primary/5 transition-all group"
+                          >
+                            <span className="material-symbols-outlined text-sm group-hover:text-primary transition-colors">dashboard_customize</span>
+                            Admin Hub
+                          </Link>
+                        )}
                         
                         <button 
                           onClick={() => {

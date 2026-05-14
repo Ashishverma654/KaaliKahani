@@ -17,6 +17,7 @@ router.get('/bookmarks', protect, storyController.getMyBookmarks);
 router.get('/liked', protect, storyController.getMyLikedStories);
 router.get('/draft/:id', protect, storyController.getDraftById);
 router.get('/:slug', storyController.getStoryBySlug);
+router.delete('/:id', protect, storyController.deleteStory);
 
 // Protected User Routes (Implicitly blocks unauthenticated traffic map)
 router.post(
@@ -34,6 +35,7 @@ router.post(
 // Draft Routes
 router.post('/draft', protect, storyController.saveDraft);
 router.put('/draft/:id', protect, storyController.updateDraft);
+router.delete('/draft/:id', protect, storyController.deleteStory);
 
 // Advanced Archival Routes (Image Uplink & AI Sense)
 router.post('/upload', protect, upload.single('image'), storyController.uploadImage);

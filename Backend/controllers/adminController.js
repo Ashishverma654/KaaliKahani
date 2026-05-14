@@ -12,7 +12,7 @@ const generateSlug = require('../utils/slugify');
  */
 exports.getAllStories = async (req, res, next) => {
   try {
-    const stories = await Story.find()
+    const stories = await Story.find({ status: { $ne: 'draft' } })
       .populate('author', 'name email avatar')
       .sort('-createdAt');
     
@@ -27,7 +27,9 @@ exports.getAllStories = async (req, res, next) => {
  */
 exports.createStory = async (req, res, next) => {
   try {
-    const { title, content, category, tags, coverImage, status, seriesId, seriesOrder, language = 'en' } = req.body;
+    let { title, content, category, tags, coverImage, status, seriesId, seriesOrder, language = 'en' } = req.body;
+    if (Array.isArray(language)) language = language[0] || 'en';
+    if (typeof language !== 'string') language = 'en';
     
     if (!title || !content) {
       return formatResponse(res, 400, 'Title and content are required');
@@ -50,6 +52,7 @@ exports.createStory = async (req, res, next) => {
       category: category || 'general-horror',
       tags: tags || [],
       coverImage,
+      images: coverImage ? [coverImage] : [],
       status: finalStatus,
       author: req.user._id,
       language: [language],

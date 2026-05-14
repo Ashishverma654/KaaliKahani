@@ -22,6 +22,11 @@ const StorySchema = new mongoose.Schema({
     enum: ['en', 'hi'],
     default: ['en']
   }],
+  languages: [{
+    type: String,
+    enum: ['en', 'hi'],
+    default: ['en']
+  }],
   images: [{
     type: String
   }],
@@ -33,7 +38,8 @@ const StorySchema = new mongoose.Schema({
   }],
   category: {
     type: String,
-    enum: ['real-horror', 'paranormal', 'haunted-places', 'urban-legends', 'general-horror'],
+    enum: ['fantasy', 'real-story', 'fiction', 'spiritual', 'horror', 'romance', 'sci-fi', 'thriller', 'other',
+           'real-horror', 'paranormal', 'haunted-places', 'urban-legends', 'general-horror'],
     default: 'general-horror',
     index: true
   },
@@ -87,6 +93,10 @@ const StorySchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  viewers: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }],
   readTime: {
     type: Number,
     default: 1
@@ -103,6 +113,8 @@ StorySchema.index({
   'title.hi': 'text',
   'content.en': 'text',
   'content.hi': 'text'
+}, {
+  language_override: 'language_none'
 });
 
 module.exports = mongoose.model('Story', StorySchema);

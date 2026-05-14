@@ -88,6 +88,11 @@ const storyService = {
   addComment: async (id, content) => {
     const response = await api.post(`/stories/${id}/comment`, { content });
     return response.data.data;
+  },
+  
+  deleteStory: async (id) => {
+    const response = await api.delete(`/stories/${id}`);
+    return response.data.data;
   }
 };
 
